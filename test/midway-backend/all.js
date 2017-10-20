@@ -12,7 +12,7 @@ const basePath = path.resolve(__dirname + '/../../node_modules/linagora-rse');
 const tmpPath = path.resolve(__dirname + '/../..', testConfig.tmp);
 const backendPath = path.normalize(__dirname + '/../../backend');
 const host = testConfig.host;
-const MODULE_NAME = 'awesome.module.seed';
+const MODULE_NAME = 'linagora.esn.james';
 let rse;
 
 before(function(done) {
@@ -61,12 +61,6 @@ before(function(done) {
   loader.load(MODULE_NAME, done);
 });
 
-// https://github.com/mfncooper/mockery/issues/34
-before(function() {
-  require('canvas');
-  require('ursa');
-});
-
 after(function() {
   try {
     fs.unlinkSync(this.testEnv.tmp + '/default.json');
@@ -80,6 +74,10 @@ after(function() {
 beforeEach(function() {
   mockery.enable({warnOnReplace: false, warnOnUnregistered: false, useCleanCache: true});
   this.testEnv.writeDBConfigFile();
+
+  // workaround https://github.com/mfncooper/mockery/issues/34
+  mockery.registerMock('canvas', {});
+  mockery.registerMock('ursa', {});
 });
 
 afterEach(function() {
