@@ -53,7 +53,7 @@
   },
   "scripts": {
     "test": "grunt test",
-    "postinstall": "./node_modules/bower/bin/bower install --production --allow-root"
+    "postinstall": "bower install --production --allow-root"
   },
   "repository": {
     "type": "git",

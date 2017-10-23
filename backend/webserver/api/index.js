@@ -6,7 +6,7 @@ module.exports = function(dependencies, lib) {
 
   const router = express.Router();
 
-  require('./example')(dependencies, lib, router);
+  require('./token')(dependencies, lib, router);
 
   return router;
 };

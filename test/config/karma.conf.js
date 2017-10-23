@@ -16,8 +16,10 @@ module.exports = function(config) {
       'frontend/components/lodash/dist/lodash.min.js',
       'frontend/components/sinon-chai/lib/sinon-chai.js',
       'frontend/components/sinon-1.15.4/index.js',
+
+      { pattern: 'frontend/app/app.routes.js', watched: false, included: false, served: false },
+
       'test/unit-frontend/mocks/*.js',
-      'test/unit-frontend/*.js',
       'frontend/app/**/*.module.js',
       'frontend/app/**/*.js',
       'frontend/app/**/*.pug'
