@@ -6,7 +6,6 @@ const mockery = require('mockery');
 const chai = require('chai');
 const path = require('path');
 const fs = require('fs-extra');
-const mongoose = require('mongoose');
 const testConfig = require('../config/servers-conf');
 const basePath = path.resolve(__dirname + '/../../node_modules/linagora-rse');
 const tmpPath = path.resolve(__dirname + '/../..', testConfig.tmp);
@@ -16,8 +15,6 @@ const MODULE_NAME = 'linagora.esn.james';
 let rse;
 
 before(function(done) {
-  mongoose.Promise = require('q').Promise;
-
   chai.use(require('chai-shallow-deep-equal'));
   chai.use(require('sinon-chai'));
   chai.use(require('chai-as-promised'));
@@ -36,7 +33,6 @@ before(function(done) {
       fs.unlinkSync(tmpPath + '/db.json');
     },
     initCore(callback) {
-      mongoose.Promise = require('q').Promise;
       rse.core.init(() => { callback && process.nextTick(callback); });
     }
   };
@@ -48,7 +44,7 @@ before(function(done) {
 
   rse = require('linagora-rse');
   this.helpers = {};
-
+  this.testEnv.core = rse.core;
   this.testEnv.moduleManager = rse.moduleManager;
   rse.test.helpers(this.helpers, this.testEnv);
   rse.test.moduleHelpers(this.helpers, this.testEnv);

@@ -1,10 +1,10 @@
 'use strict';
 
 module.exports = {
-  jamesModule
+  general
 };
 
-function jamesModule() {
+function general() {
   return {
     domain: {
       name: 'my-domain',
