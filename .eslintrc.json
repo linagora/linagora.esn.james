@@ -2,6 +2,7 @@
   "extends": "linagora-esn",
   "rules": {
     "no-unused-vars": ["error", { "vars": "all", "args": "after-used" }],
-    "no-console": "error"
+    "no-console": "error",
+    "arrow-parens": "off"
   }
 }
