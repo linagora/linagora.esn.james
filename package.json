@@ -4,7 +4,6 @@
   "description": "The OpenPaaS module for James",
   "main": "index.js",
   "devDependencies": {
-    "canvas": "1.5.0",
     "chai": "3.5.0",
     "chai-as-promised": "5.3.0",
     "chai-shallow-deep-equal": "1.4.0",
@@ -41,15 +40,12 @@
     "linagora-rse": "github:linagora/openpaas-esn#master",
     "mocha": "3.1.2",
     "mockery": "1.7.0",
-    "mongoose": "4.7.1",
     "phantomjs-prebuilt": "2.1.12",
-    "rewire": "2.5.2",
     "sinon": "1.17.5",
     "sinon-chai": "2.8.0",
-    "socket.io": "1.2.1",
     "supertest": "2.0.0",
     "time-grunt": "1.4.0",
-    "ursa": "0.9.4"
+    "rewire": "2.5.2"
   },
   "scripts": {
     "test": "grunt test",
@@ -65,13 +61,13 @@
     "node": ">=6.5.0"
   },
   "dependencies": {
-    "async": "2.0.1",
+    "async": "2.6.0",
     "awesome-module": "1.1.0",
     "bower": "1.8.2",
     "composable-middleware": "0.3.0",
     "express": "4.14.0",
     "glob-all": "3.1.0",
-    "lodash": "4.15.0",
+    "lodash": "4.17.4",
     "q": "1.4.1"
   }
 }
