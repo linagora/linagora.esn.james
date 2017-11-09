@@ -20,6 +20,7 @@ module.exports = (dependencies) => {
 function init() {
   logger.info('Start listening on group events');
   pubsub.topic(EVENTS.GROUP_CREATED).subscribe(onGroupCreated);
+  pubsub.topic(EVENTS.GROUP_UPDATED).subscribe(onGroupUpdated);
   pubsub.topic(EVENTS.GROUP_DELETED).subscribe(onGroupDeleted);
 }
 
@@ -36,6 +37,26 @@ function onGroupCreated(event = {}) {
     })
     .catch((err) => {
       logger.error(`Error while adding members to group ${group.email}`, err);
+    });
+}
+
+function onGroupUpdated(event = {}) {
+  const { old: oldGroup, new: newGroup } = event.payload || {};
+
+  if (!oldGroup || !newGroup) { return q.reject(new Error('both old and new group are required')); }
+
+  if (oldGroup.email === newGroup.email) {
+    logger.debug('Group updated but email is not modified');
+
+    return q.resolve();
+  }
+
+  return clientModule.updateGroup(oldGroup.email, newGroup.email)
+    .then(() => {
+      logger.debug(`Changed group email from ${oldGroup.email} to ${newGroup.email}`);
+    })
+    .catch((err) => {
+      logger.error(`Error while changing group email from ${oldGroup.email} to ${newGroup.email}`, err);
     });
 }
 
