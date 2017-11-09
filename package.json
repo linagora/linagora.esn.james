@@ -67,6 +67,7 @@
     "composable-middleware": "0.3.0",
     "express": "4.14.0",
     "glob-all": "3.1.0",
+    "james-admin-client": "github:linagora/james-admin-client#v0.3.0",
     "lodash": "4.17.4",
     "q": "1.4.1"
   }

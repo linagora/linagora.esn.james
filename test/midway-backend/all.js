@@ -42,8 +42,14 @@ before(function(done) {
   rse.test.apiHelpers(this.helpers, this.testEnv);
 
   const manager = this.testEnv.moduleManager.manager;
+  const nodeModulesPath = path.normalize(
+    path.join(__dirname, '../../node_modules/')
+  );
+  const nodeModulesLoader = manager.loaders.filesystem(nodeModulesPath, true);
   const loader = manager.loaders.code(require('../../index.js'), true);
 
+  manager.appendLoader(nodeModulesLoader);
   manager.appendLoader(loader);
+
   loader.load(MODULE_NAME, done);
 });
