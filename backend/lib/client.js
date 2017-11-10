@@ -12,7 +12,8 @@ module.exports = (dependencies) => {
     addGroup,
     addGroupMembers,
     removeGroup,
-    removeGroupMembers
+    removeGroupMembers,
+    updateGroup
   };
 };
 
@@ -61,6 +62,26 @@ function removeGroup(group) {
 function removeGroupMembers(group, members) {
   return get().then(client =>
     q.all(members.map(member => client.removeGroupMember(group, member)))
+  );
+}
+
+/**
+ * Update a group address
+ * @param  {String} oldGroup - The old group email address
+ * @param  {String} newGroup - The new group email address
+ * @return {Promise}         - Resolve on success
+ */
+function updateGroup(oldGroup, newGroup) {
+  if (oldGroup === newGroup) {
+    return q.reject(new Error('nothing to update'));
+  }
+
+  return get().then(client =>
+    client.listGroupMembers(oldGroup)
+      .then(members => q.all([
+        ...members.map(member => client.addGroupMember(newGroup, member)),
+        ...members.map(member => client.removeGroupMember(oldGroup, member))
+      ]))
   );
 }
 

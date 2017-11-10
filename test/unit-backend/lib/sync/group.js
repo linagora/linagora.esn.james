@@ -61,6 +61,76 @@ describe('The lib/sync/group module', function() {
     });
   });
 
+  describe('The handler of GROUP_UPDATED event ', function() {
+    let eventHandler;
+
+    beforeEach(function() {
+      pubsubTopicMock.withArgs(EVENTS.GROUP_UPDATED).returns({
+        subscribe(handler) {
+          eventHandler = handler;
+        }
+      });
+    });
+
+    it('should reject if event payload is missing', function(done) {
+      getModule().init();
+
+      eventHandler({}).catch((err) => {
+        expect(err.message).to.equal('both old and new group are required');
+        done();
+      });
+    });
+
+    it('should reject if old group is missing', function(done) {
+      const group = { email: 'group@email.com' };
+
+      getModule().init();
+
+      eventHandler({ payload: { new: group } }).catch((err) => {
+        expect(err.message).to.equal('both old and new group are required');
+        done();
+      });
+    });
+
+    it('should reject if new group is missing', function(done) {
+      const group = { email: 'group@email.com' };
+
+      getModule().init();
+
+      eventHandler({ payload: { old: group } }).catch((err) => {
+        expect(err.message).to.equal('both old and new group are required');
+        done();
+      });
+    });
+
+    it('should update group using client', function(done) {
+      const oldGroup = { email: 'old@group.com' };
+      const newGroup = { email: 'new@group.com' };
+
+      clientMock.updateGroup = sinon.stub().returns(q.resolve());
+
+      getModule().init();
+      eventHandler({ payload: { old: oldGroup, new: newGroup } }).done(() => {
+        expect(clientMock.updateGroup).to.have.been.calledOnce;
+        expect(clientMock.updateGroup).to.have.been.calledWith(oldGroup.email, newGroup.email);
+        done();
+      });
+    });
+
+    it('should do nothing and resolve if old and new group have the same email', function(done) {
+      const oldGroup = { email: 'old@group.com' };
+      const newGroup = { email: 'old@group.com' };
+
+      clientMock.updateGroup = sinon.stub().returns(q.resolve());
+
+      getModule().init();
+      eventHandler({ payload: { old: oldGroup, new: newGroup } }).done(() => {
+        expect(clientMock.updateGroup).to.not.have.been.called;
+        done();
+      });
+    });
+  });
+
   describe('The handler of GROUP_DELETED event ', function() {
     let eventHandler;
 

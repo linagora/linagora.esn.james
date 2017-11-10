@@ -140,4 +140,61 @@ describe('The lib/client module', function() {
       });
     });
   });
+
+  describe('The updateGroup function', function() {
+    it('should fail if old and new group are the same', function(done) {
+      const oldGroup = 'old@group.com';
+      const newGroup = 'old@group.com';
+
+      getModule().updateGroup(oldGroup, newGroup).catch(err => {
+        expect(err.message).to.equal('nothing to update');
+        done();
+      });
+    });
+
+    it('should fail if it cannot get API URL', function(done) {
+      const oldGroup = 'old@group.com';
+      const newGroup = 'new@group.com';
+
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().updateGroup(oldGroup, newGroup).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      const oldGroup = 'old@group.com';
+      const newGroup = 'new@group.com';
+
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().updateGroup(oldGroup, newGroup).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should move all members from old group to the new one', function(done) {
+      const oldGroup = 'old@group.com';
+      const newGroup = 'new@group.com';
+      const members = ['member1@email.com', 'member2@email.com'];
+
+      JamesClientMock.prototype.listGroupMembers = sinon.stub().returns(q.resolve(members));
+      JamesClientMock.prototype.addGroupMember = sinon.stub().returns(q.resolve());
+      JamesClientMock.prototype.removeGroupMember = sinon.stub().returns(q.resolve());
+
+      getModule().updateGroup(oldGroup, newGroup).then(() => {
+        expect(JamesClientMock.prototype.removeGroupMember).to.have.been.calledTwice;
+        expect(JamesClientMock.prototype.removeGroupMember).to.have.been.calledWith(oldGroup, members[0]);
+        expect(JamesClientMock.prototype.removeGroupMember).to.have.been.calledWith(oldGroup, members[1]);
+
+        expect(JamesClientMock.prototype.addGroupMember).to.have.been.calledTwice;
+        expect(JamesClientMock.prototype.addGroupMember).to.have.been.calledWith(newGroup, members[0]);
+        expect(JamesClientMock.prototype.addGroupMember).to.have.been.calledWith(newGroup, members[1]);
+        done();
+      });
+    });
+  });
 });
