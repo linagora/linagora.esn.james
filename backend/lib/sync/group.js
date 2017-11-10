@@ -22,6 +22,8 @@ function init() {
   pubsub.topic(EVENTS.GROUP_CREATED).subscribe(onGroupCreated);
   pubsub.topic(EVENTS.GROUP_UPDATED).subscribe(onGroupUpdated);
   pubsub.topic(EVENTS.GROUP_DELETED).subscribe(onGroupDeleted);
+  pubsub.topic(EVENTS.GROUP_MEMBERS_ADDED).subscribe(onGroupMembersAdded);
+  pubsub.topic(EVENTS.GROUP_MEMBERS_REMOVED).subscribe(onGroupMembersRemoved);
 }
 
 function onGroupCreated(event = {}) {
@@ -71,5 +73,41 @@ function onGroupDeleted(event = {}) {
     })
     .catch((err) => {
       logger.error(`Error while removing group ${group.email}`, err);
+    });
+}
+
+function onGroupMembersAdded(event = {}) {
+  const { group, members } = event.payload;
+
+  return q.all(members.map(groupModule.resolveMember))
+    .then(members => members.map(groupModule.getMemberEmail))
+    .then(memberEmails => {
+      logger.debug(`Adding members to group ${group.email} ${memberEmails}`);
+
+      return clientModule.addGroupMembers(group.email, memberEmails);
+    })
+    .then(() => {
+      logger.debug(`Added ${members.length} member(s) to group ${group.email}`);
+    })
+    .catch((err) => {
+      logger.error(`Error while adding members to group ${group.email}`, err);
+    });
+}
+
+function onGroupMembersRemoved(event = {}) {
+  const { group, members } = event.payload;
+
+  return q.all(members.map(groupModule.resolveMember))
+    .then(members => members.map(groupModule.getMemberEmail))
+    .then(memberEmails => {
+      logger.debug(`Removing members from group ${group.email} ${memberEmails}`);
+
+      return clientModule.removeGroupMembers(group.email, memberEmails);
+    })
+    .then(() => {
+      logger.debug(`Removed ${members.length} member(s) from group ${group.email}`);
+    })
+    .catch((err) => {
+      logger.error(`Error while removing members from group ${group.email}`, err);
     });
 }
