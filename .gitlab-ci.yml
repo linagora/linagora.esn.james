@@ -13,10 +13,8 @@ test:
     - elasticsearch:2.4
     - redis:3
     - rabbitmq:3.6
-    - linagora/esn-sabre:latest
   script:
     - npm i
-    - npm update
     - bower i --allow-root
     - grunt --chunk=1 --ci
 
