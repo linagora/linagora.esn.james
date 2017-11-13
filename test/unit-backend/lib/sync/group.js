@@ -164,4 +164,72 @@ describe('The lib/sync/group module', function() {
       });
     });
   });
+
+  describe('The handler of GROUP_MEMBERS_ADDED event ', function() {
+    let eventHandler;
+
+    beforeEach(function() {
+      pubsubTopicMock.withArgs(EVENTS.GROUP_MEMBERS_ADDED).returns({
+        subscribe(handler) {
+          eventHandler = handler;
+        }
+      });
+    });
+
+    it('should add members to group using client', function(done) {
+      const group = { email: 'group@email.com' };
+      const members = ['member1@email.com', 'member2@email.com'];
+
+      clientMock.addGroupMembers = sinon.stub().returns(q.resolve());
+      groupMock.resolveMember = sinon.stub().returns(q.resolve());
+      groupMock.getMemberEmail = sinon.stub();
+      groupMock.getMemberEmail.onCall(0).returns(members[0]);
+      groupMock.getMemberEmail.onCall(1).returns(members[1]);
+
+      getModule().init();
+      eventHandler({ payload: { group, members } }).done(() => {
+        expect(groupMock.resolveMember).to.have.been.calledTwice;
+        expect(groupMock.getMemberEmail).to.have.been.calledTwice;
+
+        expect(clientMock.addGroupMembers).to.have.been.calledOnce;
+        expect(clientMock.addGroupMembers).to.have.been.calledWith(group.email, members);
+
+        done();
+      });
+    });
+  });
+
+  describe('The handler of GROUP_MEMBERS_REMOVED event ', function() {
+    let eventHandler;
+
+    beforeEach(function() {
+      pubsubTopicMock.withArgs(EVENTS.GROUP_MEMBERS_REMOVED).returns({
+        subscribe(handler) {
+          eventHandler = handler;
+        }
+      });
+    });
+
+    it('should remove members from group using client', function(done) {
+      const group = { email: 'group@email.com' };
+      const members = ['member1@email.com', 'member2@email.com'];
+
+      clientMock.removeGroupMembers = sinon.stub().returns(q.resolve());
+      groupMock.resolveMember = sinon.stub().returns(q.resolve());
+      groupMock.getMemberEmail = sinon.stub();
+      groupMock.getMemberEmail.onCall(0).returns(members[0]);
+      groupMock.getMemberEmail.onCall(1).returns(members[1]);
+
+      getModule().init();
+      eventHandler({ payload: { group, members } }).done(() => {
+        expect(groupMock.resolveMember).to.have.been.calledTwice;
+        expect(groupMock.getMemberEmail).to.have.been.calledTwice;
+
+        expect(clientMock.removeGroupMembers).to.have.been.calledOnce;
+        expect(clientMock.removeGroupMembers).to.have.been.calledWith(group.email, members);
+
+        done();
+      });
+    });
+  });
 });
