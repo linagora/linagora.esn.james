@@ -1,4 +1,5 @@
 const q = require('q');
+const { JWT_DEFAULT_SUBJECT } = require('./constants');
 
 let authJwt;
 
@@ -12,7 +13,7 @@ module.exports = (dependencies) => {
 
 function generate(user = {}) {
   const payload = {
-    sub: user.preferredEmail,
+    sub: user.preferredEmail || JWT_DEFAULT_SUBJECT,
     admin: true
   };
 
