@@ -1,3 +1,11 @@
 {
-  "Hello World" : "Chào thế giới!"
+  "Click to fix synchronization issue" : "Bấm để sửa lỗi đồng bộ",
+  "Synchronization issue": "Lỗi đồng bộ",
+  "Click Sync to fix.": "Bấm Đồng bộ để sửa.",
+  "Sync": "Đồng bộ",
+  "Cancel": "Hủy",
+  "This group data does not synchronize with mail group in James.": "Dữ liệu của nhóm này không được đồng bộ với nhóm thư trong máy chủ James.",
+  "Synchronizing group...": "Đang đồng bộ nhóm...",
+  "Group synchronized": "Đã đồng bộ nhóm",
+  "Failed to synchronize group": "Không thể đồng bộ nhóm"
 }

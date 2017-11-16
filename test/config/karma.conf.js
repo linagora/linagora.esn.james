@@ -18,6 +18,7 @@ module.exports = function(config) {
       'frontend/components/sinon-1.15.4/index.js',
 
       { pattern: 'frontend/app/app.routes.js', watched: false, included: false, served: false },
+      { pattern: 'frontend/app/app.run.js', watched: false, included: false, served: false },
 
       'test/unit-frontend/mocks/*.js',
       'frontend/app/**/*.module.js',

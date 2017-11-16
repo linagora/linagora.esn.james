@@ -2,7 +2,7 @@ const q = require('q');
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-describe.only('The webserver/api/sync/controller module', function() {
+describe('The webserver/api/sync/controller module', function() {
   let getModule;
   let syncModuleMock;
 

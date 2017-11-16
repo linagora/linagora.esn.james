@@ -1,3 +1,11 @@
 {
-  "Hello World" : "Bonjour le monde"
+  "Click to fix synchronization issue" : "Cliquez pour résoudre le problème de synchronisation",
+  "Synchronization issue": "Problème de synchronisation",
+  "Click Sync to fix.": "Cliquez sur Sync pour corriger.",
+  "Sync": "Sync",
+  "Cancel": "Annuler",
+  "This group data does not synchronize with mail group in James.": "Ces données de groupe ne se synchronisent pas avec le groupe de messagerie dans James.",
+  "Synchronizing group...": "Groupe de synchronisation ...",
+  "Group synchronized": "Groupe synchronisé",
+  "Failed to synchronize group": "Échec de la synchronisation du groupe"
 }
