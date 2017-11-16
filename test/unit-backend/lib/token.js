@@ -3,10 +3,12 @@ const { expect } = require('chai');
 describe('The lib/token module', function() {
   let getModule;
   let authMock;
+  let constants;
 
   beforeEach(function() {
     authMock = {};
     this.moduleHelpers.addDep('auth', authMock);
+    constants = require(this.moduleHelpers.backendPath + '/lib/constants');
     getModule = () => require(this.moduleHelpers.backendPath + '/lib/token')(this.moduleHelpers.dependencies);
   });
 
@@ -24,6 +26,17 @@ describe('The lib/token module', function() {
       };
 
       getModule().generate(user);
+    });
+
+    it('should use default subject if user is not provided', function(done) {
+      authMock.jwt = {
+        generateWebToken(payload) {
+          expect(payload).to.deep.equal({ sub: constants.JWT_DEFAULT_SUBJECT, admin: true });
+          done();
+        }
+      };
+
+      getModule().generate();
     });
   });
 });
