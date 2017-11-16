@@ -9,14 +9,14 @@ describe('The lib/sync/group module', function() {
   let EVENTS;
 
   beforeEach(function() {
-    getModule = () => require(this.moduleHelpers.backendPath + '/lib/sync')(this.moduleHelpers.dependencies);
+    getModule = () => require(this.moduleHelpers.backendPath + '/lib/sync/group')(this.moduleHelpers.dependencies);
     EVENTS = require(this.moduleHelpers.backendPath + '/lib/sync/constants').EVENTS;
 
     pubsubTopicMock = sinon.stub().returns({ subscribe() {} });
     groupMock = {};
     clientMock = {};
 
-    mockery.registerMock('../client', () => clientMock);
+    mockery.registerMock('../../client', () => clientMock);
     this.moduleHelpers.addDep('pubsub', { local: { topic: pubsubTopicMock } });
     this.moduleHelpers.addDep('linagora.esn.group', { lib: { group: groupMock } });
   });

@@ -7,7 +7,9 @@
 
   function jamesApiClient(jamesRestangular) {
     return {
-      generateJwtToken: generateJwtToken
+      generateJwtToken: generateJwtToken,
+      getGroupSyncStatus: getGroupSyncStatus,
+      syncGroup: syncGroup
     };
 
     /**
@@ -19,6 +21,14 @@
      */
     function generateJwtToken(domainId) {
       return jamesRestangular.one('token').post(null, null, { domain_id: domainId });
+    }
+
+    function getGroupSyncStatus(groupId) {
+      return jamesRestangular.one('sync').one('groups', groupId).get();
+    }
+
+    function syncGroup(groupId) {
+      return jamesRestangular.one('sync').one('groups', groupId).post();
     }
   }
 })(angular);

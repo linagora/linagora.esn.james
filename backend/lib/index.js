@@ -6,6 +6,7 @@ module.exports = function(dependencies) {
 
   return {
     init,
+    sync,
     models
   };
 

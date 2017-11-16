@@ -1,6 +1,7 @@
 const q = require('q');
-const { EVENTS } = require('./constants');
+const { EVENTS } = require('../constants');
 
+let synchronizerModule;
 let clientModule;
 let pubsub;
 let logger;
@@ -10,10 +11,13 @@ module.exports = (dependencies) => {
   groupModule = dependencies('linagora.esn.group').lib.group;
   pubsub = dependencies('pubsub').local;
   logger = dependencies('logger');
-  clientModule = require('../client')(dependencies);
+  synchronizerModule = require('./synchronizer')(dependencies);
+  clientModule = require('../../client')(dependencies);
 
   return {
-    init
+    init,
+    getStatus: synchronizerModule.getStatus,
+    sync: synchronizerModule.sync
   };
 };
 

@@ -32,4 +32,28 @@ describe('The jamesApiClient service', function() {
       $httpBackend.flush();
     });
   });
+
+  describe('The getGroupSyncStatus fn', function() {
+    it('should GET to the right endpoint to get synchornization status of group', function() {
+      var groupId = '123';
+
+      $httpBackend.expectGET('/james/api/sync/groups/' + groupId).respond(200);
+
+      jamesApiClient.getGroupSyncStatus(groupId);
+
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The syncGroup fn', function() {
+    it('should POST to the right endpoint to sync group', function() {
+      var groupId = '123';
+
+      $httpBackend.expectPOST('/james/api/sync/groups/' + groupId).respond(204);
+
+      jamesApiClient.syncGroup(groupId);
+
+      $httpBackend.flush();
+    });
+  });
 });
