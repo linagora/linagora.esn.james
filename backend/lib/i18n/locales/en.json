@@ -1,3 +1,11 @@
 {
-  "Hello World" : "Hello World"
+  "Click to fix synchronization issue" : "Click to fix synchronization issue",
+  "Synchronization issue": "Synchronization issue",
+  "Click Sync to fix.": "Click Sync to fix.",
+  "Sync": "Sync",
+  "Cancel": "Cancel",
+  "This group data does not synchronize with mail group in James.": "This group data does not synchronize with mail group in James.",
+  "Synchronizing group...": "Synchronizing group...",
+  "Group synchronized": "Group synchronized",
+  "Failed to synchronize group": "Failed to synchronize group"
 }

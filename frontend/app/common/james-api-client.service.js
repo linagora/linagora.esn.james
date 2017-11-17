@@ -7,7 +7,9 @@
 
   function jamesApiClient(jamesRestangular) {
     return {
-      generateJwtToken: generateJwtToken
+      generateJwtToken: generateJwtToken,
+      getGroupSyncStatus: getGroupSyncStatus,
+      syncGroup: syncGroup
     };
 
     /**
@@ -19,6 +21,24 @@
      */
     function generateJwtToken(domainId) {
       return jamesRestangular.one('token').post(null, null, { domain_id: domainId });
+    }
+
+    /**
+     * Get synchronization status of a group
+     * @param  {String} groupId - The group ID
+     * @return {Promise}         - On success, resolves with the response containing the status
+     */
+    function getGroupSyncStatus(groupId) {
+      return jamesRestangular.one('sync').one('groups', groupId).get();
+    }
+
+    /**
+     * Re-synchronize a group
+     * @param  {String} groupId - The group ID
+     * @return {Promise}        - Resolve empty response on success
+     */
+    function syncGroup(groupId) {
+      return jamesRestangular.one('sync').one('groups', groupId).post();
     }
   }
 })(angular);

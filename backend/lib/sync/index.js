@@ -2,7 +2,8 @@ module.exports = (dependencies) => {
   const group = require('./group')(dependencies);
 
   return {
-    init
+    init,
+    group
   };
 
   function init() {

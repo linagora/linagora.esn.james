@@ -8,3 +8,10 @@ angular.module('esn.http', [])
       redirectToLogin: angular.noop
     };
   });
+angular.module('esn.async-action', [])
+  .factory('asyncAction', function() {
+    return function(message, action) {
+      return action();
+    };
+  });
+angular.module('esn.ui', []);

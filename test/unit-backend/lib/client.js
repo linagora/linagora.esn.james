@@ -59,6 +59,57 @@ describe('The lib/client module', function() {
     });
   });
 
+  describe('The getGroupMembers function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      const group = 'group@email.com';
+
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().getGroupMembers(group).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      const group = 'group@email.com';
+
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().getGroupMembers(group).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should resolve empty array on client error', function(done) {
+      const group = 'group@email.com';
+
+      JamesClientMock.prototype.listGroupMembers = sinon.stub().returns(q.reject(new Error('an_error')));
+
+      getModule().getGroupMembers(group).then((members) => {
+        expect(JamesClientMock.prototype.listGroupMembers).to.have.been.calledOnce;
+        expect(JamesClientMock.prototype.listGroupMembers).to.have.been.calledWith(group);
+        expect(members).to.have.length(0);
+        done();
+      });
+    });
+
+    it('should resolve array of members on success', function(done) {
+      const group = 'group@email.com';
+      const members = ['member1@email.com', 'member2@email.com'];
+
+      JamesClientMock.prototype.listGroupMembers = sinon.stub().returns(q.resolve(members));
+
+      getModule().getGroupMembers(group).then((members) => {
+        expect(JamesClientMock.prototype.listGroupMembers).to.have.been.calledOnce;
+        expect(JamesClientMock.prototype.listGroupMembers).to.have.been.calledWith(group);
+        expect(members).to.have.length(2);
+        done();
+      });
+    });
+  });
+
   describe('The removeGroup function', function() {
     it('should fail if it cannot get API URL', function(done) {
       const group = 'group@email.com';

@@ -11,6 +11,7 @@ module.exports = (dependencies) => {
   return {
     addGroup,
     addGroupMembers,
+    getGroupMembers,
     removeGroup,
     removeGroupMembers,
     updateGroup
@@ -37,6 +38,16 @@ function addGroupMembers(group, members) {
   return get().then(client =>
     q.all(members.map(member => client.addGroupMember(group, member)))
   );
+}
+
+/**
+ * Get (all) group members. In case of error while calling webadmin API, an
+ * empty array is resolved because James respond 404 when group has no members
+ * @param  {String} group - The group email address
+ * @return {Promise}      - Resolve group members on success
+ */
+function getGroupMembers(group) {
+  return get().then(client => client.listGroupMembers(group).catch(() => []));
 }
 
 /**
