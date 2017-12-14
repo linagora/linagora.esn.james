@@ -1,4 +1,4 @@
-const { Client } = require('james-admin-client');
+const { Client } = require('@linagora/james-admin-client');
 const q = require('q');
 
 let esnConfig;

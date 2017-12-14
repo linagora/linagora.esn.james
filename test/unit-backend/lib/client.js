@@ -15,7 +15,7 @@ describe('The lib/client module', function() {
     JamesClientMock = function() {};
 
     mockery.registerMock('./token', () => tokenMock);
-    mockery.registerMock('james-admin-client', { Client: JamesClientMock });
+    mockery.registerMock('@linagora/james-admin-client', { Client: JamesClientMock });
     this.moduleHelpers.addDep('esn-config', () => ({ get: esnConfigGetMock }));
   });
 
