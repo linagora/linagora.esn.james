@@ -2,8 +2,10 @@
   'use strict';
 
   angular.module('linagora.esn.james')
+    .run(injectGroupDisplaySubheaderDirective)
+    .run(registerModule);
 
-  .run(function(dynamicDirectiveService) {
+  function injectGroupDisplaySubheaderDirective(dynamicDirectiveService) {
     var syncStatusIndicator = new dynamicDirectiveService.DynamicDirective(true, 'james-sync-status-indicator', {
       attributes: [
         {
@@ -22,5 +24,9 @@
     });
 
     dynamicDirectiveService.addInjection('group-display-subheader-actions', syncStatusIndicator);
-  });
+  }
+
+  function registerModule(esnModuleRegistry, JAMES_MODULE_METADATA) {
+    esnModuleRegistry.add(JAMES_MODULE_METADATA);
+  }
 })(angular);

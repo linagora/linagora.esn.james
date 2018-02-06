@@ -1,0 +1,7 @@
+ng-form(name='form')
+  .backend-url-input
+    esn-form-group(label=__('Backend URL'))
+      input.form-control(type="url", ng-model="$ctrl.configurations.backendUrl.value", name="backendUrl", required)
+  .frontend-url-input
+    esn-form-group(label=__('Frontend URL'))
+      input.form-control(type="url", ng-model="$ctrl.configurations.frontendUrl.value", name="frontendUrl", required)

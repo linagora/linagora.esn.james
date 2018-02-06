@@ -8,6 +8,7 @@
     'esn.http',
     'esn.router',
     'esn.i18n',
-    'esn.ui'
+    'esn.ui',
+    'esn.module-registry'
   ]);
 })(angular);
