@@ -32,7 +32,7 @@ module.exports = function(config) {
     browsers: ['PhantomJS', 'Chrome', 'Firefox'],
     reporters: ['coverage', 'spec'],
     preprocessors: {
-      'frontend/app/**/*.js': ['coverage'],
+      'frontend/app/**/!(*spec).js': ['coverage'],
       '**/*.pug': ['ng-jade2module']
     },
 

@@ -3,6 +3,7 @@
 module.exports = function(dependencies) {
   const sync = require('./sync')(dependencies);
   const models = require('./db')(dependencies);
+  const config = require('./config')(dependencies);
 
   return {
     init,
@@ -12,5 +13,6 @@ module.exports = function(dependencies) {
 
   function init() {
     sync.init();
+    config.init();
   }
 };
