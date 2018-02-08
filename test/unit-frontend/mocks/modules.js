@@ -16,3 +16,7 @@ angular.module('esn.async-action', [])
   });
 angular.module('esn.ui', []);
 angular.module('esn.module-registry', []);
+angular.module('esn.configuration', [])
+  .factory('esnConfigApi', function() {
+    return {};
+  });

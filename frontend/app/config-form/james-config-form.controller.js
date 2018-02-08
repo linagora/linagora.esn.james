@@ -12,7 +12,7 @@
 
   function jamesConfigFormController(
     $q,
-    jamesClientProvider
+    jamesWebadminClientProvider
   ) {
     var self = this;
     var ACTION_DEFAULT_VALUE = { get: null, set: -1 };
@@ -79,7 +79,7 @@
     }
 
     function _getJamesClient() {
-      return jamesClientProvider.get(self.configurations.webadminApiFrontend.value);
+      return jamesWebadminClientProvider.get(self.configurations.webadminApiFrontend.value);
     }
 
     function _qualifyJamesConfig(config, defaultValue) {

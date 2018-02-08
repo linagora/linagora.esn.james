@@ -8,7 +8,7 @@ var expect = chai.expect;
 describe('The jamesConfigFormController', function() {
 
   var $controller, $rootScope, $scope, $q;
-  var jamesClientProvider;
+  var jamesWebadminClientProvider;
   var $windowMock, jamesClientInstanceMock;
 
   beforeEach(function() {
@@ -35,14 +35,14 @@ describe('The jamesConfigFormController', function() {
       _$controller_,
       _$rootScope_,
       _$q_,
-      _jamesClientProvider_
+      _jamesWebadminClientProvider_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $q = _$q_;
-      jamesClientProvider = _jamesClientProvider_;
+      jamesWebadminClientProvider = _jamesWebadminClientProvider_;
 
-      jamesClientProvider.get = sinon.stub().returns($q.when(jamesClientInstanceMock));
+      jamesWebadminClientProvider.get = sinon.stub().returns($q.when(jamesClientInstanceMock));
     });
   });
 

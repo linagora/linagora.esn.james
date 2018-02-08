@@ -9,6 +9,7 @@
     'esn.router',
     'esn.i18n',
     'esn.ui',
-    'esn.module-registry'
+    'esn.module-registry',
+    'esn.configuration'
   ]);
 })(angular);

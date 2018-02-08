@@ -14,5 +14,6 @@
           platform: true
         }
       }
-    });
+    })
+    .constant('JAMES_MODULE_NAME', 'linagora.esn.james');
 })();
