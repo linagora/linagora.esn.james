@@ -50,14 +50,16 @@ const awesomeModule = new AwesomeModule(AWESOME_MODULE_NAME, {
         FRONTEND_JS_PATH + '**/*.module.js',
         FRONTEND_JS_PATH + '**/!(*spec).js'
       ]);
-
       const frontendJsFilesUri = frontendJsFilesFullPath.map(filepath => filepath.replace(FRONTEND_JS_PATH, ''));
+      const lessFile = path.resolve(__dirname, './frontend/app/app.less');
+      const jsResourceFiles = [
+        '../components/james-admin-client/dist/james-admin-client.min.js'
+      ];
 
       webserverWrapper.injectAngularAppModules(MODULE_NAME, frontendJsFilesUri, AWESOME_MODULE_NAME, ['esn'], {
         localJsFiles: frontendJsFilesFullPath
       });
-      const lessFile = path.resolve(__dirname, './frontend/app/app.less');
-
+      webserverWrapper.injectJS(MODULE_NAME, jsResourceFiles, 'esn');
       webserverWrapper.injectLess(MODULE_NAME, [lessFile], 'esn');
       webserverWrapper.addApp(MODULE_NAME, app);
 
