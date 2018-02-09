@@ -80,6 +80,7 @@ module.exports = function(grunt) {
               'all-locales-present',
               'default-locale-translate',
               'key-trimmed',
+              'no-untranslated-key',
               'no-duplicate-among-modules',
               'no-duplicate-with-core',
               'valid-json-file'
