@@ -1,0 +1,24 @@
+ng-form(name="urlForm")
+  .form-title
+    h5 #{__('Web Admin API')}
+    small.text-muted #{__('Define the Web Admin API endpoint.')}
+  .row.flex-vertical-centered
+    .col-xs-6
+      esn-form-group(label=__('Backend'), form="urlForm")
+        input.form-control(type="url", ng-model="$ctrl.configurations.webadminApiBackend.value", name="webadminApiBackend", required)
+    .col-xs-6
+      esn-form-group(label=__('Frontend'), form="urlForm")
+        input.form-control(type="url", ng-model="$ctrl.configurations.webadminApiFrontend.value", name="webadminApiFrontend", ng-change="$ctrl.onServerUrlChange(configForm)", ng-model-options="{ updateOn: 'default blur', debounce: {'default': 300, 'blur': 0} }", required)
+
+ng-form(name="configForm")
+  div(ng-switch="$ctrl.connectionStatus")
+    div(ng-switch-when="connected")
+      james-config-form-quota(quota="$ctrl.config.quota")
+
+    div(ng-switch-when="connecting")
+      .text-center(openpaas-logo-spinner, spinner-start-active="1", spinner-size="0.5")
+
+    admin-empty-message(
+      ng-switch-when="error",
+      icon="mdi-lan-disconnect",
+      message=__('Cannot connect to James server, please check your Web Admin API for frontend'))

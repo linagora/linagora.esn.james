@@ -7,5 +7,14 @@
   "This group data does not synchronize with mail group in James.": "This group data does not synchronize with mail group in James.",
   "Synchronizing group...": "Synchronizing group...",
   "Group synchronized": "Group synchronized",
-  "Failed to synchronize group": "Failed to synchronize group"
+  "Failed to synchronize group": "Failed to synchronize group",
+  "Web Admin API": "Web Admin API",
+  "Define the Web Admin API endpoint.": "Define the Web Admin API endpoint.",
+  "Backend": "Backend",
+  "Frontend": "Frontend",
+  "Cannot connect to James server, please check your Web Admin API for frontend": "Cannot connect to James server, please check your Web Admin API for frontend",
+  "Quota": "Quota",
+  "Define the quota limit for each user. Leave the fields empty for no quota.": "Define the quota limit for each user. Leave the fields empty for no quota.",
+  "Data usage quota": "Data usage quota",
+  "Message count quota": "Message count quota"
 }

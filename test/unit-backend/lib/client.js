@@ -16,7 +16,11 @@ describe('The lib/client module', function() {
 
     mockery.registerMock('./token', () => tokenMock);
     mockery.registerMock('@linagora/james-admin-client', { Client: JamesClientMock });
-    this.moduleHelpers.addDep('esn-config', () => ({ get: esnConfigGetMock }));
+    this.moduleHelpers.addDep('esn-config', () => ({
+      inModule() {
+        return { get: esnConfigGetMock };
+      }
+    }));
   });
 
   describe('The addGroupMembers function', function() {
