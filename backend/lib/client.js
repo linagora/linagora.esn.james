@@ -113,5 +113,5 @@ function get() {
  * @return {Promise} - Resolve the endpoint url (nullable) on success
  */
 function getWebadminApiEndpoint() {
-  return esnConfig('james').get().then(config => config && config.url);
+  return esnConfig('webadminApiBackend').inModule('linagora.esn.james').get();
 }
