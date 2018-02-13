@@ -16,5 +16,12 @@
   "Quota": "Quota",
   "Define the quota limit for each user. Leave the fields empty for no quota.": "Define the quota limit for each user. Leave the fields empty for no quota.",
   "Data usage quota": "Data usage quota",
-  "Message count quota": "Message count quota"
+  "Message count quota": "Message count quota",
+  "Run": "Run",
+  "James": "James",
+  "Domains": "Domains",
+  "Synchronize domains in OpenPaaS with James": "Synchronize domains in OpenPaaS with James",
+  "Synchronizing domains...": "Synchronizing domains...",
+  "Domains synchronized": "Domains synchronized",
+  "Failed to synchronize domains": "Failed to synchronize domains"
 }
