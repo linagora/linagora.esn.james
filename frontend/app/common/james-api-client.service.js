@@ -8,8 +8,10 @@
   function jamesApiClient(jamesRestangular) {
     return {
       generateJwtToken: generateJwtToken,
+      getDomainsSyncStatus: getDomainsSyncStatus,
       getGroupSyncStatus: getGroupSyncStatus,
-      syncGroup: syncGroup
+      syncGroup: syncGroup,
+      syncDomains: syncDomains
     };
 
     /**
@@ -39,6 +41,22 @@
      */
     function syncGroup(groupId) {
       return jamesRestangular.one('sync').one('groups', groupId).post();
+    }
+
+    /**
+     * Get synchronization status of domains
+     * @return {Promise}        - Resolve empty response on success
+     */
+    function getDomainsSyncStatus() {
+      return jamesRestangular.one('sync').one('domains').get();
+    }
+
+    /**
+     * Re-synchronize domains
+     * @return {Promise}        - Resolve empty response on success
+     */
+    function syncDomains() {
+      return jamesRestangular.one('sync').one('domains').post();
     }
   }
 })(angular);

@@ -2,6 +2,7 @@
 
 module.exports = function(dependencies, lib, router) {
   const authorizationMW = dependencies('authorizationMW');
+  const platformadminMW = dependencies('platformadminsMW');
   const helperMW = dependencies('helperMW');
   const controller = require('./controller')(dependencies, lib);
   const middleware = require('./middleware')(dependencies);
@@ -17,6 +18,16 @@ module.exports = function(dependencies, lib, router) {
     helperMW.checkIdInParams('groupId', 'Group'),
     middleware.loadGroup,
     controller.syncGroup);
+
+  router.get('/sync/domains',
+    authorizationMW.requiresAPILogin,
+    platformadminMW.requirePlatformAdmin,
+    controller.getDomainsSyncStatus);
+
+  router.post('/sync/domains',
+    authorizationMW.requiresAPILogin,
+    platformadminMW.requirePlatformAdmin,
+    controller.syncDomains);
 
   return router;
 };

@@ -11,7 +11,10 @@ module.exports = (dependencies) => {
   return {
     addGroup,
     addGroupMembers,
+    createDomain,
     getGroupMembers,
+    listDomains,
+    removeDomain,
     removeGroup,
     removeGroupMembers,
     updateGroup
@@ -94,6 +97,32 @@ function updateGroup(oldGroup, newGroup) {
         ...members.map(member => client.removeGroupMember(oldGroup, member))
       ]))
   );
+}
+
+/**
+ * create a new domain
+ * @param {String} domainName - Name of the new domain
+ * @return {Promise}          - Resolve on success
+ */
+function createDomain(domainName) {
+  return get().then(client => client.createDomain(domainName));
+}
+
+/**
+ * list domains
+ * @return {Promise}          - Resolve on success
+ */
+function listDomains() {
+  return get().then(client => client.listDomains());
+}
+
+/**
+ * Remove domain
+ * @param  {String} domainName - Name of the domain to be removed
+ * @return {Promise}            - Resolve on success
+ */
+function removeDomain(domainName) {
+  return get().then(client => client.removeDomain(domainName));
 }
 
 /**
