@@ -56,4 +56,24 @@ describe('The jamesApiClient service', function() {
       $httpBackend.flush();
     });
   });
+
+  describe('The syncDomains fn', function() {
+    it('should POST to the right endpoint to sync domains', function() {
+      $httpBackend.expectPOST('/james/api/sync/domains').respond(204);
+
+      jamesApiClient.syncDomains();
+
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The getDomainsSyncStatus fn', function() {
+    it('should GET to the right endpoint to get sync domains status', function() {
+      $httpBackend.expectGET('/james/api/sync/domains').respond(200);
+
+      jamesApiClient.getDomainsSyncStatus();
+
+      $httpBackend.flush();
+    });
+  });
 });
