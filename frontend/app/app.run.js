@@ -3,6 +3,7 @@
 
   angular.module('linagora.esn.james')
     .run(injectGroupDisplaySubheaderDirective)
+    .run(injectAdminMaintenanceDirective)
     .run(registerModule);
 
   function injectGroupDisplaySubheaderDirective(dynamicDirectiveService) {
@@ -24,6 +25,12 @@
     });
 
     dynamicDirectiveService.addInjection('group-display-subheader-actions', syncStatusIndicator);
+  }
+
+  function injectAdminMaintenanceDirective(dynamicDirectiveService) {
+    var syncStatusIndicator = new dynamicDirectiveService.DynamicDirective(true, 'james-maintenance');
+
+    dynamicDirectiveService.addInjection('admin-maintenance-items', syncStatusIndicator);
   }
 
   function registerModule(esnModuleRegistry, JAMES_MODULE_METADATA) {

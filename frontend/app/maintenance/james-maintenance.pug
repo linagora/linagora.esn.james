@@ -1,0 +1,15 @@
+.block-header
+  h2 #{__('James')}
+  
+.card
+  .card-header
+    h2 #{__('Domains')}
+  .card-body
+    .listview.lv-bordered
+      .lv-body
+        .lv-item
+          .flex-space-between
+            div #{__('Synchronize domains in OpenPaaS with James')}
+            div
+              button.btn.btn-primary(ng-click="$ctrl.synchronizeDomains()") #{__('Run')}
+      
