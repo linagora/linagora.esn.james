@@ -23,5 +23,13 @@
   "Synchronize domains in OpenPaaS with James": "Synchronize domains in OpenPaaS with James",
   "Synchronizing domains...": "Synchronizing domains...",
   "Domains synchronized": "Domains synchronized",
-  "Failed to synchronize domains": "Failed to synchronize domains"
+  "Failed to synchronize domains": "Failed to synchronize domains",
+  "Set email quota": "Set email quota",
+  "Set email quota for %s": "Set email quota for %s",
+  "Save": "Save",
+  "OK": "OK",
+  "An error occured while getting quota, please try again!": "An error occured while getting quota, please try again!",
+  "Updating quota...": "Updating quota...",
+  "Quota updated": "Quota updated",
+  "Failed to update quota": "Failed to update quota"
 }

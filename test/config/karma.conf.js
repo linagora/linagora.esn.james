@@ -16,6 +16,7 @@ module.exports = function(config) {
       'frontend/components/lodash/dist/lodash.min.js',
       'frontend/components/sinon-chai/lib/sinon-chai.js',
       'frontend/components/sinon-1.15.4/index.js',
+      'frontend/components/james-admin-client/dist/james-admin-client.js',
 
       { pattern: 'frontend/app/app.routes.js', watched: false, included: false, served: false },
       { pattern: 'frontend/app/app.run.js', watched: false, included: false, served: false },

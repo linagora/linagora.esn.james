@@ -1,7 +1,4 @@
 ng-form(name="form")
-  .form-title
-    h5 #{__('Quota')}
-    small.text-muted #{__('Define the quota limit for each user. Leave the fields empty for no quota.')}
   .row
     .col-xs-12.col-md-6
       admin-form-input-bytes(input-value="$ctrl.quota.size", min="1B", label=__('Data usage quota'))

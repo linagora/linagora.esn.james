@@ -9,7 +9,7 @@ describe('The jamesWebadminClient', function() {
 
   var $rootScope, $q, jamesWebadminClient, jamesWebadminClientProvider, esnConfigApi;
   var $windowMock, jamesClientInstanceMock;
-  var domain, serverUrl;
+  var domain, serverUrl, username;
 
   beforeEach(function() {
     module('linagora.esn.james');
@@ -26,6 +26,7 @@ describe('The jamesWebadminClient', function() {
 
     domain = { name: 'abc.com' };
     serverUrl = 'http://james.com';
+    username = 'user@abc.com';
 
     angular.mock.module(function($provide) {
       $provide.value('$window', $windowMock);
@@ -144,6 +145,92 @@ describe('The jamesWebadminClient', function() {
         .then(function(jamesDomains) {
           expect(jamesClientInstanceMock.listDomains).to.have.been.calledOnce;
           expect(jamesDomains).to.equal(domains);
+
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The getUserQuota function', function() {
+    it('should reject if failed to get user quota', function(done) {
+      var error = new Error('something wrong');
+
+      jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.reject(error));
+
+      jamesWebadminClient.getUserQuota(username)
+        .catch(function(err) {
+          expect(jamesClientInstanceMock.getUserQuota).to.have.been.calledWith(username);
+          expect(err.message).to.equal(error.message);
+
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should return empty object {} if quota.user is null', function(done) {
+      var quota = { user: null };
+
+      jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.when(quota));
+
+      jamesWebadminClient.getUserQuota(username)
+        .then(function(userQuota) {
+          expect(jamesClientInstanceMock.getUserQuota).to.have.been.calledWith(username);
+          expect(userQuota).to.deep.equal({});
+
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve if successfully to get user quota', function(done) {
+      var quota = { user: {} };
+
+      jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.when(quota));
+
+      jamesWebadminClient.getUserQuota(username)
+        .then(function(userQuota) {
+          expect(jamesClientInstanceMock.getUserQuota).to.have.been.calledWith(username);
+          expect(userQuota).to.equal(quota.user);
+
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The setUserQuota function', function() {
+    it('should reject if failed to set user quota', function(done) {
+      var username = 'foo';
+      var quota = {};
+      var error = new Error('something wrong');
+
+      jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.reject(error));
+
+      jamesWebadminClient.setUserQuota(username, quota)
+        .catch(function(err) {
+          expect(jamesClientInstanceMock.setUserQuota).to.have.been.calledWith(username, quota);
+          expect(err.message).to.equal(error.message);
+
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve if successfully to set user quota', function(done) {
+      var username = 'foo';
+      var quota = {};
+
+      jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.when());
+
+      jamesWebadminClient.setUserQuota(username, quota)
+        .then(function() {
+          expect(jamesClientInstanceMock.setUserQuota).to.have.been.calledWith(username, quota);
 
           done();
         });
