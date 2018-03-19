@@ -12,10 +12,10 @@
 
   function jamesConfigFormController(
     $q,
-    jamesWebadminClientProvider
+    jamesWebadminClientProvider,
+    jamesQuotaHelpers
   ) {
     var self = this;
-    var ACTION_DEFAULT_VALUE = { get: null, set: -1 };
 
     self.$onInit = $onInit;
     self.onServerUrlChange = onServerUrlChange;
@@ -56,10 +56,10 @@
         })
         .then(function(data) {
           var config = {
-            quota: data[0]
+            quota: jamesQuotaHelpers.qualifyGet(data[0])
           };
 
-          return _qualifyJamesConfig(config);
+          return config;
         });
     }
 
@@ -68,7 +68,9 @@
         return $q.when();
       }
 
-      var config = _qualifyJamesConfig(self.config, ACTION_DEFAULT_VALUE.set);
+      var config = {
+        quota: jamesQuotaHelpers.qualifySet(self.config.quota)
+      };
 
       return _getJamesClient()
         .then(function(jamesClient) {
@@ -80,18 +82,6 @@
 
     function _getJamesClient() {
       return jamesWebadminClientProvider.get(self.configurations.webadminApiFrontend.value);
-    }
-
-    function _qualifyJamesConfig(config, defaultValue) {
-      defaultValue = defaultValue || ACTION_DEFAULT_VALUE.get;
-      var cf = angular.copy(config);
-
-      if (cf.quota) {
-        cf.quota.size = cf.quota.size > 0 ? cf.quota.size : defaultValue;
-        cf.quota.count = cf.quota.count > 0 ? cf.quota.count : defaultValue;
-      }
-
-      return cf;
     }
   }
 })(angular);
