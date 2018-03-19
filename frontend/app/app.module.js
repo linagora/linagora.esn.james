@@ -10,6 +10,7 @@
     'esn.i18n',
     'esn.ui',
     'esn.module-registry',
-    'esn.configuration'
+    'esn.configuration',
+    'esn.user'
   ]);
 })(angular);

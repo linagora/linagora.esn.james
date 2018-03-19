@@ -20,3 +20,9 @@ angular.module('esn.configuration', [])
   .factory('esnConfigApi', function() {
     return {};
   });
+angular.module('esn.user', [])
+  .factory('userUtils', function() {
+    return {
+      displayNameOf: angular.noop
+    };
+  });
