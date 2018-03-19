@@ -16,7 +16,7 @@
 
           span.helper-text(ng-if="$ctrl.status === 'loaded'")
             | #{__('Define the quota limit for each user. Leave the fields empty for no quota.')}
-          james-config-form-quota(ng-if="$ctrl.status === 'loaded'", quota="$ctrl.quota")
+          james-quota-form(ng-if="$ctrl.status === 'loaded'", quota="$ctrl.quota")
           .error-message(ng-if="$ctrl.status === 'error'") #{__('An error occured while getting quota, please try again!')}
 
         .modal-footer(ng-if="$ctrl.status === 'loaded'")

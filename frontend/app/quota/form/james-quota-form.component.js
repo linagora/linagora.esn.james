@@ -1,12 +1,12 @@
 (function(angular) {
+  'use strict';
 
   angular.module('linagora.esn.james')
 
-  .component('jamesConfigFormQuota', {
-    templateUrl: '/james/app/config-form/quota/james-config-form-quota.html',
+  .component('jamesQuotaForm', {
+    templateUrl: '/james/app/quota/form/james-quota-form.html',
     bindings: {
       quota: '='
     }
   });
-
 })(angular);
