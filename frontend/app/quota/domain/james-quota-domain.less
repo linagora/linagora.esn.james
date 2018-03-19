@@ -1,0 +1,26 @@
+james-quota-domain {
+  a {
+    &:extend(.dropdown-menu > li > a);
+    &:extend(.dropdown-menu.dropdown-menu-right > li > a);
+
+    &:hover {
+      &:extend(.dropdown-menu > li > a:hover);
+    }
+  }
+}
+
+.james-quota-domain-dialog {
+  james-quota-form {
+    .row {
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 25px;
+    }
+  }
+
+  .error-message {
+    color: @secondaryTextColor;
+    font-size: 1.4em;
+    text-align: center;
+  }
+}
