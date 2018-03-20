@@ -12,6 +12,11 @@ describe('The jamesQuotaUserController', function() {
 
   beforeEach(function() {
     module('linagora.esn.james');
+    module('esn.configuration', function($provide) {
+      $provide.value('esnConfig', function() {
+        return $q.when();
+      });
+    });
 
     inject(function(
       _$controller_,

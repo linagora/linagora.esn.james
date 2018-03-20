@@ -7,8 +7,9 @@ var expect = chai.expect;
 
 describe('The jamesWebadminClient', function() {
 
-  var $rootScope, $q, jamesWebadminClient, jamesWebadminClientProvider, esnConfigApi;
+  var $rootScope, $q;
   var $windowMock, jamesClientInstanceMock;
+  var jamesWebadminClient, jamesWebadminClientProvider, esnConfigMock;
   var domain, serverUrl, username;
 
   beforeEach(function() {
@@ -27,33 +28,30 @@ describe('The jamesWebadminClient', function() {
     domain = { name: 'abc.com' };
     serverUrl = 'http://james.com';
     username = 'user@abc.com';
+    esnConfigMock = {};
 
-    angular.mock.module(function($provide) {
+    module(function($provide) {
       $provide.value('$window', $windowMock);
+    });
+    module('esn.configuration', function($provide) {
+      $provide.value('esnConfig', function() {
+        return esnConfigMock;
+      });
     });
 
     inject(function(
       _$rootScope_,
       _$q_,
       _jamesWebadminClient_,
-      _jamesWebadminClientProvider_,
-      _esnConfigApi_
+      _jamesWebadminClientProvider_
     ) {
       $rootScope = _$rootScope_;
       $q = _$q_;
       jamesWebadminClient = _jamesWebadminClient_;
       jamesWebadminClientProvider = _jamesWebadminClientProvider_;
-      esnConfigApi = _esnConfigApi_;
 
       jamesClientInstanceMock.createDomain = sinon.stub().returns($q.when());
       jamesWebadminClientProvider.get = sinon.stub().returns($q.when(jamesClientInstanceMock));
-      esnConfigApi.getPlatformConfigurations = sinon.stub().returns($q.when([{
-        name: 'linagora.esn.james',
-        configurations: [{
-          name: 'webadminApiFrontend',
-          value: serverUrl
-        }]
-      }]));
     });
   });
 
@@ -61,11 +59,11 @@ describe('The jamesWebadminClient', function() {
     it('should reject if failed to create domain in James', function(done) {
       var error = new Error('something wrong');
 
+      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.createDomain = sinon.stub().returns($q.reject(error));
 
       jamesWebadminClient.createDomain(domain.name)
         .catch(function(err) {
-          expect(esnConfigApi.getPlatformConfigurations).to.have.been.calledOnce;
           expect(jamesClientInstanceMock.createDomain).to.have.been.calledOnce;
           expect(jamesClientInstanceMock.createDomain).to.have.been.calledWith(domain.name);
           expect(err.message).to.equal(error.message);
@@ -77,9 +75,9 @@ describe('The jamesWebadminClient', function() {
     });
 
     it('should resolve if successfully to create domain in James', function(done) {
+      esnConfigMock = $q.when(serverUrl);
       jamesWebadminClient.createDomain(domain.name)
         .then(function() {
-          expect(esnConfigApi.getPlatformConfigurations).to.have.been.calledOnce;
           expect(jamesClientInstanceMock.createDomain).to.have.been.calledOnce;
           expect(jamesClientInstanceMock.createDomain).to.have.been.calledWith(domain.name);
 
@@ -94,11 +92,10 @@ describe('The jamesWebadminClient', function() {
     it('should reject if failed to get James server URL', function(done) {
       var error = new Error('something wrong');
 
-      esnConfigApi.getPlatformConfigurations = sinon.stub().returns($q.reject(error));
+      esnConfigMock = $q.reject(error);
 
       jamesWebadminClient.getServerUrl()
         .catch(function(err) {
-          expect(esnConfigApi.getPlatformConfigurations).to.have.been.calledOnce;
           expect(err.message).to.equal(error.message);
 
           done();
@@ -108,9 +105,10 @@ describe('The jamesWebadminClient', function() {
     });
 
     it('should resolve if successfully to get James server URL', function(done) {
+      esnConfigMock = $q.when(serverUrl);
       jamesWebadminClient.getServerUrl()
-        .then(function() {
-          expect(esnConfigApi.getPlatformConfigurations).to.have.been.calledOnce;
+        .then(function(url) {
+          expect(url).to.equal(serverUrl);
 
           done();
         });
@@ -124,6 +122,7 @@ describe('The jamesWebadminClient', function() {
       var error = new Error('something wrong');
 
       jamesClientInstanceMock.listDomains = sinon.stub().returns($q.reject(error));
+      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.listDomains()
         .catch(function(err) {
@@ -140,6 +139,7 @@ describe('The jamesWebadminClient', function() {
       var domains = ['awesome.com'];
 
       jamesClientInstanceMock.listDomains = sinon.stub().returns($q.when(domains));
+      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.listDomains()
         .then(function(jamesDomains) {
@@ -158,6 +158,7 @@ describe('The jamesWebadminClient', function() {
       var error = new Error('something wrong');
 
       jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.reject(error));
+      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.getUserQuota(username)
         .catch(function(err) {
@@ -174,6 +175,7 @@ describe('The jamesWebadminClient', function() {
       var quota = { user: null };
 
       jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.when(quota));
+      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.getUserQuota(username)
         .then(function(userQuota) {
@@ -190,6 +192,7 @@ describe('The jamesWebadminClient', function() {
       var quota = { user: {} };
 
       jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.when(quota));
+      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.getUserQuota(username)
         .then(function(userQuota) {
@@ -210,6 +213,7 @@ describe('The jamesWebadminClient', function() {
       var error = new Error('something wrong');
 
       jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.reject(error));
+      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setUserQuota(username, quota)
         .catch(function(err) {
@@ -227,6 +231,7 @@ describe('The jamesWebadminClient', function() {
       var quota = {};
 
       jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.when());
+      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setUserQuota(username, quota)
         .then(function() {

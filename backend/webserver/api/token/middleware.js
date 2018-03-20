@@ -2,12 +2,14 @@
 
 const composableMw = require('composable-middleware');
 
-let platformadminsMW;
+let corePlatformAdmin;
 let domainMW;
 let authorizationMW;
+let logger;
 
 module.exports = function(dependencies) {
-  platformadminsMW = dependencies('platformadminsMW');
+  logger = dependencies('logger');
+  corePlatformAdmin = dependencies('platformadmin');
   domainMW = dependencies('domainMW');
   authorizationMW = dependencies('authorizationMW');
 
@@ -17,12 +19,27 @@ module.exports = function(dependencies) {
 };
 
 function canGenerateToken(req, res, next) {
-  if (req.query.domain_id) {
-    composableMw(
-      domainMW.loadFromDomainIdParameter,
+  corePlatformAdmin.isPlatformAdmin(req.user.id).then(isPlatformAdmin => {
+    if (isPlatformAdmin) {
+      return next();
+    }
+
+    return composableMw(
+      domainMW.loadSessionDomain,
       authorizationMW.requiresDomainManager
     )(req, res, next);
-  } else {
-    platformadminsMW.requirePlatformAdmin(req, res, next);
-  }
+  })
+  .catch(err => {
+    const details = 'Error while checking platformadmin';
+
+    logger.error(details, err);
+
+    res.status(500).json({
+      error: {
+        code: 500,
+        message: 'Server Error',
+        details
+      }
+    });
+  });
 }
