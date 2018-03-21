@@ -11,10 +11,12 @@
   ) {
     return {
       createDomain: createDomain,
+      getDomainQuota: getDomainQuota,
       getServerUrl: getServerUrl,
-      listDomains: listDomains,
       getUserQuota: getUserQuota,
-      setUserQuota: setUserQuota
+      listDomains: listDomains,
+      setUserQuota: setUserQuota,
+      setDomainQuota: setDomainQuota
     };
 
     function createDomain(domainName) {
@@ -59,6 +61,20 @@
       return _getJamesClient()
         .then(function(jamesClient) {
           return jamesClient.setUserQuota(username, quota);
+        });
+    }
+
+    function getDomainQuota(domainName) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.getDomainQuota(domainName);
+        });
+    }
+
+    function setDomainQuota(domainName, quota) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.setDomainQuota(domainName, quota);
         });
     }
 

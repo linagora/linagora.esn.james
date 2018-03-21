@@ -194,7 +194,7 @@ describe('The jamesWebadminClient', function() {
       jamesWebadminClient.getUserQuota(username)
         .then(function(userQuota) {
           expect(jamesClientInstanceMock.getUserQuota).to.have.been.calledWith(username);
-          expect(userQuota).to.equal(quota.user);
+          expect(userQuota).to.deep.equal(quota.user);
 
           done();
         });
@@ -234,6 +234,77 @@ describe('The jamesWebadminClient', function() {
 
           done();
         });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The getDomainQuota function', function() {
+    it('should reject if failed to get domain quota', function(done) {
+      var domainName = 'abc';
+
+      jamesClientInstanceMock.getDomainQuota = sinon.stub().returns($q.reject());
+      jamesWebadminClient.getDomainQuota(domainName)
+        .catch(function() {
+          expect(jamesClientInstanceMock.getDomainQuota).to.have.been.calledWith(domainName);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve if succeed to get domain quota', function(done) {
+      var domainName = 'abc';
+      var quota = {
+        size: 15,
+        count: 57
+      };
+
+      jamesClientInstanceMock.getDomainQuota = sinon.stub().returns($q.when(quota));
+
+      jamesWebadminClient.getDomainQuota(domainName)
+        .then(function(quota) {
+          expect(jamesClientInstanceMock.getDomainQuota).to.have.been.calledWith(domainName);
+          expect(quota).to.deep.equal(quota);
+
+          done();
+        })
+        .catch(function(err) {
+          done(err || 'should resolve');
+        });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The setDomainQuota function', function() {
+    it('should reject if failed to set domain quota', function(done) {
+      var domainName = 'abc';
+      var quota = { size: 11, count: 45 };
+
+      jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.reject());
+
+      jamesWebadminClient.setDomainQuota(domainName, quota)
+        .catch(function() {
+          expect(jamesClientInstanceMock.setDomainQuota).to.have.been.calledWith(domainName, quota);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve if succeed to set domain quota', function(done) {
+      var domainName = 'abc';
+      var quota = { size: 11, count: 45 };
+
+      jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.when());
+
+      jamesWebadminClient.setDomainQuota(domainName, quota)
+        .then(function() {
+          expect(jamesClientInstanceMock.setDomainQuota).to.have.been.calledWith(domainName, quota);
+          done();
+        })
+        .catch(done);
 
       $rootScope.$digest();
     });
