@@ -5,9 +5,8 @@
     .factory('jamesWebadminClient', jamesWebadminClient);
 
   function jamesWebadminClient(
-    esnConfigApi,
-    jamesWebadminClientProvider,
-    JAMES_MODULE_NAME
+    esnConfig,
+    jamesWebadminClientProvider
   ) {
     return {
       createDomain: createDomain,
@@ -27,13 +26,7 @@
     }
 
     function getServerUrl() {
-      return esnConfigApi.getPlatformConfigurations([{
-        name: JAMES_MODULE_NAME,
-        keys: ['webadminApiFrontend']
-      }])
-        .then(function(data) {
-          return data[0] && data[0].configurations && data[0].configurations[0] && data[0].configurations[0].value;
-        });
+      return esnConfig('linagora.esn.james.webadminApiFrontend');
     }
 
     function listDomains() {

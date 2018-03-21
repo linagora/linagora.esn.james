@@ -6,7 +6,7 @@ const path = require('path');
 const MODULE_NAME = 'linagora.esn.james';
 
 describe('/token API', () => {
-  let app, deployOptions, adminUser, regularUser, domain;
+  let app, deployOptions, adminUser, regularUser;
   let core;
   const password = 'secret';
 
@@ -30,7 +30,6 @@ describe('/token API', () => {
         }
         adminUser = models.users[0];
         regularUser = models.users[1];
-        domain = models.domain;
         core = this.testEnv.core;
         done();
       });
@@ -53,7 +52,7 @@ describe('/token API', () => {
       this.helpers.api.requireLogin(app, 'post', '/api/token', done);
     });
 
-    it('should respond 403 if the user is not platform admin', function(done) {
+    it('should respond 403 if the user is not platform admin or domain admin', function(done) {
       this.helpers.api.loginAsUser(app, regularUser.emails[0], password, (err, requestAsMember) => {
         expect(err).to.not.exist;
 
@@ -61,13 +60,27 @@ describe('/token API', () => {
           .expect(403)
           .end((err, res) => {
             expect(err).to.not.exist;
-            expect(res.body.error.details).to.equal('To perform this action, you need to be a platformadmin');
+            expect(res.body.error.details).to.equal('User is not the domain manager');
             done();
           });
       });
     });
 
-    it('should respond 200 with JWT token on success', function(done) {
+    it('should return 200 with JWT token if user is domain admin', function(done) {
+      this.helpers.api.loginAsUser(app, adminUser.emails[0], password, (err, requestAsMember) => {
+        expect(err).to.not.exist;
+
+        requestAsMember(request(app).post('/api/token'))
+          .expect(200)
+          .end((err, res) => {
+            expect(err).to.not.exist;
+            expect(res.body).to.exist;
+            done();
+          });
+      });
+    });
+
+    it('should respond 200 with JWT token if user is platform admin', function(done) {
       core.platformadmin
         .addPlatformAdmin(regularUser)
         .catch(err => done(err || 'failed to add platformadmin'))
@@ -86,34 +99,6 @@ describe('/token API', () => {
               });
           });
         });
-    });
-
-    describe('With domain_id query', function() {
-      it('should respond 403 if the user is not domain admin', function(done) {
-        this.helpers.api.loginAsUser(app, regularUser.emails[0], password, (err, requestAsMember) => {
-          expect(err).to.not.exist;
-          requestAsMember(request(app).post(`/api/token?domain_id=${domain.id}`))
-            .expect(403)
-            .end((err, res) => {
-              expect(err).to.not.exist;
-              expect(res.body.error.details).to.equal('User is not the domain manager');
-              done();
-            });
-        });
-      });
-
-      it('should respond 200 with the JWT token on success', function(done) {
-        this.helpers.api.loginAsUser(app, adminUser.emails[0], password, (err, requestAsMember) => {
-          expect(err).to.not.exist;
-          requestAsMember(request(app).post(`/api/token?domain_id=${domain.id}`))
-            .expect(200)
-            .end((err, res) => {
-              expect(err).to.not.exist;
-              expect(res.body).to.exist;
-              done();
-            });
-        });
-      });
     });
   });
 });
