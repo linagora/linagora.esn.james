@@ -248,6 +248,7 @@ describe('The jamesWebadminClient', function() {
     it('should reject if failed to get domain quota', function(done) {
       var domainName = 'abc';
 
+      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.getDomainQuota = sinon.stub().returns($q.reject());
       jamesWebadminClient.getDomainQuota(domainName)
         .catch(function() {
@@ -265,6 +266,7 @@ describe('The jamesWebadminClient', function() {
         count: 57
       };
 
+      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.getDomainQuota = sinon.stub().returns($q.when(quota));
 
       jamesWebadminClient.getDomainQuota(domainName)
@@ -287,6 +289,7 @@ describe('The jamesWebadminClient', function() {
       var domainName = 'abc';
       var quota = { size: 11, count: 45 };
 
+      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.reject());
 
       jamesWebadminClient.setDomainQuota(domainName, quota)
@@ -302,6 +305,7 @@ describe('The jamesWebadminClient', function() {
       var domainName = 'abc';
       var quota = { size: 11, count: 45 };
 
+      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.when());
 
       jamesWebadminClient.setDomainQuota(domainName, quota)
