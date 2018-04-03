@@ -6,6 +6,10 @@ module.exports = dependencies => {
   };
 
   return {
+    rights: {
+      admin: 'r',
+      padmin: 'rw'
+    },
     validator: createValidator(schema)
   };
 };

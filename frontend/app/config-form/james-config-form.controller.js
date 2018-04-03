@@ -12,6 +12,7 @@
 
   function jamesConfigFormController(
     $q,
+    session,
     jamesWebadminClientProvider,
     jamesQuotaHelpers
   ) {
@@ -50,6 +51,12 @@
     function _getJamesConfigurations() {
       return _getJamesClient()
         .then(function(jamesClient) {
+          if (self.mode === self.availableModes.domain) {
+            return $q.all([
+              jamesClient.getDomainQuota(session.domain.name)
+            ]);
+          }
+
           return $q.all([
             jamesClient.getQuota()
           ]);
@@ -74,6 +81,12 @@
 
       return _getJamesClient()
         .then(function(jamesClient) {
+          if (self.mode === self.availableModes.domain) {
+            return $q.all([
+              jamesClient.setDomainQuota(session.domain.name, config.quota)
+            ]);
+          }
+
           return $q.all([
             jamesClient.setQuota(config.quota)
           ]);

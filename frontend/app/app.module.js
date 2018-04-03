@@ -11,6 +11,7 @@
     'esn.ui',
     'esn.module-registry',
     'esn.configuration',
-    'esn.user'
+    'esn.user',
+    'esn.session'
   ]);
 })(angular);

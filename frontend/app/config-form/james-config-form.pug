@@ -5,10 +5,10 @@ ng-form(name="urlForm")
   .row.flex-vertical-centered
     .col-xs-6
       esn-form-group(label=__('Backend'), form="urlForm")
-        input.form-control(type="url", ng-model="$ctrl.configurations.webadminApiBackend.value", name="webadminApiBackend", required)
+        input.form-control(type="url", ng-disabled="$ctrl.mode === $ctrl.availableModes.domain" ng-model="$ctrl.configurations.webadminApiBackend.value", name="webadminApiBackend", required)
     .col-xs-6
       esn-form-group(label=__('Frontend'), form="urlForm")
-        input.form-control(type="url", ng-model="$ctrl.configurations.webadminApiFrontend.value", name="webadminApiFrontend", ng-change="$ctrl.onServerUrlChange(configForm)", ng-model-options="{ updateOn: 'default blur', debounce: {'default': 300, 'blur': 0} }", required)
+        input.form-control(type="url", ng-disabled="$ctrl.mode === $ctrl.availableModes.domain", ng-model="$ctrl.configurations.webadminApiFrontend.value", name="webadminApiFrontend", ng-change="$ctrl.onServerUrlChange(configForm)", ng-model-options="{ updateOn: 'default blur', debounce: {'default': 300, 'blur': 0} }", required)
 
 ng-form(name="configForm")
   div(ng-switch="$ctrl.connectionStatus")
