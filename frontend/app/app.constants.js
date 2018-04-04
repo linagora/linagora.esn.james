@@ -10,7 +10,7 @@
         template: 'james-config-form',
         displayIn: {
           user: false,
-          domain: false,
+          domain: true,
           platform: true
         }
       }

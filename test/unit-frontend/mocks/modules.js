@@ -1,6 +1,12 @@
 'use strict';
 
 angular.module('esn.router', []);
+angular.module('esn.session', [])
+  .factory('session', function() {
+    return {
+      domain: {}
+    };
+  });
 angular.module('esn.i18n', []);
 angular.module('esn.http', [])
   .factory('httpErrorHandler', function() {

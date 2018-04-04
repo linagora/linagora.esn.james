@@ -8,6 +8,7 @@ module.exports = dependencies => {
   return {
     rights: {
       user: 'r',
+      admin: 'r',
       padmin: 'rw'
     },
     validator: createValidator(schema)

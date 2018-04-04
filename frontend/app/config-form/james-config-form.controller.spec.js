@@ -8,7 +8,7 @@ var expect = chai.expect;
 describe('The jamesConfigFormController', function() {
 
   var $controller, $rootScope, $scope, $q;
-  var jamesWebadminClientProvider;
+  var session, jamesWebadminClientProvider;
   var $windowMock, jamesClientInstanceMock;
 
   beforeEach(function() {
@@ -35,11 +35,13 @@ describe('The jamesConfigFormController', function() {
       _$controller_,
       _$rootScope_,
       _$q_,
+      _session_,
       _jamesWebadminClientProvider_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $q = _$q_;
+      session = _session_;
       jamesWebadminClientProvider = _jamesWebadminClientProvider_;
 
       jamesWebadminClientProvider.get = sinon.stub().returns($q.when(jamesClientInstanceMock));
@@ -50,6 +52,11 @@ describe('The jamesConfigFormController', function() {
     $scope = scope || $rootScope.$new();
 
     var controller = $controller('jamesConfigFormController', { $scope: $scope });
+
+    controller.availableModes = {
+      domain: 'domain',
+      platform: 'platform'
+    };
 
     controller.adminModulesDisplayerController = {
       registerPostSaveHandler: sinon.spy()
@@ -102,20 +109,28 @@ describe('The jamesConfigFormController', function() {
         postSaveHandler = handler;
       };
       controller.$onInit();
+
+      $rootScope.$digest();
     });
 
     it('should do nothing and resolve if the connection status is not "connected"', function(done) {
+      jamesClientInstanceMock.setQuota = sinon.spy();
+      jamesClientInstanceMock.setDomainQuota = sinon.spy();
+      controller.connectionStatus = 'foo';
+
       postSaveHandler().then(function() {
+        expect(jamesClientInstanceMock.setQuota).to.not.have.been.called;
+        expect(jamesClientInstanceMock.setDomainQuota).to.not.have.been.called;
         done();
       });
 
       $rootScope.$digest();
     });
 
-    it('should call James API to set the quota configuration', function(done) {
+    it('should call James API to set platform quota', function(done) {
       controller.connectionStatus = 'connected';
       controller.config = { quota: { count: 10, size: 12 } };
-      jamesClientInstanceMock.setQuota = sinon.stub().returns($q.when());
+      jamesClientInstanceMock.setQuota = sinon.spy();
 
       postSaveHandler().then(function() {
         expect(jamesClientInstanceMock.setQuota).to.have.been.calledWith(controller.config.quota);
@@ -125,10 +140,24 @@ describe('The jamesConfigFormController', function() {
       $rootScope.$digest();
     });
 
+    it('should call James API to set domain quota', function(done) {
+      controller.connectionStatus = 'connected';
+      controller.config = { quota: { count: 10, size: 12 } };
+      controller.mode = 'domain';
+      jamesClientInstanceMock.setDomainQuota = sinon.spy();
+
+      postSaveHandler().then(function() {
+        expect(jamesClientInstanceMock.setDomainQuota).to.have.been.calledWith(session.domain.name, controller.config.quota);
+        done();
+      });
+
+      $rootScope.$digest();
+    });
+
     it('should qualify quota configuration before saving', function(done) {
       controller.connectionStatus = 'connected';
       controller.config = { quota: { count: 0, size: -100 } };
-      jamesClientInstanceMock.setQuota = sinon.stub().returns($q.when());
+      jamesClientInstanceMock.setQuota = sinon.spy();
 
       postSaveHandler().then(function() {
         expect(jamesClientInstanceMock.setQuota).to.have.been.calledWith({ count: -1, size: -1 });
@@ -173,6 +202,22 @@ describe('The jamesConfigFormController', function() {
 
       expect(controller.config).to.deep.equal({ quota: { size: 11, count: 12 } });
       expect(controller.connectionStatus).to.equal('connected');
+    });
+
+    it('should call James API to get config of domain and assign to controller on success', function(done) {
+      var controller = initController();
+
+      controller.$onInit();
+
+      controller.mode = 'domain';
+      jamesClientInstanceMock.getDomainQuota = sinon.stub().returns({ size: 11, count: 12 });
+      controller.onServerUrlChange(form);
+
+      $rootScope.$digest();
+
+      expect(controller.config).to.deep.equal({ quota: { size: 11, count: 12 } });
+      expect(controller.connectionStatus).to.equal('connected');
+      done();
     });
 
     it('should qualify quota configuration before assigning to controller', function() {
