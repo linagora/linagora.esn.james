@@ -9,11 +9,14 @@ module.exports = (dependencies) => {
   tokenModule = require('./token')(dependencies);
 
   return {
+    addDestinationsToForward,
     addGroup,
     addGroupMembers,
     createDomain,
     getGroupMembers,
+    listDestinationsOfForward,
     listDomains,
+    removeDestinationsOfForward,
     removeDomain,
     removeGroup,
     removeGroupMembers,
@@ -40,6 +43,19 @@ function addGroup(group, members) {
 function addGroupMembers(group, members) {
   return get().then(client =>
     q.all(members.map(member => client.addGroupMember(group, member)))
+  );
+}
+
+/**
+ * Add multiple destinations to a forward (creating the forward if need).
+ *
+ * @param {String} forward      - The forward email address
+ * @param {Array} destinations  - Array of destination email addresses
+ * @return {Promise}            - Resolve on success
+ */
+function addDestinationsToForward(forward, destinations) {
+  return get().then(client =>
+    q.all(destinations.map(destination => client.forward.addDestination(forward, destination)))
   );
 }
 
@@ -109,11 +125,44 @@ function createDomain(domainName) {
 }
 
 /**
+ * List destinations of a forward. James returns 404 when forward does not have any destination,
+ * so an empty array will be resolved in that case.
+ *
+ * @param {String} forward  - The forward email address
+ * @return {Promise}        - Resolve on success
+ */
+function listDestinationsOfForward(forward) {
+  return get().then(client =>
+    client.forward.listDestinationsOfForward(forward)
+      .then(destinations => destinations.map(destination => destination.mailAddress))
+      .catch(err => {
+        if (err.response.status === 404) {
+          return [];
+        }
+
+        return err;
+      }));
+}
+
+/**
  * list domains
  * @return {Promise}          - Resolve on success
  */
 function listDomains() {
   return get().then(client => client.listDomains());
+}
+
+/**
+ * Remove destinations of a forward.
+ *
+ * @param {String} forward      - The forward email address
+ * @param {Array} destinations  - Array of destination email addresses
+ * @return {Promise}            - Resolve on success
+ */
+function removeDestinationsOfForward(forward, destinations) {
+  return get().then(client =>
+    q.all(destinations.map(destination => client.forward.removeDestination(forward, destination)))
+  );
 }
 
 /**
