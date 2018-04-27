@@ -252,4 +252,140 @@ describe('The lib/client module', function() {
       });
     });
   });
+
+  describe('The addDestinationsToForward function', function() {
+    let forward, destinations;
+
+    beforeEach(() => {
+      forward = 'user0@email.com';
+      destinations = ['user1@email.com', 'user2@email.com'];
+    });
+
+    it('should fail if it cannot get API URL', done => {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().addDestinationsToForward(forward, destinations).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', done => {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().addDestinationsToForward(forward, destinations).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should add all destinations one by one', done => {
+      JamesClientMock.prototype.forward = {
+        addDestination: sinon.stub().returns(q.resolve())
+      };
+
+      getModule().addDestinationsToForward(forward, destinations).then(() => {
+        expect(JamesClientMock.prototype.forward.addDestination).to.have.been.calledTwice;
+        expect(JamesClientMock.prototype.forward.addDestination).to.have.been.calledWith(forward, destinations[0]);
+        expect(JamesClientMock.prototype.forward.addDestination).to.have.been.calledWith(forward, destinations[1]);
+        done();
+      });
+    });
+  });
+
+  describe('The removeDestinationsOfForward function', function() {
+    let forward, destinations;
+
+    beforeEach(() => {
+      forward = 'user0@email.com';
+      destinations = ['user1@email.com', 'user2@email.com'];
+    });
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().removeDestinationsOfForward(forward, destinations).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().removeDestinationsOfForward(forward, destinations).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should remove destinations one by one', function(done) {
+      JamesClientMock.prototype.forward = {
+        removeDestination: sinon.stub().returns(q.resolve())
+      };
+
+      getModule().removeDestinationsOfForward(forward, destinations).then(() => {
+        expect(JamesClientMock.prototype.forward.removeDestination).to.have.been.calledTwice;
+        expect(JamesClientMock.prototype.forward.removeDestination).to.have.been.calledWith(forward, destinations[0]);
+        expect(JamesClientMock.prototype.forward.removeDestination).to.have.been.calledWith(forward, destinations[1]);
+        done();
+      });
+    });
+  });
+
+  describe('The listDestinationsOfForward function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().listDestinationsOfForward('user0@email.com').catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().listDestinationsOfForward('user0@email.com').catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should return an empty array if get 404 error from client', function(done) {
+      const forward = 'user0@email.com';
+
+      JamesClientMock.prototype.forward = {
+        listDestinationsOfForward: sinon.stub().returns(q.reject({ response: { status: 404 } }))
+      };
+
+      getModule().listDestinationsOfForward(forward).then(destinations => {
+        expect(JamesClientMock.prototype.forward.listDestinationsOfForward).to.have.been.calledOnce;
+        expect(JamesClientMock.prototype.forward.listDestinationsOfForward).to.have.been.calledWith(forward);
+        expect(destinations).to.have.lengthOf(0);
+        done();
+      });
+    });
+
+    it('should return an array of destinations if success', function(done) {
+      const forward = 'user0@email.com';
+      const dest1 = 'user1@email.com';
+      const dest2 = 'user2@email.com';
+      const destinations = [
+        { mailAddress: dest1 },
+        { mailAddress: dest2 }
+      ];
+
+      JamesClientMock.prototype.forward = {
+        listDestinationsOfForward: sinon.stub().returns(q.resolve(destinations))
+      };
+
+      getModule().listDestinationsOfForward(forward).then(destinations => {
+        expect(JamesClientMock.prototype.forward.listDestinationsOfForward).to.have.been.calledOnce;
+        expect(JamesClientMock.prototype.forward.listDestinationsOfForward).to.have.been.calledWith(forward);
+        expect(destinations).to.deep.equal([dest1, dest2]);
+        done();
+      });
+    });
+  });
 });
