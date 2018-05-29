@@ -24,9 +24,7 @@
     function $onInit() {
       self.adminModulesDisplayerController.registerPostSaveHandler(_saveJamesConfigurations);
 
-      if (self.configurations.webadminApiFrontend.value) {
-        _connect();
-      }
+      _connect();
     }
 
     function onServerUrlChange(configForm) {
@@ -35,6 +33,10 @@
     }
 
     function _connect() {
+      if (!self.configurations.webadminApiFrontend.value) {
+        return;
+      }
+
       self.connectionStatus = CONNECTION_STATUS.connecting;
       self.config = {};
 

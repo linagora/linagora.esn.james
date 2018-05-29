@@ -175,6 +175,15 @@ describe('The jamesConfigFormController', function() {
       form = { $setPristine: sinon.spy() };
     });
 
+    it('should not try to connect when the webadminApiFrontend is not defined', function() {
+      var controller = initController();
+
+      controller.configurations.webadminApiFrontend.value = null;
+      controller.onServerUrlChange(form);
+
+      expect(controller.connectionStatus).to.be.undefined;
+    });
+
     it('should make the given form pristine', function() {
       var controller = initController();
 
