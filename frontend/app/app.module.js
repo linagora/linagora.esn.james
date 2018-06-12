@@ -12,6 +12,7 @@
     'esn.module-registry',
     'esn.configuration',
     'esn.user',
-    'esn.session'
+    'esn.session',
+    'ngFileSaver'
   ]);
 })(angular);

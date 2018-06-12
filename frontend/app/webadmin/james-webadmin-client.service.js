@@ -7,16 +7,21 @@
   function jamesWebadminClient(
     $q,
     esnConfig,
+    FileSaver,
     jamesWebadminClientProvider
   ) {
     return {
       createDomain: createDomain,
+      downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
       getDomainQuota: getDomainQuota,
       getServerUrl: getServerUrl,
       getUserQuota: getUserQuota,
       getGlobalQuota: getGlobalQuota,
+      getMailInMailRepository: getMailInMailRepository,
       setGlobalQuota: setGlobalQuota,
       listDomains: listDomains,
+      listMailRepositories: listMailRepositories,
+      listMailsInMailRepository: listMailsInMailRepository,
       setUserQuota: setUserQuota,
       setDomainQuota: setDomainQuota
     };
@@ -120,6 +125,36 @@
           }
 
           return $q.all(tasks);
+        });
+    }
+
+    function listMailRepositories() {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.list();
+        });
+    }
+
+    function listMailsInMailRepository(repositoryId, options) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.getMails(repositoryId, options);
+        });
+    }
+
+    function getMailInMailRepository(repositoryId, mailKey, options) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.getMail(repositoryId, mailKey, options);
+        });
+    }
+
+    function downloadEmlFileFromMailRepository(repositoryId, mailKey) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.downloadEmlFile(repositoryId, mailKey).then(function(response) {
+            FileSaver.saveAs(response, [mailKey, 'eml'].join('.'));
+          });
         });
     }
 
