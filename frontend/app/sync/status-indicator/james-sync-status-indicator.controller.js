@@ -6,10 +6,16 @@
   .controller('JamesSyncStatusIndicatorController', JamesSyncStatusIndicatorController);
 
   function JamesSyncStatusIndicatorController(
+    asyncAction,
     jamesSynchronizerService
   ) {
     var self = this;
     var synchronizer;
+    var notificationMessages = {
+      progressing: 'Synchronizing group...',
+      success: 'Group synchronized',
+      failure: 'Failed to synchronize group'
+    };
 
     self.$onInit = $onInit;
     self.sync = sync;
@@ -27,7 +33,11 @@
     }
 
     function sync() {
-      return synchronizer.sync(self.resourceId).then(_checkStatus);
+      return asyncAction(notificationMessages, function() {
+        return synchronizer.sync(self.resourceId).then(function() {
+          self.syncError = false;
+        });
+      });
     }
 
     function _checkStatus() {

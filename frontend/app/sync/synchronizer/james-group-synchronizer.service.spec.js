@@ -46,18 +46,53 @@ describe('The jamesGroupSynchronizer service', function() {
   });
 
   describe('The sync fn', function() {
-    it('should call API client to synchronize group', function(done) {
+    it('should reject if failed to synchronize group', function(done) {
+      var status = { ok: true };
       var groupId = '123';
 
+      jamesApiClient.getGroupSyncStatus.returns($q.when({ data: status }));
+      jamesApiClient.syncGroup.returns($q.reject());
+
+      jamesGroupSynchronizer.sync(groupId).catch(function() {
+        expect(jamesApiClient.syncGroup).to.have.been.calledWith(groupId);
+        expect(jamesApiClient.getGroupSyncStatus).to.not.have.been.called;
+        done();
+      });
+
+      $rootScope.$digest();
+    });
+
+    it('should reject if status of group is not ok', function(done) {
+      var status = { ok: false };
+      var groupId = '123';
+
+      jamesApiClient.getGroupSyncStatus.returns($q.when({ data: status }));
+      jamesApiClient.syncGroup.returns($q.when());
+
+      jamesGroupSynchronizer.sync(groupId).catch(function(err) {
+        expect(err).to.equal('Failed to synchronize group');
+        expect(jamesApiClient.syncGroup).to.have.been.calledWith(groupId);
+        expect(jamesApiClient.getGroupSyncStatus).to.have.been.calledWith(groupId);
+        done();
+      });
+
+      $rootScope.$digest();
+    });
+
+    it('should call API client to synchronize group', function(done) {
+      var status = { ok: true };
+      var groupId = '123';
+
+      jamesApiClient.getGroupSyncStatus.returns($q.when({ data: status }));
       jamesApiClient.syncGroup.returns($q.when());
 
       jamesGroupSynchronizer.sync(groupId).then(function() {
         expect(jamesApiClient.syncGroup).to.have.been.calledWith(groupId);
+        expect(jamesApiClient.getGroupSyncStatus).to.have.been.calledWith(groupId);
         done();
       });
 
       $rootScope.$digest();
     });
   });
-
 });

@@ -6,7 +6,7 @@
   .factory('jamesGroupSynchronizer', jamesGroupSynchronizer);
 
   function jamesGroupSynchronizer(
-    asyncAction,
+    $q,
     jamesApiClient
   ) {
     return {
@@ -22,15 +22,14 @@
     }
 
     function sync(groupId) {
-      var notificationMessages = {
-        progressing: 'Synchronizing group...',
-        success: 'Group synchronized',
-        failure: 'Failed to synchronize group'
-      };
-
-      return asyncAction(notificationMessages, function() {
-        return jamesApiClient.syncGroup(groupId);
-      });
+      return jamesApiClient.syncGroup(groupId)
+        .then(function() {
+          return getStatus(groupId).then(function(status) {
+            if (!status.ok) {
+              return $q.reject('Failed to synchronize group');
+            }
+          });
+        });
     }
   }
 })(angular);
