@@ -31,5 +31,8 @@
   "An error occured while getting quota, please try again!": "An error occured while getting quota, please try again!",
   "Updating quota...": "Updating quota...",
   "Quota updated": "Quota updated",
-  "Failed to update quota": "Failed to update quota"
+  "Failed to update quota": "Failed to update quota",
+  "Currently applied quota": "Currently applied quota",
+  "Set quota": "Set quota",
+  "Unlimited": "Unlimited"
 }
