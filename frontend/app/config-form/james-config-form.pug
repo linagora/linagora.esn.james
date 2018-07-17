@@ -13,10 +13,14 @@ ng-form(name="urlForm")
 ng-form(name="configForm")
   div(ng-switch="$ctrl.connectionStatus")
     div(ng-switch-when="connected")
-      .form-title
-        h5 #{__('Quota')}
-        small.text-muted #{__('Define the quota limit for each user. Leave the fields empty for no quota.')}
-      james-quota-form(quota="$ctrl.config.quota")
+      .computed-quota(ng-if="$ctrl.mode === $ctrl.availableModes.domain")
+        h5 #{__('Currently applied quota')}
+        james-quota-displayer(quota="$ctrl.config.computedQuota")
+      .quota-set
+        .form-title
+          h5 #{__('Set quota')}
+          small.text-muted #{__('Define the quota limit for each user. Leave the fields empty for no quota.')}
+        james-quota-form(quota="$ctrl.config.quota")
 
     div(ng-switch-when="connecting")
       .text-center(openpaas-logo-spinner, spinner-start-active="1", spinner-size="0.5")

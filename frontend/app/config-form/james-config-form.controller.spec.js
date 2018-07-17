@@ -8,27 +8,12 @@ var expect = chai.expect;
 describe('The jamesConfigFormController', function() {
 
   var $controller, $rootScope, $scope, $q;
-  var session, jamesWebadminClientProvider;
-  var $windowMock, jamesClientInstanceMock;
+  var session, jamesWebadminClient;
 
   beforeEach(function() {
     module('linagora.esn.james');
-
-    jamesClientInstanceMock = {
-      getQuota: function() { return $q.when({}); },
-      setQuota: function() { return $q.when(); }
-    };
-
-    $windowMock = {
-      james: {
-        Client: function() {
-          return jamesClientInstanceMock;
-        }
-      }
-    };
-
-    angular.mock.module(function($provide) {
-      $provide.value('$window', $windowMock);
+    module('esn.configuration', function($provide) {
+      $provide.value('esnConfig', function() {});
     });
 
     inject(function(
@@ -36,15 +21,24 @@ describe('The jamesConfigFormController', function() {
       _$rootScope_,
       _$q_,
       _session_,
-      _jamesWebadminClientProvider_
+      _jamesWebadminClient_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $q = _$q_;
       session = _session_;
-      jamesWebadminClientProvider = _jamesWebadminClientProvider_;
+      jamesWebadminClient = _jamesWebadminClient_;
 
-      jamesWebadminClientProvider.get = sinon.stub().returns($q.when(jamesClientInstanceMock));
+      jamesWebadminClient.getDomainQuota = sinon.stub().returns($q.when({
+        count: 10,
+        size: 10000
+      }));
+      jamesWebadminClient.setDomainQuota = sinon.stub().returns($q.when());
+      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.when({
+        count: 50,
+        size: 50000
+      }));
+      jamesWebadminClient.setGlobalQuota = sinon.stub().returns($q.when());
     });
   });
 
@@ -114,13 +108,11 @@ describe('The jamesConfigFormController', function() {
     });
 
     it('should do nothing and resolve if the connection status is not "connected"', function(done) {
-      jamesClientInstanceMock.setQuota = sinon.spy();
-      jamesClientInstanceMock.setDomainQuota = sinon.spy();
       controller.connectionStatus = 'foo';
 
       postSaveHandler().then(function() {
-        expect(jamesClientInstanceMock.setQuota).to.not.have.been.called;
-        expect(jamesClientInstanceMock.setDomainQuota).to.not.have.been.called;
+        expect(jamesWebadminClient.setGlobalQuota).to.not.have.been.called;
+        expect(jamesWebadminClient.setDomainQuota).to.not.have.been.called;
         done();
       });
 
@@ -130,10 +122,9 @@ describe('The jamesConfigFormController', function() {
     it('should call James API to set platform quota', function(done) {
       controller.connectionStatus = 'connected';
       controller.config = { quota: { count: 10, size: 12 } };
-      jamesClientInstanceMock.setQuota = sinon.spy();
 
       postSaveHandler().then(function() {
-        expect(jamesClientInstanceMock.setQuota).to.have.been.calledWith(controller.config.quota);
+        expect(jamesWebadminClient.setGlobalQuota).to.have.been.calledWith(controller.config.quota);
         done();
       });
 
@@ -144,10 +135,9 @@ describe('The jamesConfigFormController', function() {
       controller.connectionStatus = 'connected';
       controller.config = { quota: { count: 10, size: 12 } };
       controller.mode = 'domain';
-      jamesClientInstanceMock.setDomainQuota = sinon.spy();
 
       postSaveHandler().then(function() {
-        expect(jamesClientInstanceMock.setDomainQuota).to.have.been.calledWith(session.domain.name, controller.config.quota);
+        expect(jamesWebadminClient.setDomainQuota).to.have.been.calledWith(session.domain.name, controller.config.quota);
         done();
       });
 
@@ -157,10 +147,9 @@ describe('The jamesConfigFormController', function() {
     it('should qualify quota configuration before saving', function(done) {
       controller.connectionStatus = 'connected';
       controller.config = { quota: { count: 0, size: -100 } };
-      jamesClientInstanceMock.setQuota = sinon.spy();
 
       postSaveHandler().then(function() {
-        expect(jamesClientInstanceMock.setQuota).to.have.been.calledWith({ count: -1, size: -1 });
+        expect(jamesWebadminClient.setGlobalQuota).to.have.been.calledWith({ count: null, size: null });
         done();
       });
 
@@ -204,12 +193,12 @@ describe('The jamesConfigFormController', function() {
     it('should call James API to get config and assign to controller on success', function() {
       var controller = initController();
 
-      jamesClientInstanceMock.getQuota = sinon.stub().returns({ size: 11, count: 12 });
+      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.when({ size: 11, count: 12 }));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();
 
-      expect(controller.config).to.deep.equal({ quota: { size: 11, count: 12 } });
+      expect(controller.config).to.shallowDeepEqual({ quota: { size: 11, count: 12 } });
       expect(controller.connectionStatus).to.equal('connected');
     });
 
@@ -219,12 +208,12 @@ describe('The jamesConfigFormController', function() {
       controller.$onInit();
 
       controller.mode = 'domain';
-      jamesClientInstanceMock.getDomainQuota = sinon.stub().returns({ size: 11, count: 12 });
+      jamesWebadminClient.getDomainQuota = sinon.stub().returns($q.when({ size: 11, count: 12 }));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();
 
-      expect(controller.config).to.deep.equal({ quota: { size: 11, count: 12 } });
+      expect(controller.config).to.shallowDeepEqual({ quota: { size: 11, count: 12 } });
       expect(controller.connectionStatus).to.equal('connected');
       done();
     });
@@ -232,18 +221,18 @@ describe('The jamesConfigFormController', function() {
     it('should qualify quota configuration before assigning to controller', function() {
       var controller = initController();
 
-      jamesClientInstanceMock.getQuota = sinon.stub().returns({ size: -11, count: -12 });
+      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.when({ size: -11, count: -12 }));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();
 
-      expect(controller.config).to.deep.equal({ quota: { size: null, count: null } });
+      expect(controller.config).to.shallowDeepEqual({ quota: { size: null, count: null } });
     });
 
     it('should set connectionStatus error on failure', function() {
       var controller = initController();
 
-      jamesClientInstanceMock.getQuota = sinon.stub().returns($q.reject(new Error('an_error')));
+      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.reject(new Error('an_error')));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();
