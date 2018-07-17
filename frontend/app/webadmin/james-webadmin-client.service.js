@@ -5,6 +5,7 @@
     .factory('jamesWebadminClient', jamesWebadminClient);
 
   function jamesWebadminClient(
+    $q,
     esnConfig,
     jamesWebadminClientProvider
   ) {
@@ -13,6 +14,8 @@
       getDomainQuota: getDomainQuota,
       getServerUrl: getServerUrl,
       getUserQuota: getUserQuota,
+      getGlobalQuota: getGlobalQuota,
+      setGlobalQuota: setGlobalQuota,
       listDomains: listDomains,
       setUserQuota: setUserQuota,
       setDomainQuota: setDomainQuota
@@ -39,21 +42,28 @@
     function getUserQuota(username) {
       return _getJamesClient()
         .then(function(jamesClient) {
-          return jamesClient.getUserQuota(username)
-            .then(function(data) {
-              if (data) {
-                return data.user || {};
-              }
-
-              return null;
-            });
+          return jamesClient.getUserQuota(username);
         });
     }
 
     function setUserQuota(username, quota) {
       return _getJamesClient()
         .then(function(jamesClient) {
-          return jamesClient.setUserQuota(username, quota);
+          var tasks = [];
+
+          if (quota.count === null) {
+            tasks.push(jamesClient.deleteUserQuotaCount(username));
+          }
+
+          if (quota.size === null) {
+            tasks.push(jamesClient.deleteUserQuotaSize(username));
+          }
+
+          if (quota.count !== null || quota.size !== null) {
+            tasks.push(jamesClient.setUserQuota(username, quota));
+          }
+
+          return $q.all(tasks);
         });
     }
 
@@ -64,10 +74,52 @@
         });
     }
 
+    function getGlobalQuota() {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.getQuota();
+        });
+    }
+
+    function setGlobalQuota(quota) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          var tasks = [];
+
+          if (quota.count === null) {
+            tasks.push(jamesClient.deleteQuotaCount());
+          }
+
+          if (quota.size === null) {
+            tasks.push(jamesClient.deleteQuotaSize());
+          }
+
+          if (quota.count !== null || quota.size !== null) {
+            tasks.push(jamesClient.setQuota(quota));
+          }
+
+          return $q.all(tasks);
+        });
+    }
+
     function setDomainQuota(domainName, quota) {
       return _getJamesClient()
         .then(function(jamesClient) {
-          return jamesClient.setDomainQuota(domainName, quota);
+          var tasks = [];
+
+          if (quota.count === null) {
+            tasks.push(jamesClient.deleteDomainQuotaCount(domainName));
+          }
+
+          if (quota.size === null) {
+            tasks.push(jamesClient.deleteDomainQuotaSize(domainName));
+          }
+
+          if (quota.count !== null || quota.size !== null) {
+            tasks.push(jamesClient.setDomainQuota(domainName, quota));
+          }
+
+          return $q.all(tasks);
         });
     }
 
