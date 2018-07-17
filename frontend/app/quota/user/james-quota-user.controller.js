@@ -11,21 +11,27 @@
     userUtils
   ) {
     var self = this;
+    var GET_USER_QUOTA_STATUS = {
+      loading: 'loading',
+      loaded: 'loaded',
+      error: 'error'
+    };
 
     self.updateUserQuota = updateUserQuota;
     self.init = init;
 
     function init() {
-      self.status = 'loading';
+      self.status = GET_USER_QUOTA_STATUS.loading;
       self.userDisplayName = userUtils.displayNameOf(self.user);
 
       return jamesWebadminClient.getUserQuota(self.user.emails[0])
         .then(function(quota) {
-          self.quota = jamesQuotaHelpers.qualifyGet(quota);
-          self.status = 'loaded';
+          self.quota = jamesQuotaHelpers.qualifyGet(quota.user);
+          self.computedQuota = jamesQuotaHelpers.qualifyGet(quota.computed);
+          self.status = GET_USER_QUOTA_STATUS.loaded;
         })
         .catch(function() {
-          self.status = 'error';
+          self.status = GET_USER_QUOTA_STATUS.error;
         });
     }
 

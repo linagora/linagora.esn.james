@@ -5,8 +5,8 @@
 
   .factory('jamesQuotaHelpers', jamesQuotaHelpers);
 
-  function jamesQuotaHelpers() {
-    var ACTION_DEFAULT_VALUE = { get: null, set: -1 };
+  function jamesQuotaHelpers(JAMES_UNLIMITED_QUOTA) {
+    var ACTION_DEFAULT_VALUE = { get: null, set: null };
 
     return {
       qualifyGet: qualifyGet,
@@ -14,11 +14,11 @@
     };
 
     function qualifyGet(quota, defaultValue) {
-      defaultValue = defaultValue || ACTION_DEFAULT_VALUE.get;
+      defaultValue = defaultValue || ACTION_DEFAULT_VALUE.set;
       var qualifiedQuota = angular.copy(quota) || {};
 
-      qualifiedQuota.size = qualifiedQuota.size > 0 ? qualifiedQuota.size : defaultValue;
-      qualifiedQuota.count = qualifiedQuota.count > 0 ? qualifiedQuota.count : defaultValue;
+      qualifiedQuota.size = (qualifiedQuota.size > 0 || qualifiedQuota.size === JAMES_UNLIMITED_QUOTA) ? qualifiedQuota.size : defaultValue;
+      qualifiedQuota.count = (qualifiedQuota.size > 0 || qualifiedQuota.size === JAMES_UNLIMITED_QUOTA) ? qualifiedQuota.count : defaultValue;
 
       return qualifiedQuota;
     }
@@ -27,8 +27,8 @@
       defaultValue = defaultValue || ACTION_DEFAULT_VALUE.set;
       var qualifiedQuota = angular.copy(quota) || {};
 
-      qualifiedQuota.size = qualifiedQuota.size > 0 ? qualifiedQuota.size : defaultValue;
-      qualifiedQuota.count = qualifiedQuota.count > 0 ? qualifiedQuota.count : defaultValue;
+      qualifiedQuota.size = (qualifiedQuota.size > 0 || qualifiedQuota.size === JAMES_UNLIMITED_QUOTA) ? qualifiedQuota.size : defaultValue;
+      qualifiedQuota.count = (qualifiedQuota.count > 0 || qualifiedQuota.count === JAMES_UNLIMITED_QUOTA) ? qualifiedQuota.count : defaultValue;
 
       return qualifiedQuota;
     }
