@@ -333,6 +333,82 @@ describe('The lib/client module', function() {
     });
   });
 
+  describe('The removeForward function', function() {
+    const forward = 'user0@email.com';
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().removeForward(forward).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().removeForward(forward).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should remove all destinations of forward', function(done) {
+      const dest1 = 'user1@email.com';
+      const dest2 = 'user2@email.com';
+      const destinations = [
+        { mailAddress: dest1 },
+        { mailAddress: dest2 }
+      ];
+
+      JamesClientMock.prototype.forward = {
+        listDestinationsOfForward: sinon.stub().returns(Promise.resolve(destinations)),
+        removeDestination: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().removeForward(forward).then(() => {
+        expect(JamesClientMock.prototype.forward.listDestinationsOfForward).to.have.been.calledWith(forward);
+        expect(JamesClientMock.prototype.forward.removeDestination).to.have.been.calledWith(forward, dest1);
+        expect(JamesClientMock.prototype.forward.removeDestination).to.have.been.calledWith(forward, dest2);
+        done();
+      });
+    });
+  });
+
+  describe('The removeLocalCopyOfForward function', function() {
+    const forward = 'user0@email.com';
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().removeLocalCopyOfForward(forward).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().removeLocalCopyOfForward(forward).catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should remove local copy of forward', function(done) {
+      JamesClientMock.prototype.forward = {
+        removeDestination: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().removeLocalCopyOfForward(forward).then(() => {
+        expect(JamesClientMock.prototype.forward.removeDestination).to.have.been.calledWith(forward, forward);
+        done();
+      });
+    });
+  });
+
   describe('The listDestinationsOfForward function', function() {
     it('should fail if it cannot get API URL', function(done) {
       esnConfigGetMock = () => q.reject(new Error('an_error'));
@@ -384,6 +460,42 @@ describe('The lib/client module', function() {
         expect(JamesClientMock.prototype.forward.listDestinationsOfForward).to.have.been.calledOnce;
         expect(JamesClientMock.prototype.forward.listDestinationsOfForward).to.have.been.calledWith(forward);
         expect(destinations).to.deep.equal([dest1, dest2]);
+        done();
+      });
+    });
+  });
+
+  describe('The listForwardsInDomain function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().listForwardsInDomain('domain-name').catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().listForwardsInDomain('domain-name').catch(err => {
+        expect(err.message).to.equal('an_error');
+        done();
+      });
+    });
+
+    it('should return an array of forwards in domain if success', function(done) {
+      const forward0 = 'user0@domain1.com';
+      const forward1 = 'user1@domain1.com';
+      const forward2 = 'user2@domain2.com';
+
+      JamesClientMock.prototype.forward = {
+        list: sinon.stub().returns(Promise.resolve([forward0, forward1, forward2]))
+      };
+
+      getModule().listForwardsInDomain('domain1.com').then(forwards => {
+        expect(JamesClientMock.prototype.forward.list).to.have.been.called;
+        expect(forwards).to.deep.equal([forward0, forward1]);
         done();
       });
     });
