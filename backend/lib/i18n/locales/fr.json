@@ -31,5 +31,8 @@
   "An error occured while getting quota, please try again!": "Une erreur est survenue en chargeant le quota, veuillez réessayer!",
   "Updating quota...": "Mise à jour du quota...",
   "Quota updated": "Le quota est mis à jour",
-  "Failed to update quota": "Impossible de mettre à jour le quota"
+  "Failed to update quota": "Impossible de mettre à jour le quota",
+  "Currently applied quota": "Quota actuellement appliqué",
+  "Set quota": "Modifier le quota",
+  "Unlimited": "Illimité"
 }

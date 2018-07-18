@@ -31,5 +31,8 @@
   "An error occured while getting quota, please try again!": "Có lỗi xảy ra khi lấy định mức, vui lòng thử lại!",
   "Updating quota...": "Đang cập nhật định mức...",
   "Quota updated": "Đã cập nhật định mức",
-  "Failed to update quota": "Cập nhật định mức thất bại"
+  "Failed to update quota": "Cập nhật định mức thất bại",
+  "Currently applied quota": "Định mức đang áp dụng",
+  "Set quota": "Đặt định mức",
+  "Unlimited": "Không giới hạn"
 }

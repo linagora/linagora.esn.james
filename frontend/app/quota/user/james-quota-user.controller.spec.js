@@ -51,7 +51,10 @@ describe('The jamesQuotaUserController', function() {
       var user = {
         emails: ['toto@tata.ti']
       };
-      var quota = { count: 1, size: 1 };
+      var quota = {
+        user: { count: 1, size: 1 },
+        computed: { count: 1, size: 1 }
+      };
 
       jamesWebadminClient.getUserQuota = sinon.stub().returns($q.when(quota));
       var controller = initController();
@@ -62,7 +65,8 @@ describe('The jamesQuotaUserController', function() {
         .then(function() {
           expect(jamesWebadminClient.getUserQuota).to.have.been.calledWith(controller.user.emails[0]);
           expect(controller.status).to.equal('loaded');
-          expect(controller.quota).to.deep.equal(quota);
+          expect(controller.quota).to.deep.equal(quota.user);
+          expect(controller.computedQuota).to.deep.equal(quota.computed);
           done();
         })
         .catch(done);

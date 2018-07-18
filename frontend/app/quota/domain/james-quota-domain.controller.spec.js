@@ -29,9 +29,6 @@ describe('The JamesQuotaDomainController', function() {
       $q = _$q_;
       jamesWebadminClient = _jamesWebadminClient_;
       jamesQuotaHelpers = _jamesQuotaHelpers_;
-
-      jamesQuotaHelpers.qualifyGet = function(quota) { return quota; };
-      jamesQuotaHelpers.qualifySet = function(quota) { return quota; };
     });
   });
 
@@ -76,7 +73,10 @@ describe('The JamesQuotaDomainController', function() {
 
     it('should set the status to loaded if succeed to get domain quota', function() {
       var domain = { name: 'abc' };
-      var quota = { count: 16, size: 21 };
+      var quota = {
+        domain: { count: 16, size: 21 },
+        computed: { count: 20, size: 1000 }
+      };
       var controller = initController();
 
       controller.domain = domain;
@@ -87,26 +87,28 @@ describe('The JamesQuotaDomainController', function() {
 
       expect(jamesWebadminClient.getDomainQuota).to.have.been.calledWith(domain.name);
       expect(controller.status).to.equal('loaded');
-      expect(controller.quota).to.deep.equal(quota);
+      expect(controller.quota).to.deep.equal(quota.domain);
+      expect(controller.computedQuota).to.deep.equal(quota.computed);
     });
 
     it('should qualify quota when succeed to get domain quota', function() {
       var domain = { name: 'abc' };
-      var quota = { count: 16, size: 21 };
-      var qualifiedQuota = { foo: 'bar' };
+      var quota = {
+        domain: { count: -10, size: -20 },
+        computed: { count: 100, size: 2000 }
+      };
       var controller = initController();
 
       controller.domain = domain;
       jamesWebadminClient.getDomainQuota = function() {
         return $q.when(quota);
       };
-      jamesQuotaHelpers.qualifyGet = sinon.stub().returns(qualifiedQuota);
 
       controller.getDomainQuota();
       $rootScope.$digest();
 
-      expect(jamesQuotaHelpers.qualifyGet).to.have.been.calledWith(quota);
-      expect(controller.quota).to.deep.equal(qualifiedQuota);
+      expect(controller.quota).to.deep.equal({ count: null, size: null });
+      expect(controller.computedQuota).to.deep.equal({ count: 100, size: 2000 });
     });
   });
 

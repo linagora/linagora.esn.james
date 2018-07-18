@@ -29,7 +29,8 @@
 
       return jamesWebadminClient.getDomainQuota(self.domain.name)
         .then(function(quota) {
-          self.quota = jamesQuotaHelpers.qualifyGet(quota);
+          self.quota = jamesQuotaHelpers.qualifyGet(quota.domain);
+          self.computedQuota = jamesQuotaHelpers.qualifyGet(quota.computed);
           self.status = GET_DOMAIN_QUOTA_STATUS.loaded;
         })
         .catch(function() {

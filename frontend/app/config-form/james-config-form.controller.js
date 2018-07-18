@@ -13,8 +13,8 @@
   function jamesConfigFormController(
     $q,
     session,
-    jamesWebadminClientProvider,
-    jamesQuotaHelpers
+    jamesQuotaHelpers,
+    jamesWebadminClient
   ) {
     var self = this;
 
@@ -51,25 +51,22 @@
     }
 
     function _getJamesConfigurations() {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          if (self.mode === self.availableModes.domain) {
-            return $q.all([
-              jamesClient.getDomainQuota(session.domain.name)
-            ]);
-          }
+      var getQuota;
 
-          return $q.all([
-            jamesClient.getQuota()
-          ]);
-        })
-        .then(function(data) {
-          var config = {
-            quota: jamesQuotaHelpers.qualifyGet(data[0])
-          };
+      if (self.mode === self.availableModes.domain) {
+        getQuota = jamesWebadminClient.getDomainQuota(session.domain.name);
+      } else {
+        getQuota = jamesWebadminClient.getGlobalQuota();
+      }
 
-          return config;
-        });
+      return getQuota.then(function(data) {
+        var config = {
+          quota: data.domain ? jamesQuotaHelpers.qualifyGet(data.domain) : jamesQuotaHelpers.qualifyGet(data),
+          computedQuota: jamesQuotaHelpers.qualifyGet(data.computed)
+        };
+
+        return config;
+      });
     }
 
     function _saveJamesConfigurations() {
@@ -81,22 +78,11 @@
         quota: jamesQuotaHelpers.qualifySet(self.config.quota)
       };
 
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          if (self.mode === self.availableModes.domain) {
-            return $q.all([
-              jamesClient.setDomainQuota(session.domain.name, config.quota)
-            ]);
-          }
+      if (self.mode === self.availableModes.domain) {
+        return jamesWebadminClient.setDomainQuota(session.domain.name, config.quota);
+      }
 
-          return $q.all([
-            jamesClient.setQuota(config.quota)
-          ]);
-        });
-    }
-
-    function _getJamesClient() {
-      return jamesWebadminClientProvider.get(self.configurations.webadminApiFrontend.value);
+      return jamesWebadminClient.setGlobalQuota(config.quota);
     }
   }
 })(angular);
