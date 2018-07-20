@@ -16,10 +16,13 @@ module.exports = (dependencies) => {
     getGroupMembers,
     listDestinationsOfForward,
     listDomains,
+    listForwardsInDomain,
     removeDestinationsOfForward,
     removeDomain,
+    removeForward,
     removeGroup,
     removeGroupMembers,
+    removeLocalCopyOfForward,
     updateGroup
   };
 };
@@ -70,6 +73,20 @@ function getGroupMembers(group) {
 }
 
 /**
+ * Remove a forward.
+ *
+ * @param  {String} forward - The forward to be removed
+ * @return {Promise}        - Resolve on success
+ */
+function removeForward(forward) {
+  return get().then(client =>
+    client.forward.listDestinationsOfForward(forward)
+      .then(destinations => destinations.map(destination => destination.mailAddress))
+      .then(destinations => q.all(destinations.map(destination => client.forward.removeDestination(forward, destination))))
+  );
+}
+
+/**
  * Remove a group
  * @param  {String} group - The group email address
  * @return {Promise}      - Resolve on success
@@ -93,6 +110,17 @@ function removeGroupMembers(group, members) {
   return get().then(client =>
     q.all(members.map(member => client.removeGroupMember(group, member)))
   );
+}
+
+/**
+ * Remove local copy of a specific foward.
+ * Local copy means that forward email address itself is one destination.
+ *
+ * @param {String} forward  - The forward email address
+ * @return {Promise}        - Resolve on success
+ */
+function removeLocalCopyOfForward(forward) {
+  return removeDestinationsOfForward(forward, [forward]);
 }
 
 /**
@@ -150,6 +178,17 @@ function listDestinationsOfForward(forward) {
  */
 function listDomains() {
   return get().then(client => client.listDomains());
+}
+
+/**
+ * List forwards in a specific domain.
+ *
+ * @param  {String} domainName  - Name of the domain
+ * @return {Promise}            - Resolve list forwards on success
+ */
+function listForwardsInDomain(domainName) {
+  return get().then(client => client.forward.list())
+              .then(forwards => forwards.filter(forward => forward.endsWith(domainName)));
 }
 
 /**
