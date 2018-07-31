@@ -9,8 +9,9 @@ describe('The jamesWebadminClient', function() {
 
   var $rootScope, $q;
   var $windowMock, jamesClientInstanceMock;
-  var jamesWebadminClient, jamesWebadminClientProvider, esnConfigMock;
+  var jamesWebadminClient, jamesWebadminClientProvider, esnConfigMock, FileSaver;
   var domain, serverUrl, username;
+  var REPOSITORY_ID = 'file://var/www/example';
 
   beforeEach(function() {
     module('linagora.esn.james');
@@ -28,7 +29,6 @@ describe('The jamesWebadminClient', function() {
     domain = { name: 'abc.com' };
     serverUrl = 'http://james.com';
     username = 'user@abc.com';
-    esnConfigMock = {};
 
     module(function($provide) {
       $provide.value('$window', $windowMock);
@@ -43,13 +43,16 @@ describe('The jamesWebadminClient', function() {
       _$rootScope_,
       _$q_,
       _jamesWebadminClient_,
-      _jamesWebadminClientProvider_
+      _jamesWebadminClientProvider_,
+      _FileSaver_
     ) {
       $rootScope = _$rootScope_;
       $q = _$q_;
       jamesWebadminClient = _jamesWebadminClient_;
       jamesWebadminClientProvider = _jamesWebadminClientProvider_;
+      FileSaver = _FileSaver_;
 
+      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.createDomain = sinon.stub().returns($q.when());
       jamesWebadminClientProvider.get = sinon.stub().returns($q.when(jamesClientInstanceMock));
     });
@@ -59,7 +62,6 @@ describe('The jamesWebadminClient', function() {
     it('should reject if failed to create domain in James', function(done) {
       var error = new Error('something wrong');
 
-      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.createDomain = sinon.stub().returns($q.reject(error));
 
       jamesWebadminClient.createDomain(domain.name)
@@ -75,7 +77,6 @@ describe('The jamesWebadminClient', function() {
     });
 
     it('should resolve if successfully to create domain in James', function(done) {
-      esnConfigMock = $q.when(serverUrl);
       jamesWebadminClient.createDomain(domain.name)
         .then(function() {
           expect(jamesClientInstanceMock.createDomain).to.have.been.calledOnce;
@@ -105,7 +106,6 @@ describe('The jamesWebadminClient', function() {
     });
 
     it('should resolve if successfully to get James server URL', function(done) {
-      esnConfigMock = $q.when(serverUrl);
       jamesWebadminClient.getServerUrl()
         .then(function(url) {
           expect(url).to.equal(serverUrl);
@@ -122,7 +122,6 @@ describe('The jamesWebadminClient', function() {
       var error = new Error('something wrong');
 
       jamesClientInstanceMock.listDomains = sinon.stub().returns($q.reject(error));
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.listDomains()
         .catch(function(err) {
@@ -139,7 +138,6 @@ describe('The jamesWebadminClient', function() {
       var domains = ['awesome.com'];
 
       jamesClientInstanceMock.listDomains = sinon.stub().returns($q.when(domains));
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.listDomains()
         .then(function(jamesDomains) {
@@ -158,7 +156,6 @@ describe('The jamesWebadminClient', function() {
       var error = new Error('something wrong');
 
       jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.reject(error));
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.getUserQuota(username)
         .catch(function(err) {
@@ -175,7 +172,6 @@ describe('The jamesWebadminClient', function() {
       var quota = { user: {} };
 
       jamesClientInstanceMock.getUserQuota = sinon.stub().returns($q.when(quota));
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.getUserQuota(username)
         .then(function(userQuota) {
@@ -196,7 +192,6 @@ describe('The jamesWebadminClient', function() {
       var error = new Error('something wrong');
 
       jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.reject(error));
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setUserQuota(username, quota)
         .catch(function(err) {
@@ -214,7 +209,6 @@ describe('The jamesWebadminClient', function() {
       var quota = {};
 
       jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setUserQuota(username, quota)
         .then(function() {
@@ -235,7 +229,6 @@ describe('The jamesWebadminClient', function() {
 
       jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteUserQuotaCount = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setUserQuota(username, quota)
         .then(function() {
@@ -256,7 +249,6 @@ describe('The jamesWebadminClient', function() {
 
       jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteUserQuotaSize = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setUserQuota(username, quota)
         .then(function() {
@@ -278,7 +270,6 @@ describe('The jamesWebadminClient', function() {
       jamesClientInstanceMock.setUserQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteUserQuotaCount = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteUserQuotaSize = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setUserQuota(username, quota)
         .then(function() {
@@ -296,7 +287,6 @@ describe('The jamesWebadminClient', function() {
     it('should reject if failed to get domain quota', function(done) {
       var domainName = 'abc';
 
-      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.getDomainQuota = sinon.stub().returns($q.reject());
       jamesWebadminClient.getDomainQuota(domainName)
         .catch(function() {
@@ -314,7 +304,6 @@ describe('The jamesWebadminClient', function() {
         count: 57
       };
 
-      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.getDomainQuota = sinon.stub().returns($q.when(quota));
 
       jamesWebadminClient.getDomainQuota(domainName)
@@ -337,7 +326,6 @@ describe('The jamesWebadminClient', function() {
       var domainName = 'abc';
       var quota = { size: 11, count: 45 };
 
-      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.reject());
 
       jamesWebadminClient.setDomainQuota(domainName, quota)
@@ -353,7 +341,6 @@ describe('The jamesWebadminClient', function() {
       var domainName = 'abc';
       var quota = { size: 11, count: 45 };
 
-      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.when());
 
       jamesWebadminClient.setDomainQuota(domainName, quota)
@@ -375,7 +362,6 @@ describe('The jamesWebadminClient', function() {
 
       jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteDomainQuotaCount = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setDomainQuota(username, quota)
         .then(function() {
@@ -396,7 +382,6 @@ describe('The jamesWebadminClient', function() {
 
       jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteDomainQuotaSize = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setDomainQuota(username, quota)
         .then(function() {
@@ -418,7 +403,6 @@ describe('The jamesWebadminClient', function() {
       jamesClientInstanceMock.setDomainQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteDomainQuotaCount = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteDomainQuotaSize = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setDomainQuota(username, quota)
         .then(function() {
@@ -434,7 +418,6 @@ describe('The jamesWebadminClient', function() {
 
   describe('The getGlobalQuota function', function() {
     it('should reject if failed to get global quota', function(done) {
-      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.getQuota = sinon.stub().returns($q.reject());
       jamesWebadminClient.getGlobalQuota()
         .catch(function() {
@@ -451,7 +434,6 @@ describe('The jamesWebadminClient', function() {
         count: 57
       };
 
-      esnConfigMock = $q.when(serverUrl);
       jamesClientInstanceMock.getQuota = sinon.stub().returns($q.when(quota));
 
       jamesWebadminClient.getGlobalQuota()
@@ -475,7 +457,6 @@ describe('The jamesWebadminClient', function() {
       var error = new Error('something wrong');
 
       jamesClientInstanceMock.setQuota = sinon.stub().returns($q.reject(error));
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setGlobalQuota(quota)
         .catch(function(err) {
@@ -492,7 +473,6 @@ describe('The jamesWebadminClient', function() {
       var quota = {};
 
       jamesClientInstanceMock.setQuota = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setGlobalQuota(quota)
         .then(function() {
@@ -512,7 +492,6 @@ describe('The jamesWebadminClient', function() {
 
       jamesClientInstanceMock.setQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteQuotaCount = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setGlobalQuota(quota)
         .then(function() {
@@ -532,7 +511,6 @@ describe('The jamesWebadminClient', function() {
 
       jamesClientInstanceMock.setQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteQuotaSize = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setGlobalQuota(quota)
         .then(function() {
@@ -553,7 +531,6 @@ describe('The jamesWebadminClient', function() {
       jamesClientInstanceMock.setQuota = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteQuotaCount = sinon.stub().returns($q.when());
       jamesClientInstanceMock.deleteQuotaSize = sinon.stub().returns($q.when());
-      esnConfigMock = $q.when(serverUrl);
 
       jamesWebadminClient.setGlobalQuota(quota)
         .then(function() {
@@ -564,6 +541,131 @@ describe('The jamesWebadminClient', function() {
         });
 
       $rootScope.$digest();
+    });
+  });
+
+  describe('The listMailRepositories function', function() {
+    it('should reject if failed to list mail repositories', function(done) {
+      jamesClientInstanceMock.mailRepositories = {
+        list: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.listMailRepositories()
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.list).to.have.been.called;
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve if listed email repositories successfully', function() {
+      jamesClientInstanceMock.mailRepositories = {
+        list: sinon.stub().returns($q.when([]))
+      };
+
+      jamesWebadminClient.listMailRepositories();
+
+      $rootScope.$digest();
+
+      expect(jamesClientInstanceMock.mailRepositories.list).to.have.been.called;
+    });
+  });
+
+  describe('The listMailsInMailRepository function', function() {
+    it('should reject if failed to list mails in a mail repository', function(done) {
+      jamesClientInstanceMock.mailRepositories = {
+        getMails: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.listMailsInMailRepository(REPOSITORY_ID)
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.getMails).to.have.been.calledWith(REPOSITORY_ID);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve if listed mail in a mail repository successfully', function() {
+      jamesClientInstanceMock.mailRepositories = {
+        getMails: sinon.stub().returns($q.when([]))
+      };
+
+      jamesWebadminClient.listMailsInMailRepository(REPOSITORY_ID);
+
+      $rootScope.$digest();
+
+      expect(jamesClientInstanceMock.mailRepositories.getMails).to.have.been.calledWith(REPOSITORY_ID);
+    });
+  });
+
+  describe('The getMailInMailRepository function', function() {
+    it('should reject if failed to get mail details in a mail repository', function(done) {
+      var mailKey = 'mail-key-1';
+
+      jamesClientInstanceMock.mailRepositories = {
+        getMail: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.getMailInMailRepository(REPOSITORY_ID, mailKey)
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.getMail).to.have.been.calledWith(REPOSITORY_ID, mailKey);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve if gotten mail detail in a mail repository successfully', function() {
+      var mailKey = 'mail-key-1';
+
+      jamesClientInstanceMock.mailRepositories = {
+        getMail: sinon.stub().returns($q.when([]))
+      };
+
+      jamesWebadminClient.getMailInMailRepository(REPOSITORY_ID, mailKey);
+
+      $rootScope.$digest();
+
+      expect(jamesClientInstanceMock.mailRepositories.getMail).to.have.been.calledWith(REPOSITORY_ID, mailKey);
+    });
+  });
+
+  describe('The downloadEmlFileFromMailRepository function', function() {
+    it('should reject if failed download eml file', function(done) {
+      var mailKey = 'mail-key-1';
+
+      FileSaver.saveAs = sinon.spy();
+      jamesClientInstanceMock.mailRepositories = {
+        downloadEmlFile: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.downloadEmlFileFromMailRepository(REPOSITORY_ID, mailKey)
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.downloadEmlFile).to.have.been.calledWith(REPOSITORY_ID, mailKey);
+          expect(FileSaver.saveAs).to.not.have.been.called;
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should call FileSaver with the retrieved blob object', function() {
+      var mailKey = 'mail-key-1';
+      var blob = new Blob();
+
+      FileSaver.saveAs = sinon.stub().returns(blob);
+      jamesClientInstanceMock.mailRepositories = {
+        downloadEmlFile: sinon.stub().returns($q.when(blob))
+      };
+
+      jamesWebadminClient.downloadEmlFileFromMailRepository(REPOSITORY_ID, mailKey);
+
+      $rootScope.$digest();
+
+      expect(jamesClientInstanceMock.mailRepositories.downloadEmlFile).to.have.been.calledWith(REPOSITORY_ID, mailKey);
+      expect(FileSaver.saveAs).to.have.been.calledWith(blob, 'mail-key-1.eml');
     });
   });
 });

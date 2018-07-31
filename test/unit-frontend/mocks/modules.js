@@ -32,3 +32,9 @@ angular.module('esn.user', [])
       displayNameOf: angular.noop
     };
   });
+angular.module('ngFileSaver', [])
+  .factory('FileSaver', function() {
+    return {
+      saveAs: angular.noop
+    };
+  });
