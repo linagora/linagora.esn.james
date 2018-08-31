@@ -668,4 +668,126 @@ describe('The jamesWebadminClient', function() {
       expect(FileSaver.saveAs).to.have.been.calledWith(blob, 'mail-key-1.eml');
     });
   });
+
+  describe('The listDlpRules function', function() {
+    beforeEach(function() {
+      esnConfigMock = $q.when(serverUrl);
+    });
+
+    it('should reject if failed to list rules', function(done) {
+      jamesClientInstanceMock.dlpRules = {
+        list: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.listDlpRules(domain.name)
+        .catch(function() {
+          expect(jamesClientInstanceMock.dlpRules.list).to.have.been.calledWith(domain.name);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success to list rules', function(done) {
+      var rules = [{
+        id: '1',
+        expression: 'abc',
+        explanation: 'Anything contains abcs',
+        targetsSender: false,
+        targetsRecipients: false,
+        targetsContent: true
+      }];
+
+      jamesClientInstanceMock.dlpRules = {
+        list: sinon.stub().returns($q.when({ rules: rules }))
+      };
+
+      jamesWebadminClient.listDlpRules(domain.name)
+        .then(function(_rules_) {
+          expect(_rules_).to.deep.equal(rules);
+          expect(jamesClientInstanceMock.dlpRules.list).to.have.been.calledWith(domain.name);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The storeDlpRules function', function() {
+    it('should reject if failed to store rules', function(done) {
+      var rules = [{
+        id: '1',
+        expression: 'abc',
+        explanation: 'Anything contains abcs',
+        targetsSender: false,
+        targetsRecipients: false,
+        targetsContent: true
+      }];
+
+      jamesClientInstanceMock.dlpRules = {
+        store: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.storeDlpRules(domain.name, rules)
+        .catch(function() {
+          expect(jamesClientInstanceMock.dlpRules.store).to.have.been.calledWith(domain.name, { rules: rules });
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success to store rules', function(done) {
+      var rules = [{
+        id: '1',
+        expression: 'abc',
+        explanation: 'Anything contains abcs',
+        targetsSender: false,
+        targetsRecipients: false,
+        targetsContent: true
+      }];
+
+      jamesClientInstanceMock.dlpRules = {
+        store: sinon.stub().returns($q.when())
+      };
+
+      jamesWebadminClient.storeDlpRules(domain.name, rules)
+        .then(function() {
+          expect(jamesClientInstanceMock.dlpRules.store).to.have.been.calledWith(domain.name, { rules: rules });
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The removeDlpRules function', function() {
+    it('should reject if failed to remove rules', function(done) {
+      jamesClientInstanceMock.dlpRules = {
+        remove: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.removeDlpRules(domain.name)
+        .catch(function() {
+          expect(jamesClientInstanceMock.dlpRules.remove).to.have.been.calledWith(domain.name);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success to remove rules', function(done) {
+      jamesClientInstanceMock.dlpRules = {
+        remove: sinon.stub().returns($q.when())
+      };
+
+      jamesWebadminClient.removeDlpRules(domain.name)
+        .then(function() {
+          expect(jamesClientInstanceMock.dlpRules.remove).to.have.been.calledWith(domain.name);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
 });
