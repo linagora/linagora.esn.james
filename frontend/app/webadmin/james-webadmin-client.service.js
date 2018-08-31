@@ -19,11 +19,14 @@
       getGlobalQuota: getGlobalQuota,
       getMailInMailRepository: getMailInMailRepository,
       setGlobalQuota: setGlobalQuota,
+      listDlpRules: listDlpRules,
       listDomains: listDomains,
       listMailRepositories: listMailRepositories,
       listMailsInMailRepository: listMailsInMailRepository,
+      removeDlpRules: removeDlpRules,
       setUserQuota: setUserQuota,
-      setDomainQuota: setDomainQuota
+      setDomainQuota: setDomainQuota,
+      storeDlpRules: storeDlpRules
     };
 
     function createDomain(domainName) {
@@ -155,6 +158,30 @@
           return jamesClient.mailRepositories.downloadEmlFile(repositoryId, mailKey).then(function(response) {
             FileSaver.saveAs(response, [mailKey, 'eml'].join('.'));
           });
+        });
+    }
+
+    function listDlpRules(domainName) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.dlpRules.list(domainName);
+        })
+        .then(function(data) {
+          return data.rules;
+        });
+    }
+
+    function storeDlpRules(domainName, rules) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.dlpRules.store(domainName, { rules: rules });
+        });
+    }
+
+    function removeDlpRules(domainName) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.dlpRules.remove(domainName);
         });
     }
 

@@ -7,7 +7,7 @@ module.exports = function(config) {
       'frontend/components/chai/chai.js',
       'node_modules/chai-shallow-deep-equal/chai-shallow-deep-equal.js',
       'frontend/components/jquery/dist/jquery.min.js',
-      'frontend/components/angular/angular.min.js',
+      'frontend/components/angular/angular.js',
       'frontend/components/angular-ui-router/release/angular-ui-router.min.js',
       'frontend/components/angular-mocks/angular-mocks.js',
       'frontend/components/dynamic-directive/dist/dynamic-directive.min.js',
