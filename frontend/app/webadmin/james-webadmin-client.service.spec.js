@@ -790,4 +790,70 @@ describe('The jamesWebadminClient', function() {
       $rootScope.$digest();
     });
   });
+
+  describe('The deleteMailInMailRepository function', function() {
+    it('should reject if failed to delete a mail in mail repository', function(done) {
+      jamesClientInstanceMock.mailRepositories = {
+        removeMail: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.deleteMailInMailRepository('var/mail/sample', 'mail-key1')
+        .then(function() {
+          done(new Error('should not resolve'));
+        })
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.removeMail).to.have.been.calledWith('var/mail/sample', 'mail-key1');
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success todelete a mail in mail repository', function(done) {
+      jamesClientInstanceMock.mailRepositories = {
+        removeMail: sinon.stub().returns($q.when())
+      };
+
+      jamesWebadminClient.deleteMailInMailRepository('var/mail/sample', 'mail-key1')
+        .then(function() {
+          expect(jamesClientInstanceMock.mailRepositories.removeMail).to.have.been.calledWith('var/mail/sample', 'mail-key1');
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The deleteAllMailsInMailRepository function', function() {
+    it('should reject if failed to delete all mails in mail repository', function(done) {
+      jamesClientInstanceMock.mailRepositories = {
+        removeAllMails: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.deleteAllMailsInMailRepository('var/mail/sample')
+        .then(function() {
+          done(new Error('should not resolve'));
+        })
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.removeAllMails).to.have.been.calledWith('var/mail/sample');
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success to delete all mails in mail repository', function(done) {
+      jamesClientInstanceMock.mailRepositories = {
+        removeAllMails: sinon.stub().returns($q.when())
+      };
+
+      jamesWebadminClient.deleteAllMailsInMailRepository('var/mail/sample')
+        .then(function() {
+          expect(jamesClientInstanceMock.mailRepositories.removeAllMails).to.have.been.calledWith('var/mail/sample');
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
 });
