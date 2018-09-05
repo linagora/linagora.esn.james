@@ -12,6 +12,8 @@
   ) {
     return {
       createDomain: createDomain,
+      deleteMailInMailRepository: deleteMailInMailRepository,
+      deleteAllMailsInMailRepository: deleteAllMailsInMailRepository,
       downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
       getDomainQuota: getDomainQuota,
       getServerUrl: getServerUrl,
@@ -182,6 +184,20 @@
       return _getJamesClient()
         .then(function(jamesClient) {
           return jamesClient.dlpRules.remove(domainName);
+        });
+    }
+
+    function deleteMailInMailRepository(repositoryId, mailKey) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.removeMail(repositoryId, mailKey);
+        });
+    }
+
+    function deleteAllMailsInMailRepository(repositoryId) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.removeAllMails(repositoryId);
         });
     }
 
