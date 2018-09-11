@@ -856,4 +856,82 @@ describe('The jamesWebadminClient', function() {
       $rootScope.$digest();
     });
   });
+
+  describe('The reprocessAllMailsFromMailRepository function', function() {
+    it('should reject if failed to reprocess all mails from a mail repository', function(done) {
+      var options = {
+        processor: 'processor'
+      };
+
+      jamesClientInstanceMock.mailRepositories = {
+        reprocessAllMails: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.reprocessAllMailsFromMailRepository(REPOSITORY_ID, options)
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.reprocessAllMails).to.have.been.calledWith(REPOSITORY_ID, options);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success to reprocess all mails from a mail repository', function(done) {
+      var options = {
+        processor: 'processor'
+      };
+
+      jamesClientInstanceMock.mailRepositories = {
+        reprocessAllMails: sinon.stub().returns($q.when())
+      };
+
+      jamesWebadminClient.reprocessAllMailsFromMailRepository(REPOSITORY_ID, options)
+        .then(function() {
+          expect(jamesClientInstanceMock.mailRepositories.reprocessAllMails).to.have.been.calledWith(REPOSITORY_ID, options);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
+
+  describe('The reprocessMailFromMailRepository function', function() {
+    it('should reject if failed to reprocess a specific mail from a mail repository', function(done) {
+      var options = {
+        processor: 'processor'
+      };
+      var mailKey = '123';
+
+      jamesClientInstanceMock.mailRepositories = {
+        reprocessMail: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.reprocessMailFromMailRepository(REPOSITORY_ID, mailKey, options)
+        .catch(function() {
+          expect(jamesClientInstanceMock.mailRepositories.reprocessMail).to.have.been.calledWith(REPOSITORY_ID, mailKey, options);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success to reprocess a specific mail from a mail repository', function(done) {
+      var options = {
+        processor: 'processor'
+      };
+      var mailKey = '123';
+
+      jamesClientInstanceMock.mailRepositories = {
+        reprocessMail: sinon.stub().returns($q.when())
+      };
+
+      jamesWebadminClient.reprocessMailFromMailRepository(REPOSITORY_ID, mailKey, options)
+        .then(function() {
+          expect(jamesClientInstanceMock.mailRepositories.reprocessMail).to.have.been.calledWith(REPOSITORY_ID, mailKey, options);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
 });
