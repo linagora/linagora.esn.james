@@ -26,6 +26,8 @@
       listMailRepositories: listMailRepositories,
       listMailsInMailRepository: listMailsInMailRepository,
       removeDlpRules: removeDlpRules,
+      reprocessAllMailsFromMailRepository: reprocessAllMailsFromMailRepository,
+      reprocessMailFromMailRepository: reprocessMailFromMailRepository,
       setUserQuota: setUserQuota,
       setDomainQuota: setDomainQuota,
       storeDlpRules: storeDlpRules
@@ -198,6 +200,20 @@
       return _getJamesClient()
         .then(function(jamesClient) {
           return jamesClient.mailRepositories.removeAllMails(repositoryId);
+        });
+    }
+
+    function reprocessAllMailsFromMailRepository(repositoryId, options) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.reprocessAllMails(repositoryId, options);
+        });
+    }
+
+    function reprocessMailFromMailRepository(repositoryId, mailKey, options) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.mailRepositories.reprocessMail(repositoryId, mailKey, options);
         });
     }
 
