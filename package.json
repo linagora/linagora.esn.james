@@ -54,7 +54,7 @@
     "node": ">=6.5.0"
   },
   "dependencies": {
-    "@linagora/james-admin-client": "0.8.0",
+    "@linagora/james-admin-client": "0.9.0",
     "async": "2.6.0",
     "awesome-module": "1.1.0",
     "bower": "1.8.2",
