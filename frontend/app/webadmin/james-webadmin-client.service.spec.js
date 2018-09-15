@@ -934,4 +934,38 @@ describe('The jamesWebadminClient', function() {
       $rootScope.$digest();
     });
   });
+
+  describe('The getDlpRule function', function() {
+    it('should reject if failed to get a specific DLP rule', function(done) {
+      var ruleId = '123';
+
+      jamesClientInstanceMock.dlpRules = {
+        get: sinon.stub().returns($q.reject())
+      };
+
+      jamesWebadminClient.getDlpRule(domain.name, ruleId)
+        .catch(function() {
+          expect(jamesClientInstanceMock.dlpRules.get).to.have.been.calledWith(domain.name, ruleId);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+
+    it('should resolve on success to get a specific DLP rule', function(done) {
+      var ruleId = '123';
+
+      jamesClientInstanceMock.dlpRules = {
+        get: sinon.stub().returns($q.when())
+      };
+
+      jamesWebadminClient.getDlpRule(domain.name, ruleId)
+        .then(function() {
+          expect(jamesClientInstanceMock.dlpRules.get).to.have.been.calledWith(domain.name, ruleId);
+          done();
+        });
+
+      $rootScope.$digest();
+    });
+  });
 });
