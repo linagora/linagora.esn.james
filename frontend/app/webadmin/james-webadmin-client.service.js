@@ -15,6 +15,7 @@
       deleteMailInMailRepository: deleteMailInMailRepository,
       deleteAllMailsInMailRepository: deleteAllMailsInMailRepository,
       downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
+      getDlpRule: getDlpRule,
       getDomainQuota: getDomainQuota,
       getServerUrl: getServerUrl,
       getUserQuota: getUserQuota,
@@ -214,6 +215,13 @@
       return _getJamesClient()
         .then(function(jamesClient) {
           return jamesClient.mailRepositories.reprocessMail(repositoryId, mailKey, options);
+        });
+    }
+
+    function getDlpRule(domainName, ruleId) {
+      return _getJamesClient()
+        .then(function(jamesClient) {
+          return jamesClient.dlpRules.get(domainName, ruleId);
         });
     }
 
