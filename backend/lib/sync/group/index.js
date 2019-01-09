@@ -1,15 +1,10 @@
-const q = require('q');
-const { EVENTS } = require('../constants');
-
 let synchronizerModule;
 let clientModule;
-let pubsub;
 let logger;
 let groupModule;
 
 module.exports = (dependencies) => {
-  groupModule = dependencies('linagora.esn.group').lib.group;
-  pubsub = dependencies('pubsub').local;
+  groupModule = dependencies('linagora.esn.group').lib;
   logger = dependencies('logger');
   synchronizerModule = require('./synchronizer')(dependencies);
   clientModule = require('../../client')(dependencies);
@@ -22,21 +17,20 @@ module.exports = (dependencies) => {
 };
 
 function init() {
-  logger.info('Start listening on group events');
-  pubsub.topic(EVENTS.GROUP_CREATED).subscribe(onGroupCreated);
-  pubsub.topic(EVENTS.GROUP_UPDATED).subscribe(onGroupUpdated);
-  pubsub.topic(EVENTS.GROUP_DELETED).subscribe(onGroupDeleted);
-  pubsub.topic(EVENTS.GROUP_MEMBERS_ADDED).subscribe(onGroupMembersAdded);
-  pubsub.topic(EVENTS.GROUP_MEMBERS_REMOVED).subscribe(onGroupMembersRemoved);
+  groupModule.registry.register('JAMES', {
+    addGroupMembers,
+    createGroup,
+    deleteGroup,
+    removeGroupMembers,
+    updateGroup
+  });
 }
 
-function onGroupCreated(event = {}) {
-  const group = event.payload;
+function createGroup(group) {
+  if (!group) { return Promise.reject(new Error('group cannot be null')); }
 
-  if (!group) { return q.reject(new Error('group cannot be null')); }
-
-  return groupModule.getAllMembers(group)
-    .then(members => members.map(groupModule.getMemberEmail))
+  return groupModule.group.getAllMembers(group)
+    .then(members => members.map(groupModule.group.getMemberEmail))
     .then(memberEmails => clientModule.addGroup(group.email, memberEmails))
     .then(() => {
       logger.debug(`Added ${group.members.length} member(s) to group ${group.email}`);
@@ -46,15 +40,13 @@ function onGroupCreated(event = {}) {
     });
 }
 
-function onGroupUpdated(event = {}) {
-  const { old: oldGroup, new: newGroup } = event.payload || {};
-
-  if (!oldGroup || !newGroup) { return q.reject(new Error('both old and new group are required')); }
+function updateGroup(oldGroup, newGroup) {
+  if (!oldGroup || !newGroup) { return Promise.reject(new Error('both old and new group are required')); }
 
   if (oldGroup.email === newGroup.email) {
     logger.debug('Group updated but email is not modified');
 
-    return q.resolve();
+    return Promise.resolve();
   }
 
   return clientModule.updateGroup(oldGroup.email, newGroup.email)
@@ -66,10 +58,8 @@ function onGroupUpdated(event = {}) {
     });
 }
 
-function onGroupDeleted(event = {}) {
-  const group = event.payload;
-
-  if (!group) { return q.reject(new Error('group cannot be null')); }
+function deleteGroup(group) {
+  if (!group) { return Promise.reject(new Error('group cannot be null')); }
 
   return clientModule.removeGroup(group.email)
     .then(() => {
@@ -80,11 +70,9 @@ function onGroupDeleted(event = {}) {
     });
 }
 
-function onGroupMembersAdded(event = {}) {
-  const { group, members } = event.payload;
-
-  return q.all(members.map(groupModule.resolveMember))
-    .then(members => members.map(groupModule.getMemberEmail))
+function addGroupMembers(group, members) {
+  return Promise.all(members.map(groupModule.group.resolveMember))
+    .then(members => members.map(groupModule.group.getMemberEmail))
     .then(memberEmails => {
       logger.debug(`Adding members to group ${group.email} ${memberEmails}`);
 
@@ -98,11 +86,9 @@ function onGroupMembersAdded(event = {}) {
     });
 }
 
-function onGroupMembersRemoved(event = {}) {
-  const { group, members } = event.payload;
-
-  return q.all(members.map(groupModule.resolveMember))
-    .then(members => members.map(groupModule.getMemberEmail))
+function removeGroupMembers(group, members) {
+  return Promise.all(members.map(groupModule.group.resolveMember))
+    .then(members => members.map(groupModule.group.getMemberEmail))
     .then(memberEmails => {
       logger.debug(`Removing members from group ${group.email} ${memberEmails}`);
 
