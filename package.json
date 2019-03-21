@@ -1,6 +1,6 @@
 {
   "name": "linagora.esn.james",
-  "version": "1.4.6-dev",
+  "version": "1.4.6",
   "description": "The OpenPaaS module for James",
   "main": "index.js",
   "devDependencies": {
