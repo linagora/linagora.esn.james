@@ -156,6 +156,43 @@ describe('The lib/client module', function() {
     });
   });
 
+  describe('The addDomainAliases function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().addDomainAliases('domain1', [])
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().addDomainAliases('domain1', [])
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+      });
+    });
+
+    it('should resolve after successfully added domain aliases', function(done) {
+      const domain = { name: 'domain1', hostnames: ['hostname1', 'hostname2'] };
+
+      JamesClientMock.prototype.addDomainAlias = sinon.stub().returns(Promise.resolve());
+
+      getModule().addDomainAliases(domain.name, domain.hostnames).then(() => {
+        expect(JamesClientMock.prototype.addDomainAlias).to.have.been.calledTwice;
+        expect(JamesClientMock.prototype.addDomainAlias).to.have.been.calledWith(domain.name, domain.hostnames[0]);
+        expect(JamesClientMock.prototype.addDomainAlias).to.have.been.calledWith(domain.name, domain.hostnames[1]);
+        done();
+      }).catch(done);
+    });
+  });
+
   describe('The removeGroupMembers function', function() {
     it('should fail if it cannot get API URL', function(done) {
       const group = 'group@email.com';

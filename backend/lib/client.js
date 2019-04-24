@@ -10,6 +10,7 @@ module.exports = (dependencies) => {
 
   return {
     addDestinationsToForward,
+    addDomainAliases,
     addGroup,
     addGroupMembers,
     createDomain,
@@ -110,6 +111,17 @@ function removeGroupMembers(group, members) {
   return get().then(client =>
     q.all(members.map(member => client.removeGroupMember(group, member)))
   );
+}
+
+/**
+ * Add domain aliases
+ * @param {String} domainName - the name of target domain
+ * @param {Array} domainAliases - an array of aliases name to add
+ * @return {Promise} - Resolve on success
+ */
+function addDomainAliases(domainName, domainAliases) {
+  return get()
+    .then(client => Promise.all(domainAliases.map(alias => client.addDomainAlias(domainName, alias))));
 }
 
 /**

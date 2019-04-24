@@ -19,7 +19,7 @@ describe('The lib/sync/domain module', function() {
     this.moduleHelpers.addDep('pubsub', { local: { topic: pubsubTopicMock } });
   });
 
-  describe('The handler of GROUP_CREATED event ', function() {
+  describe('The handler of DOMAIN_CREATED event', function() {
     let eventHandler;
 
     beforeEach(function() {
@@ -43,6 +43,47 @@ describe('The lib/sync/domain module', function() {
 
         done();
       });
+    });
+
+    it('should create domain aliases after successfully creating james domain', function(done) {
+      const domain = { name: 'mydomain', hostnames: ['hostname1', 'hostname2'] };
+
+      clientMock.createDomain = sinon.stub().returns(Promise.resolve());
+      clientMock.addDomainAliases = sinon.stub().returns(Promise.resolve());
+
+      getModule().init();
+      eventHandler({ payload: domain }).then(() => {
+        expect(clientMock.createDomain).to.have.been.calledWith(domain.name);
+        expect(clientMock.addDomainAliases).to.have.been.calledWith(domain.name, domain.hostnames);
+
+        done();
+      }).catch(done);
+    });
+
+    it('should not create domain aliases when there is no hostnames', function(done) {
+      const domain = { name: 'mydomain' };
+
+      clientMock.createDomain = () => Promise.resolve();
+      clientMock.addDomainAliases = sinon.spy();
+
+      getModule().init();
+      eventHandler({ payload: domain }).then(() => {
+        expect(clientMock.addDomainAliases).to.not.have.been.called;
+        done();
+      }).catch(done);
+    });
+
+    it('should not create domain aliases when hostnames is empty', function(done) {
+      const domain = { name: 'mydomain', hostname: [] };
+
+      clientMock.createDomain = () => Promise.resolve();
+      clientMock.addDomainAliases = sinon.spy();
+
+      getModule().init();
+      eventHandler({ payload: domain }).then(() => {
+        expect(clientMock.addDomainAliases).to.not.have.been.called;
+        done();
+      }).catch(done);
     });
 
     it('should reject if pubsub payload is null', function(done) {

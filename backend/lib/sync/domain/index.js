@@ -28,9 +28,24 @@ module.exports = dependencies => {
 
     if (!domain || !domain.name) { return q.reject(new Error('domain name cannot be null')); }
 
+    return createDomain(domain)
+      .then(createDomainAliases);
+  }
+
+  function createDomainAliases(domain) {
+    if (!domain.hostnames || !domain.hostnames.length) return;
+
+    return clientModule.addDomainAliases(domain.name, domain.hostnames)
+      .then(() => logger.info(`Created james domain aliases: ${domain.hostnames.join(', ')} for domain ${domain.name}`))
+      .catch(err => logger.error('Error when creating james domain aliases', err));
+  }
+
+  function createDomain(domain) {
     return clientModule.createDomain(domain.name)
       .then(() => {
         logger.info(`Created new james domain: ${domain.name}`);
+
+        return domain;
       })
       .catch(err => {
         logger.error(`Error while creating james domain ${domain.name}:`, err);
