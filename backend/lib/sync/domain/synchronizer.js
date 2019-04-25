@@ -11,8 +11,10 @@ module.exports = (dependencies) => {
   coreDomain = dependencies('domain');
 
   return {
+    getDomainAliasesStatus,
     getStatus,
-    sync
+    sync,
+    syncDomainAliases
   };
 };
 
@@ -62,5 +64,39 @@ function sync() {
     .catch((err) => {
       logger.error('Error while creating james domains', err);
     });
+  });
+}
+
+function getDomainAliasesStatus(domain) {
+  return clientModule.listDomainAliases(domain.name).then((aliases) => {
+    const notAddedAliases = _.difference(domain.hostnames, aliases);
+    const notRemovedAliases = _.difference(aliases, domain.hostnames);
+    const ok = _.isEmpty(notAddedAliases) && _.isEmpty(notRemovedAliases);
+
+    return {
+      ok,
+      notAddedAliases,
+      notRemovedAliases
+    };
+  }).catch(err => logger.error(`Error while geting domain aliases status of domain ${domain.name}`, err));
+}
+
+function syncDomainAliases(domain) {
+  return getDomainAliasesStatus(domain).then((status) => {
+    if (status.ok) return;
+
+    const syncPromises = [];
+
+    if (!_.isEmpty(status.notAddedAliases)) {
+      syncPromises.push(clientModule.addDomainAliases(domain.name, status.notAddedAliases));
+    }
+
+    if (!_.isEmpty(status.notRemovedAliases)) {
+      syncPromises.push(clientModule.removeDomainAliases(domain.name, status.notRemovedAliases));
+    }
+
+    return Promise.all(syncPromises)
+      .then(() => logger.debug(`Finish synchronizing domain ${domain.name}`))
+      .catch(err => logger.error(`Error while synchronizing domain ${domain.name}`, err));
   });
 }

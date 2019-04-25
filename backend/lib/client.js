@@ -15,11 +15,14 @@ module.exports = (dependencies) => {
     addGroupMembers,
     createDomain,
     getGroupMembers,
+    isDomainCreated,
     listDestinationsOfForward,
     listDomains,
+    listDomainAliases,
     listForwardsInDomain,
     removeDestinationsOfForward,
     removeDomain,
+    removeDomainAliases,
     removeForward,
     removeGroup,
     removeGroupMembers,
@@ -125,6 +128,17 @@ function addDomainAliases(domainName, domainAliases) {
 }
 
 /**
+ * Remove aliases of a domain
+ * @param  {String} domainName   - Name of the target domain
+ * @param  {Array} aliases  - Array of aliases to removed
+ * @return {Promise}             - Resolve on success
+ */
+function removeDomainAliases(domainName, aliases) {
+  return get()
+    .then(client => Promise.all(aliases.map(alias => client.removeDomainAlias(domainName, alias))));
+}
+
+/**
  * Remove local copy of a specific foward.
  * Local copy means that forward email address itself is one destination.
  *
@@ -193,6 +207,28 @@ function listDomains() {
 }
 
 /**
+ * list all aliases of a domain
+ * @param  {String} domainName  - Name of the domain
+ * @return {Promise}            - Resolve on success
+ */
+function listDomainAliases(domainName) {
+  return get()
+    .then(client => client.listDomainAliases(domainName))
+    .catch(err => {
+      // If there is no domain aliases, james will respond with 404
+      if (err.response &&
+        err.response.data &&
+        err.response.data.message &&
+        err.response.data.message.match(/Cannot find mappings for/)) {
+
+        return [];
+      }
+
+      return Promise.reject(err);
+    });
+}
+
+/**
  * List forwards in a specific domain.
  *
  * @param  {String} domainName  - Name of the domain
@@ -223,6 +259,15 @@ function removeDestinationsOfForward(forward, destinations) {
  */
 function removeDomain(domainName) {
   return get().then(client => client.removeDomain(domainName));
+}
+
+/**
+ * check whether if a domain name is created
+ * @param  {String}  domainName - Name of the target domain
+ * @return {Promise}            - Resolve with a boolean on domain existence
+ */
+function isDomainCreated(domainName) {
+  return listDomains().then(domains => domains.some(domain => domain === domainName));
 }
 
 /**
