@@ -1,6 +1,7 @@
-module.exports = (dependencies) => {
+module.exports = dependencies => {
   const group = require('./group')(dependencies);
   const domain = require('./domain')(dependencies);
+  const user = require('./user')(dependencies);
 
   return {
     init,
@@ -11,5 +12,6 @@ module.exports = (dependencies) => {
   function init() {
     domain.init();
     group.init();
+    user.init();
   }
 };
