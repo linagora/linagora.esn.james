@@ -853,4 +853,41 @@ describe('The lib/client module', function() {
       .catch(err => done(err || 'should resolve'));
     });
   });
+
+  describe('The listDomainMappings function', () => {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().listDomainMappings()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().listDomainMappings()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should resolve with the list of domain mappings', function(done) {
+      JamesClientMock.prototype.listDomainMappings = sinon.stub().returns(Promise.resolve({
+        domain1: ['alias1']
+      }));
+
+      getModule().listDomainMappings('domain1.com').then(aliases => {
+        expect(JamesClientMock.prototype.listDomainMappings).to.have.been.called;
+        expect(aliases).to.be.deep.equal({domain1: ['alias1']});
+
+        done();
+      }).catch(done);
+    });
+  });
 });
