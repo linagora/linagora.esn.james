@@ -625,4 +625,232 @@ describe('The lib/client module', function() {
       }).catch(done);
     });
   });
+
+  describe('The listUsersHavingAliases method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().listUsersHavingAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().listUsersHavingAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should return an array of users who have alias if success', function(done) {
+      const users = ['user1@domain.com', 'user2@domain.com'];
+
+      JamesClientMock.prototype.listUsersHavingAliases = sinon.stub().returns(Promise.resolve(users));
+
+      getModule().listUsersHavingAliases()
+        .then(_users => {
+          expect(JamesClientMock.prototype.listUsersHavingAliases).to.have.been.called;
+          expect(_users).to.deep.equal(users);
+          done();
+        })
+        .catch(err => done(err || 'should resolve'));
+    });
+  });
+
+  describe('The listUserAliases method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().listUserAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().listUserAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should return an array of aliases of the user if success', function(done) {
+      const user = 'user@domain.com';
+      const aliases = ['alias1@domain.com', 'alias2@domain.com'];
+
+      JamesClientMock.prototype.listUserAliases = sinon.stub().returns(Promise.resolve(aliases));
+
+      getModule().listUserAliases(user).then(_aliases => {
+        expect(JamesClientMock.prototype.listUserAliases).to.have.been.calledWith(user);
+        expect(_aliases).to.deep.equal(aliases);
+        done();
+      })
+      .catch(err => done(err || 'should resolve'));
+    });
+  });
+
+  describe('The addUserAlias method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().addUserAlias('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().addUserAlias('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should resolve if success to add alias', function(done) {
+      const user = 'user@domain.com';
+      const alias = 'alias@domain.com';
+
+      JamesClientMock.prototype.addUserAlias = sinon.stub().returns(Promise.resolve());
+
+      getModule().addUserAlias(user, alias).then(() => {
+        expect(JamesClientMock.prototype.addUserAlias).to.have.been.calledWith(user, alias);
+        done();
+      })
+      .catch(err => done(err || 'should resolve'));
+    });
+  });
+
+  describe('The addUserAliases method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().addUserAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().addUserAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should resolve if success to add alias', function(done) {
+      const user = 'user@domain.com';
+      const aliases = ['alias1@domain.com', 'alias2@domain.com'];
+
+      JamesClientMock.prototype.addUserAlias = sinon.stub().returns(Promise.resolve());
+
+      getModule().addUserAliases(user, aliases).then(() => {
+        expect(JamesClientMock.prototype.addUserAlias).to.have.been.calledTwice;
+        expect(JamesClientMock.prototype.addUserAlias).to.have.been.calledWith(user, aliases[0]);
+        expect(JamesClientMock.prototype.addUserAlias).to.have.been.calledWith(user, aliases[1]);
+        done();
+      })
+      .catch(err => done(err || 'should resolve'));
+    });
+  });
+
+  describe('The removeUserAlias method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().removeUserAlias('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().removeUserAlias('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should resolve if success to remove alias', function(done) {
+      const user = 'user@domain.com';
+      const alias = 'alias@domain.com';
+
+      JamesClientMock.prototype.removeUserAlias = sinon.stub().returns(Promise.resolve());
+
+      getModule().removeUserAlias(user, alias).then(() => {
+        expect(JamesClientMock.prototype.removeUserAlias).to.have.been.calledWith(user, alias);
+        done();
+      })
+      .catch(err => done(err || 'should resolve'));
+    });
+  });
+
+  describe('The removeUserAliases method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().removeUserAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().removeUserAliases('domain-name')
+        .then(() => done('should not resolve'))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should resolve if success to remove alias', function(done) {
+      const user = 'user@domain.com';
+      const aliases = ['alias1@domain.com', 'alias2@domain.com'];
+
+      JamesClientMock.prototype.removeUserAlias = sinon.stub().returns(Promise.resolve());
+
+      getModule().removeUserAliases(user, aliases).then(() => {
+        expect(JamesClientMock.prototype.removeUserAlias).to.have.been.calledTwice;
+        expect(JamesClientMock.prototype.removeUserAlias).to.have.been.calledWith(user, aliases[0]);
+        expect(JamesClientMock.prototype.removeUserAlias).to.have.been.calledWith(user, aliases[1]);
+        done();
+      })
+      .catch(err => done(err || 'should resolve'));
+    });
+  });
 });

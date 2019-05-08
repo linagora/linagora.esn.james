@@ -13,6 +13,8 @@ module.exports = (dependencies) => {
     addDomainAliases,
     addGroup,
     addGroupMembers,
+    addUserAlias,
+    addUserAliases,
     createDomain,
     getGroupMembers,
     isDomainCreated,
@@ -20,6 +22,8 @@ module.exports = (dependencies) => {
     listDomains,
     listDomainAliases,
     listForwardsInDomain,
+    listUserAliases,
+    listUsersHavingAliases,
     removeDestinationsOfForward,
     removeDomain,
     removeDomainAliases,
@@ -27,6 +31,8 @@ module.exports = (dependencies) => {
     removeGroup,
     removeGroupMembers,
     removeLocalCopyOfForward,
+    removeUserAlias,
+    removeUserAliases,
     updateGroup
   };
 };
@@ -268,6 +274,67 @@ function removeDomain(domainName) {
  */
 function isDomainCreated(domainName) {
   return listDomains().then(domains => domains.some(domain => domain === domainName));
+}
+
+/**
+ * Listing users with aliases
+ * @return {Promise} -Resolve on success
+ */
+function listUsersHavingAliases() {
+  return get().then(client => client.listUsersHavingAliases());
+}
+
+/**
+ * Listing alias sources of a user
+ * @param  {String} user - The user preferred email address
+ * @return {Promise} - Resolve on success
+ */
+function listUserAliases(user) {
+  return get().then(client => client.listUserAliases(user));
+}
+
+/**
+ * Adding a new alias to a user
+ * @param  {String} user  - The user preferred email address
+ * @param  {String} alias - Alias to add
+ * @return {Promise}      - Resolve on success
+ */
+function addUserAlias(user, alias) {
+  return get().then(client => client.addUserAlias(user, alias));
+}
+
+/**
+ * Adding new aliases to a user
+ * @param  {String} user   - The user preferred email address
+ * @param  {Array} aliases - Array of aliases to add
+ * @return {Promise}       - Resolve on success
+ */
+function addUserAliases(user, aliases) {
+  return get().then(client =>
+    Promise.all(aliases.map(alias => client.addUserAlias(user, alias)))
+  );
+}
+
+/**
+ * Removing an alias of a user
+ * @param  {String} user  - The user preferred email address
+ * @param  {String} alias - Alias to remove
+ * @return {Promise}      - Resolve on success
+ */
+function removeUserAlias(user, alias) {
+  return get().then(client => client.removeUserAlias(user, alias));
+}
+
+/**
+ * Removing aliases of a user
+ * @param  {String} user   - The user preferred email address
+ * @param  {Array} aliases - Array of aliases to remove
+ * @return {Promise}       - Resolve on success
+ */
+function removeUserAliases(user, aliases) {
+  return get().then(client =>
+    Promise.all(aliases.map(alias => client.removeUserAlias(user, alias)))
+  );
 }
 
 /**
