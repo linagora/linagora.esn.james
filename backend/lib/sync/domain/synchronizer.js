@@ -19,18 +19,52 @@ module.exports = (dependencies) => {
 };
 
 function getStatus() {
-  return q.all([
-    q.denodeify(coreDomain.list)({}).then(domains => domains.map((domain) => domain.name)),
-    clientModule.listDomains()
-  ]).spread((esnDomains, jamesDomains) => {
-    const notAddedDomains = _.difference(esnDomains, jamesDomains);
-    const notRemovedDomains = _.difference(jamesDomains, esnDomains);
-    const ok = _.isEmpty(notAddedDomains) && _.isEmpty(notRemovedDomains);
+  return Promise.all([
+    q.denodeify(coreDomain.list)({}),
+    clientModule.listDomains(),
+    clientModule.listDomainMappings()
+  ]).then(([esnDomains, jamesDomains, jamesDomainMappings]) => {
+    const notAddedDomains = _.difference(esnDomains.map(domain => domain.name), jamesDomains);
+    const notRemovedDomains = _.difference(jamesDomains, esnDomains.map(domain => domain.name));
+    const notAddedDomainMappings = [];
+    const notRemovedDomainMappings = [];
+
+    esnDomains.forEach(domain => {
+      const aliasesToAdd = _.difference(domain.hostnames, jamesDomainMappings[domain.name]);
+      const aliasesToRemove = _.difference(jamesDomainMappings[domain.name], domain.hostnames);
+
+      if (aliasesToAdd.length) {
+        notAddedDomainMappings.push({
+          source: domain.name,
+          aliases: aliasesToAdd
+        });
+      }
+
+      if (aliasesToRemove.length) {
+        notRemovedDomainMappings.push({
+          source: domain.name,
+          aliases: aliasesToRemove
+        });
+      }
+    });
+
+    notRemovedDomains.forEach(domainName => {
+      if (jamesDomainMappings[domainName]) {
+        notRemovedDomainMappings.push({
+          source: domainName,
+          aliases: jamesDomainMappings[domainName]
+        });
+      }
+    });
+
+    const ok = _.isEmpty(notAddedDomains) && _.isEmpty(notAddedDomainMappings) && _.isEmpty(notRemovedDomainMappings) && _.isEmpty(notRemovedDomains);
 
     return {
       ok,
       notAddedDomains,
-      notRemovedDomains
+      notAddedDomainMappings,
+      notRemovedDomains,
+      notRemovedDomainMappings
     };
   }).catch((err) => {
     logger.error('Error while getting sync status of james and esn domains', err);
@@ -57,13 +91,21 @@ function sync() {
       });
     }
 
+    if (!_.isEmpty(status.notAddedDomainMappings)) {
+      status.notAddedDomainMappings.forEach(mapping => {
+        syncPromises.push(clientModule.addDomainAliases(mapping.source, mapping.aliases));
+      });
+    }
+
+    if (!_.isEmpty(status.notRemovedDomainMappings)) {
+      status.notRemovedDomainMappings.forEach(mapping => {
+        syncPromises.push(clientModule.removeDomainAliases(mapping.source, mapping.aliases));
+      });
+    }
+
     return q.all(syncPromises)
-    .then(() => {
-      logger.debug(`Done synchronizing by adding ${status.notAddedDomains.length} new domains and remove ${status.notRemovedDomains.length} domains`);
-    })
-    .catch((err) => {
-      logger.error('Error while creating james domains', err);
-    });
+    .then(() => logger.debug(`Added ${status.notAddedDomains.length} new domains, ${status.notAddedDomainMappings.length} domain aliases and remove ${status.notRemovedDomains.length} domains, ${status.notRemovedDomainMappings.length} domain aliases`))
+    .catch((err) => logger.error('Error while creating james domains', err));
   });
 }
 
