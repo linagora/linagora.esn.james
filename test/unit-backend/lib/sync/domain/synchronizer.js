@@ -1,3 +1,4 @@
+const q = require('q');
 const { expect } = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
@@ -22,87 +23,50 @@ describe('The lib/sync/group/synchronizer module', function() {
       const jamesDomains = ['domain1', 'domain2'];
 
       coreDomainMock.list = (opts, callback) => callback(null, esnDomains);
-      clientMock.listDomains = () => Promise.resolve(jamesDomains);
-      clientMock.listDomainMappings = () => Promise.resolve({});
+      clientMock.listDomains = () => q.resolve(jamesDomains);
 
       getModule().getStatus().then((status) => {
         expect(status.ok).to.equal(true);
         expect(status.notAddedDomains).to.have.length(0);
         expect(status.notRemovedDomains).to.have.length(0);
-        expect(status.notAddedDomainMappings).to.have.length(0);
-        expect(status.notRemovedDomainMappings).to.have.length(0);
         done();
       }).catch(done);
     });
 
     it('should resolve NOK if domains in ESN and James are not synchronized', function(done) {
-      const esnDomains = [
-        { name: 'domain1', hostnames: ['ok1'] },
-        { name: 'domain2', hostnames: ['ok2', 'not-added2'] },
-        { name: 'domain3', hostnames: [] }
-      ];
+      const esnDomains = [{ name: 'domain1' }, { name: 'domain2' }, { name: 'domain3' }];
       const jamesDomains = ['domain1', 'domain2', 'domain5'];
-      const jamesDomainMappings = {
-        domain1: ['ok1'],
-        domain2: ['ok2'],
-        domain3: ['not-removed3']
-      };
 
       coreDomainMock.list = (opts, callback) => callback(null, esnDomains);
-      clientMock.listDomains = () => Promise.resolve(jamesDomains);
-      clientMock.listDomainMappings = () => Promise.resolve(jamesDomainMappings);
+      clientMock.listDomains = () => q.resolve(jamesDomains);
 
       getModule().getStatus().then((status) => {
         expect(status.ok).to.equal(false);
         expect(status.notAddedDomains).to.deep.equal(['domain3']);
         expect(status.notRemovedDomains).to.deep.equal(['domain5']);
-        expect(status.notAddedDomainMappings).to.deep.equal([
-          { source: 'domain2', aliases: ['not-added2'] }
-        ]);
-        expect(status.notRemovedDomainMappings).to.deep.equal([
-          {source: 'domain3', aliases: ['not-removed3']}
-        ]);
         done();
       }).catch(done);
     });
   });
 
   describe('The sync function', function() {
-    it('should create missing James domain and domain aliases comparing to ESN domains', function(done) {
-      const esnDomains = [
-        { name: 'domain1', hostnames: ['ok1'] },
-        { name: 'domain2', hostnames: ['ok2', 'not-added2'] },
-        { name: 'domain3', hostnames: [] },
-        { name: 'domain4'}
-      ];
-      const jamesDomains = ['domain1', 'domain2', 'domain5'];
-      const jamesDomainMappings = {
-        domain1: ['ok1'],
-        domain2: ['ok2'],
-        domain3: ['not-removed3']
-      };
+    it('should create missing James domain comparing to ESN domains', function(done) {
+      const esnDomains = [{ name: 'domain1' }, { name: 'domain2' }, { name: 'domain3' }];
+      const jamesDomains = ['domain1', 'domain4'];
 
       coreDomainMock.list = (opts, callback) => callback(null, esnDomains);
-      clientMock.listDomains = () => Promise.resolve(jamesDomains);
-      clientMock.listDomainMappings = () => Promise.resolve(jamesDomainMappings);
-      clientMock.createDomain = sinon.stub().returns(Promise.resolve());
-      clientMock.removeDomain = sinon.stub().returns(Promise.resolve());
-      clientMock.addDomainAliases = sinon.stub().returns(Promise.resolve());
-      clientMock.removeDomainAliases = sinon.stub().returns(Promise.resolve());
+      clientMock.listDomains = () => q.resolve(jamesDomains);
+      clientMock.createDomain = sinon.stub().returns(q.when());
+      clientMock.removeDomain = sinon.stub().returns(q.when());
 
       getModule().sync().then(() => {
         expect(clientMock.createDomain).to.have.been.calledTwice;
+        expect(clientMock.createDomain).to.have.been.calledWith('domain2');
         expect(clientMock.createDomain).to.have.been.calledWith('domain3');
-        expect(clientMock.createDomain).to.have.been.calledWith('domain4');
 
         expect(clientMock.removeDomain).to.have.been.calledOnce;
-        expect(clientMock.removeDomain).to.have.been.calledWith('domain5');
+        expect(clientMock.removeDomain).to.have.been.calledWith('domain4');
 
-        expect(clientMock.addDomainAliases).to.have.been.calledOnce;
-        expect(clientMock.addDomainAliases).to.have.been.calledWith('domain2', ['not-added2']);
-
-        expect(clientMock.removeDomainAliases).to.have.been.calledOnce;
-        expect(clientMock.removeDomainAliases).to.have.been.calledWith('domain3', ['not-removed3']);
         done();
       }).catch(done);
     });

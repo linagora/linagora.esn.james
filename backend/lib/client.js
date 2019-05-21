@@ -20,7 +20,6 @@ module.exports = (dependencies) => {
     isDomainCreated,
     listDestinationsOfForward,
     listDomains,
-    listDomainMappings,
     listDomainAliases,
     listForwardsInDomain,
     listUserAliases,
@@ -211,14 +210,6 @@ function listDestinationsOfForward(forward) {
  */
 function listDomains() {
   return get().then(client => client.listDomains());
-}
-
-/**
- * list all domain mappings
- * @return {Promise} - Resolve on success
- */
-function listDomainMappings() {
-  return get().then(client => client.listDomainMappings());
 }
 
 /**
