@@ -33,7 +33,9 @@ module.exports = (dependencies) => {
     removeLocalCopyOfForward,
     removeUserAlias,
     removeUserAliases,
-    updateGroup
+    updateGroup,
+    restoreDeletedMessages,
+    exportDeletedMessages
   };
 };
 
@@ -335,6 +337,27 @@ function removeUserAliases(user, aliases) {
   return get().then(client =>
     Promise.all(aliases.map(alias => client.removeUserAlias(user, alias)))
   );
+}
+
+/**
+ * Restore deleted messages of a user
+ * @param  {String} user       - The user preferred email address
+ * @param  {Object} rules      - Set of rules to filter out messages
+ * @return {Promise}           - Resolve a task Id of the restoring process on success
+ */
+function restoreDeletedMessages(user, rules) {
+  return get().then(client => client.restoreDeletedMessages(user, rules));
+}
+
+/**
+ * Export deleted messages of a user
+ * @param  {String} user        - The user preferred email address
+ * @param  {String} exportTo    - The email address where the exported file is sent to
+ * @param  {Object} rules       - Set of rules to filter out messages
+ * @return {Promise}            - Resolve a task Id of the exporting process on success
+ */
+function exportDeletedMessages(user, exportTo, rules) {
+  return get().then(client => client.exportDeletedMessages(user, exportTo, rules));
 }
 
 /**

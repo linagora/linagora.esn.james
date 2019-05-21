@@ -853,4 +853,100 @@ describe('The lib/client module', function() {
       .catch(err => done(err || 'should resolve'));
     });
   });
+
+  describe('The restoreDeletedMessages function', () => {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().restoreDeletedMessages()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().restoreDeletedMessages()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should resolve with task id of restoring process', function(done) {
+      JamesClientMock.prototype.restoreDeletedMessages = sinon.stub().returns(Promise.resolve({
+        taskId: '767c7da2-a13a-40a5-9504-4e9bce50130d'
+      }));
+
+      getModule().restoreDeletedMessages('admin@open-paas.org', {
+        combinator: 'and',
+        criteria: [
+          {
+            fieldName: 'subject',
+            operator: 'containsIgnoreCase',
+            value: 'Apache James'
+          }
+        ]
+      }).then(aliases => {
+        expect(JamesClientMock.prototype.restoreDeletedMessages).to.have.been.called;
+        expect(aliases).to.be.deep.equal({
+          taskId: '767c7da2-a13a-40a5-9504-4e9bce50130d'
+        });
+
+        done();
+      }).catch(done);
+    });
+  });
+
+  describe('The exportDeletedMessages function', () => {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => q.reject(new Error('an_error'));
+
+      getModule().exportDeletedMessages()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => q.reject(new Error('an_error'));
+
+      getModule().exportDeletedMessages()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should resolve with task id of exporting process', function(done) {
+      JamesClientMock.prototype.exportDeletedMessages = sinon.stub().returns(Promise.resolve({
+        taskId: '767c7da2-a13a-40a5-9504-4e9bce50130d'
+      }));
+
+      getModule().exportDeletedMessages('admin@open-paas.org', 'receiver@gmail.com', {
+        combinator: 'and',
+        criteria: [
+          {
+            fieldName: 'subject',
+            operator: 'containsIgnoreCase',
+            value: 'Apache James'
+          }
+        ]
+      }).then(aliases => {
+        expect(JamesClientMock.prototype.exportDeletedMessages).to.have.been.called;
+        expect(aliases).to.be.deep.equal({
+          taskId: '767c7da2-a13a-40a5-9504-4e9bce50130d'
+        });
+
+        done();
+      }).catch(done);
+    });
+  });
 });
