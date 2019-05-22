@@ -538,46 +538,6 @@ describe('The lib/client module', function() {
     });
   });
 
-  describe('The isDomainCreated function', () => {
-    it('should fail if it cannot get API URL', function(done) {
-      esnConfigGetMock = () => q.reject(new Error('an_error'));
-
-      getModule().isDomainCreated('domain-name').catch(err => {
-        expect(err.message).to.equal('an_error');
-        done();
-      });
-    });
-
-    it('should fail if it cannot generate JWT token', function(done) {
-      tokenMock.generate = () => q.reject(new Error('an_error'));
-
-      getModule().isDomainCreated('domain-name').catch(err => {
-        expect(err.message).to.equal('an_error');
-        done();
-      });
-    });
-
-    it('should resolve with true if domain is created', function(done) {
-      JamesClientMock.prototype.listDomains = sinon.stub().returns(Promise.resolve(['domain1.com']));
-
-      getModule().isDomainCreated('domain1.com').then(created => {
-        expect(JamesClientMock.prototype.listDomains).to.have.been.called;
-        expect(created).to.equal(true);
-        done();
-      }).catch(done);
-    });
-
-    it('should resolve with false if domain is not created', function(done) {
-      JamesClientMock.prototype.listDomains = sinon.stub().returns(Promise.resolve([]));
-
-      getModule().isDomainCreated('domain1.com').then(created => {
-        expect(JamesClientMock.prototype.listDomains).to.have.been.called;
-        expect(created).to.equal(false);
-        done();
-      }).catch(done);
-    });
-  });
-
   describe('The listDomainAliases function', () => {
     it('should fail if it cannot get API URL', function(done) {
       esnConfigGetMock = () => Promise.reject(new Error('an_error'));

@@ -16,7 +16,6 @@ module.exports = dependencies => {
     addUserAliases,
     createDomain,
     getGroupMembers,
-    isDomainCreated,
     listDestinationsOfForward,
     listDomains,
     listDomainAliases,
@@ -266,15 +265,6 @@ function removeDestinationsOfForward(forward, destinations) {
  */
 function removeDomain(domainName) {
   return get().then(client => client.removeDomain(domainName));
-}
-
-/**
- * check whether if a domain name is created
- * @param  {String}  domainName - Name of the target domain
- * @return {Promise}            - Resolve with a boolean on domain existence
- */
-function isDomainCreated(domainName) {
-  return listDomains().then(domains => domains.some(domain => domain === domainName));
 }
 
 /**
