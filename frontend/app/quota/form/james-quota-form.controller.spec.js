@@ -8,6 +8,7 @@ describe('The jamesQuotaFormController', function() {
 
   var $controller, $rootScope, $scope;
   var JAMES_UNLIMITED_QUOTA;
+
   beforeEach(function() {
     module('linagora.esn.james');
 

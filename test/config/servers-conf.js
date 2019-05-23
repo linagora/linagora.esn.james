@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable no-process-env */
 
 const DEFAULT_PORTS = {
   express: 23455

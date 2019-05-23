@@ -1,10 +1,9 @@
 const { Client } = require('@linagora/james-admin-client');
-const q = require('q');
 
 let esnConfig;
 let tokenModule;
 
-module.exports = (dependencies) => {
+module.exports = dependencies => {
   esnConfig = dependencies('esn-config');
   tokenModule = require('./token')(dependencies);
 
@@ -17,7 +16,6 @@ module.exports = (dependencies) => {
     addUserAliases,
     createDomain,
     getGroupMembers,
-    isDomainCreated,
     listDestinationsOfForward,
     listDomains,
     listDomainAliases,
@@ -57,7 +55,7 @@ function addGroup(group, members) {
  */
 function addGroupMembers(group, members) {
   return get().then(client =>
-    q.all(members.map(member => client.addGroupMember(group, member)))
+    Promise.all(members.map(member => client.addGroupMember(group, member)))
   );
 }
 
@@ -70,7 +68,7 @@ function addGroupMembers(group, members) {
  */
 function addDestinationsToForward(forward, destinations) {
   return get().then(client =>
-    q.all(destinations.map(destination => client.forward.addDestination(forward, destination)))
+    Promise.all(destinations.map(destination => client.forward.addDestination(forward, destination)))
   );
 }
 
@@ -94,7 +92,7 @@ function removeForward(forward) {
   return get().then(client =>
     client.forward.listDestinationsOfForward(forward)
       .then(destinations => destinations.map(destination => destination.mailAddress))
-      .then(destinations => q.all(destinations.map(destination => client.forward.removeDestination(forward, destination))))
+      .then(destinations => Promise.all(destinations.map(destination => client.forward.removeDestination(forward, destination))))
   );
 }
 
@@ -107,7 +105,7 @@ function removeGroup(group) {
   return get().then(client =>
     client.listGroupMembers(group)
       .then(members =>
-        q.all(members.map(member => client.removeGroupMember(group, member)))
+        Promise.all(members.map(member => client.removeGroupMember(group, member)))
       )
   );
 }
@@ -120,7 +118,7 @@ function removeGroup(group) {
  */
 function removeGroupMembers(group, members) {
   return get().then(client =>
-    q.all(members.map(member => client.removeGroupMember(group, member)))
+    Promise.all(members.map(member => client.removeGroupMember(group, member)))
   );
 }
 
@@ -165,12 +163,12 @@ function removeLocalCopyOfForward(forward) {
  */
 function updateGroup(oldGroup, newGroup) {
   if (oldGroup === newGroup) {
-    return q.reject(new Error('nothing to update'));
+    return Promise.reject(new Error('nothing to update'));
   }
 
   return get().then(client =>
     client.listGroupMembers(oldGroup)
-      .then(members => q.all([
+      .then(members => Promise.all([
         ...members.map(member => client.addGroupMember(newGroup, member)),
         ...members.map(member => client.removeGroupMember(oldGroup, member))
       ]))
@@ -256,7 +254,7 @@ function listForwardsInDomain(domainName) {
  */
 function removeDestinationsOfForward(forward, destinations) {
   return get().then(client =>
-    q.all(destinations.map(destination => client.forward.removeDestination(forward, destination)))
+    Promise.all(destinations.map(destination => client.forward.removeDestination(forward, destination)))
   );
 }
 
@@ -267,15 +265,6 @@ function removeDestinationsOfForward(forward, destinations) {
  */
 function removeDomain(domainName) {
   return get().then(client => client.removeDomain(domainName));
-}
-
-/**
- * check whether if a domain name is created
- * @param  {String}  domainName - Name of the target domain
- * @return {Promise}            - Resolve with a boolean on domain existence
- */
-function isDomainCreated(domainName) {
-  return listDomains().then(domains => domains.some(domain => domain === domainName));
 }
 
 /**
@@ -365,11 +354,11 @@ function exportDeletedMessages(user, exportTo, rules) {
  * @return {Promise} - Resolve instance of Client on success
  */
 function get() {
-  return q.all([
-      getWebadminApiEndpoint(),
-      tokenModule.generate()
-    ])
-    .spread((apiUrl, token) => new Client({ apiUrl, token }));
+  return Promise.all([
+    getWebadminApiEndpoint(),
+    tokenModule.generate()
+  ])
+  .then(([apiUrl, token]) => new Client({ apiUrl, token }));
 }
 
 /**
