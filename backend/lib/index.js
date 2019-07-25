@@ -2,6 +2,7 @@
 
 module.exports = function(dependencies) {
   const sync = require('./sync')(dependencies);
+  const domain = require('./domain')(dependencies);
   const models = require('./db')(dependencies);
   const config = require('./config')(dependencies);
   const client = require('./client')(dependencies);
@@ -10,7 +11,8 @@ module.exports = function(dependencies) {
     init,
     client,
     sync,
-    models
+    models,
+    domain
   };
 
   function init() {
