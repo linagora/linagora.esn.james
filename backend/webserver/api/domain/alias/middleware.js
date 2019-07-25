@@ -1,7 +1,7 @@
 let domainLib;
 let logger;
 
-module.exports = function(dependencies) {
+module.exports = dependencies => {
   domainLib = dependencies('domain');
   logger = dependencies('logger');
 
