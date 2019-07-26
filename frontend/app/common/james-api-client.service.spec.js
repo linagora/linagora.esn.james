@@ -76,4 +76,30 @@ describe('The jamesApiClient service', function() {
       $httpBackend.flush();
     });
   });
+
+  describe('The addDomainAlias function', function() {
+    it('should POST to the right endpoint to add the domain alias', function() {
+      var domainId = '123';
+      var alias = 'open-paas.org';
+
+      $httpBackend.expectPOST('/james/api/domains/' + domainId + '/aliases/' + alias).respond(204);
+
+      jamesApiClient.addDomainAlias(domainId, alias);
+
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The removeDomainAlias function', function() {
+    it('should DELETE to the right endpoint to remove the domain alias', function() {
+      var domainId = '123';
+      var alias = 'open-paas.org';
+
+      $httpBackend.expectDELETE('/james/api/domains/' + domainId + '/aliases/' + alias).respond(204);
+
+      jamesApiClient.removeDomainAlias(domainId, alias);
+
+      $httpBackend.flush();
+    });
+  });
 });

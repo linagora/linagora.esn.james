@@ -7,9 +7,11 @@
 
   function jamesApiClient(jamesRestangular) {
     return {
+      addDomainAlias: addDomainAlias,
       generateJwtToken: generateJwtToken,
       getDomainsSyncStatus: getDomainsSyncStatus,
       getGroupSyncStatus: getGroupSyncStatus,
+      removeDomainAlias: removeDomainAlias,
       syncGroup: syncGroup,
       syncDomains: syncDomains
     };
@@ -41,6 +43,26 @@
      */
     function syncGroup(groupId) {
       return jamesRestangular.one('sync').one('groups', groupId).post();
+    }
+
+    /**
+     * Add domain alias
+     * @param  {String} domainId - The domain ID
+     * @param  {String} alias    - The alias to add
+     * @return {Promise}         - Resolve empty response on success
+     */
+    function addDomainAlias(domainId, alias) {
+      return jamesRestangular.one('domains', domainId).one('aliases', alias).post();
+    }
+
+    /**
+     * Remove domain alias
+     * @param  {String} domainId - The domain ID
+     * @param  {String} alias    - The alias to remove
+     * @return {Promise}         - Resolve empty response on success
+     */
+    function removeDomainAlias(domainId, alias) {
+      return jamesRestangular.one('domains', domainId).one('aliases', alias).remove();
     }
 
     /**
