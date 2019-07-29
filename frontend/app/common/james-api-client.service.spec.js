@@ -77,6 +77,18 @@ describe('The jamesApiClient service', function() {
     });
   });
 
+  describe('The getDomainAliases function', function() {
+    it('should GET to the right endpoint to get the domain aliases', function() {
+      var domainId = '123';
+
+      $httpBackend.expectGET('/james/api/domains/' + domainId + '/aliases').respond(200);
+
+      jamesApiClient.getDomainAliases(domainId);
+
+      $httpBackend.flush();
+    });
+  });
+
   describe('The addDomainAlias function', function() {
     it('should POST to the right endpoint to add the domain alias', function() {
       var domainId = '123';
