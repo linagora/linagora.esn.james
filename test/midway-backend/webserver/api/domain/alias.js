@@ -45,6 +45,47 @@ describe('/domain/:uuid/aliases API', () => {
     });
   });
 
+  describe('GET /domains/:uuid/aliases', function() {
+    it('should respond 401 if not logged in', function(done) {
+      this.helpers.api.requireLogin(app, 'get', `/api/domains/${domain.id}}/aliases`, done);
+    });
+
+    it('should respond 403 if the user is not platform admin', function(done) {
+      this.helpers.api.loginAsUser(app, regularUser.emails[0], password, (err, requestAsMember) => {
+        expect(err).to.not.exist;
+
+        requestAsMember(request(app).get(`/api/domains/${domain.id}/aliases`))
+          .expect(403)
+          .end((err, res) => {
+            expect(err).to.not.exist;
+            expect(res.body.error.details).to.equal('To perform this action, you need to be a platformadmin');
+            done();
+          });
+      });
+    });
+
+    it('should respond 400 if the domain id is not valid', function(done) {
+      core.platformadmin
+        .addPlatformAdmin(regularUser)
+        .then(() => {
+          const platformAdminUser = regularUser;
+
+          this.helpers.api.loginAsUser(app, platformAdminUser.emails[0], password, (err, requestAsMember) => {
+            expect(err).to.not.exist;
+
+            requestAsMember(request(app).get('/api/domains/not_valid/aliases'))
+            .expect(400)
+            .end((err, res) => {
+              expect(err).to.not.exist;
+              expect(res.body.error.details).to.equal('Invalid domain id');
+              done();
+            });
+          });
+        })
+        .catch(err => done(err || 'failed to add platformadmin'));
+    });
+  });
+
   describe('POST /domains/:uuid/aliases/:alias', function() {
     it('should respond 401 if not logged in', function(done) {
       this.helpers.api.requireLogin(app, 'post', `/api/domains/${domain.id}}/aliases/abc`, done);
@@ -83,7 +124,7 @@ describe('/domain/:uuid/aliases API', () => {
               });
           });
         });
-      });
+    });
 
     it('should respond 400 if the alias is not an existing domain', function(done) {
       core.platformadmin

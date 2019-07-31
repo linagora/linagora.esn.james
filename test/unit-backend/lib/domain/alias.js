@@ -65,6 +65,40 @@ describe('The lib/domain/alias module', function() {
     });
   });
 
+  describe('The getDomainAliases', function() {
+    it('should return rejected Promise if domain is undefined/null', function(done) {
+      aliasModule.getDomainAliases(null)
+        .then(() => done('should not resolved'))
+        .catch(err => {
+          expect(err.message).to.equal('domain cannot be null');
+          done();
+        });
+    });
+
+    it('should return rejected Promise if domain name is not a string', function(done) {
+      aliasModule.getDomainAliases(123)
+        .then(() => done('should not resolved'))
+        .catch(err => {
+          expect(err.message).to.equal('domain name must be a string');
+          done();
+        });
+    });
+
+    it('should resolve if success for listing domain aliases', function(done) {
+      const mockResult = [{ source: 'linagora1.org' }, { source: 'linagora2.org' }];
+
+      clientMock.listDomainAliases = sinon.stub().returns(Promise.resolve(mockResult));
+
+      aliasModule.getDomainAliases('openpaas.org')
+        .then(result => {
+          expect(clientMock.listDomainAliases).to.have.been.calledWith('openpaas.org');
+          expect(result).to.deep.equal(mockResult);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
   describe('The removeDomainAliases function', function() {
     it('should return rejected Promise if domain is undefined/null', function(done) {
       aliasModule.addDomainAliases(null, [])

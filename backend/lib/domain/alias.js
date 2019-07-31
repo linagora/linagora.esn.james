@@ -4,6 +4,7 @@ module.exports = dependencies => {
 
   return {
     addDomainAliases,
+    getDomainAliases,
     removeDomainAliases
   };
 
@@ -31,6 +32,20 @@ module.exports = dependencies => {
     }
 
     return client.addDomainAliases(domainName, aliases).catch(_handleClientError);
+  }
+
+  function getDomainAliases(domain) {
+    if (!domain) {
+      return Promise.reject(new Error('domain cannot be null'));
+    }
+
+    const domainName = domain.name || domain;
+
+    if (typeof domainName !== 'string') {
+      return Promise.reject(new Error('domain name must be a string'));
+    }
+
+    return client.listDomainAliases(domainName).catch(_handleClientError);
   }
 
   function removeDomainAliases(domain, aliases) {

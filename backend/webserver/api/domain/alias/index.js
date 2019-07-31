@@ -5,6 +5,13 @@ module.exports = (dependencies, lib, router) => {
   const controller = require('./controller')(dependencies, lib);
   const middleware = require('./middleware')(dependencies);
 
+  router.get('/domains/:uuid/aliases',
+    authorizationMW.requiresAPILogin,
+    platformadminMW.requirePlatformAdmin,
+    domainMW.load,
+    controller.getDomainAliases
+  );
+
   router.post('/domains/:uuid/aliases/:alias',
     authorizationMW.requiresAPILogin,
     platformadminMW.requirePlatformAdmin,

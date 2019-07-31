@@ -9,6 +9,7 @@
     return {
       addDomainAlias: addDomainAlias,
       generateJwtToken: generateJwtToken,
+      getDomainAliases: getDomainAliases,
       getDomainsSyncStatus: getDomainsSyncStatus,
       getGroupSyncStatus: getGroupSyncStatus,
       removeDomainAlias: removeDomainAlias,
@@ -43,6 +44,17 @@
      */
     function syncGroup(groupId) {
       return jamesRestangular.one('sync').one('groups', groupId).post();
+    }
+
+    /**
+     * Get aliases of a particular domain
+     * @param  {String} domainId - The domain ID
+     * @return {Promise}         - On success, resolves with the list of domain aliases
+     */
+    function getDomainAliases(domainId) {
+      jamesRestangular.one('domains', domainId).one('aliases').get().then(function(response) {
+        return response.data;
+      });
     }
 
     /**
