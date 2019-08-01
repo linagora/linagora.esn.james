@@ -52,7 +52,7 @@
      * @return {Promise}         - On success, resolves with the list of domain aliases
      */
     function getDomainAliases(domainId) {
-      jamesRestangular.one('domains', domainId).one('aliases').get().then(function(response) {
+      return jamesRestangular.one('domains', domainId).one('aliases').get().then(function(response) {
         return response.data;
       });
     }

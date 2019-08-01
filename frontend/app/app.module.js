@@ -13,6 +13,7 @@
     'esn.configuration',
     'esn.user',
     'esn.session',
+    'esn.domain',
     'ngFileSaver'
   ]);
 })(angular);

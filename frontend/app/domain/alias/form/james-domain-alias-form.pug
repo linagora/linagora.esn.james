@@ -1,0 +1,23 @@
+.james-domain-alias-form
+  h5 #{__('Add domain alias')}
+  form(name='form')
+    .row
+      .col-xs-10
+        esn-form-group(
+          form="form",
+          validator="$ctrl.aliasValidator"
+          validator-error-message=__('Alias already exist'),
+          async-validator-error-message=__('Alias must be an existing domain'),
+          async-validator="$ctrl.checkAliasAvailability"
+        )
+          input.form-control.fg-input(
+            ng-model="$ctrl.alias",
+            name="alias",
+            autocomplete="off",
+            ng-model-options="{ debounce: {'default': 300} }"
+          )
+      .col-xs-2.text-center
+        button.btn.btn-primary.btn-sm.waves-effect(
+          ng-disabled="!$ctrl.alias || form.$invalid",
+          ng-click="$ctrl.onAddBtnClick()"
+        ) #{__('Add')}

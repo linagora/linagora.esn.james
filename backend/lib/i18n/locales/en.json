@@ -34,5 +34,21 @@
   "Failed to update quota": "Failed to update quota",
   "Currently applied quota": "Currently applied quota",
   "Set quota": "Set quota",
-  "Unlimited": "Unlimited"
+  "Unlimited": "Unlimited",
+  "Manage aliases": "Manage aliases",
+  "Aliases of %s": "Aliases of %s",
+  "Current aliases": "Current aliases",
+  "No alias": "No alias",
+  "An error occurred while getting domain aliases, please try again!": "An error occurred while getting domain aliases, please try again!",
+  "Close": "Close",
+  "Add domain alias": "Add domain alias",
+  "Alias already exist": "Alias already exist",
+  "Alias must be an existing domain": "Alias must be an existing domain",
+  "Add": "Add",
+  "Adding alias...": "Adding alias...",
+  "Alias added": "Alias added",
+  "Failed to add alias": "Failed to add alias",
+  "Removing alias...": "Removing alias...",
+  "Alias removed": "Alias removed",
+  "Failed to remove alias": "Failed to remove alias"
 }
