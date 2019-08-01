@@ -34,5 +34,21 @@
   "Failed to update quota": "Impossible de mettre à jour le quota",
   "Currently applied quota": "Quota actuellement appliqué",
   "Set quota": "Modifier le quota",
-  "Unlimited": "Illimité"
+  "Unlimited": "Illimité",
+  "Manage aliases": "Gérer les alias",
+  "Aliases of %s": "Alias de %s",
+  "Current aliases": "Alias actuels",
+  "No alias": "Pas d'alias",
+  "An error occurred while getting domain aliases, please try again!": "Une erreur est survenue lors de l'obtention des alias de domaine. Veuillez réessayer!",
+  "Close": "Fermer",
+  "Add domain alias": "Ajouter un alias de domaine",
+  "Alias already exist": "L'alias existe déjà",
+  "Alias must be an existing domain": "L'alias doit être un domaine existant",
+  "Add": "Ajouter",
+  "Adding alias...": "Ajout d'alias...",
+  "Alias added": "Alias ajouté",
+  "Failed to add alias": "Impossible d'ajouter un alias",
+  "Removing alias...": "Supprimer l'alias...",
+  "Alias removed": "Alias supprimé",
+  "Failed to remove alias": "Échec de la suppression de l'alias"
 }

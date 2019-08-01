@@ -21,6 +21,12 @@ angular.module('esn.async-action', [])
     };
   });
 angular.module('esn.ui', []);
+
+angular.module('esn.domain', [])
+  .factory('domainAPI', function() {
+    return {};
+  });
+
 angular.module('esn.module-registry', []);
 angular.module('esn.configuration', [])
   .factory('esnConfigApi', function() {

@@ -34,5 +34,21 @@
   "Failed to update quota": "Cập nhật định mức thất bại",
   "Currently applied quota": "Định mức đang áp dụng",
   "Set quota": "Đặt định mức",
-  "Unlimited": "Không giới hạn"
+  "Unlimited": "Không giới hạn",
+  "Manage aliases": "Quản lý tên miền thay thế",
+  "Aliases of %s": "Tên miền thay thế của %s",
+  "Current aliases": "Các tên miền thay thế hiện tại",
+  "No alias": "Không có tên miền thay thế",
+  "An error occurred while getting domain aliases, please try again!": "Có lỗi xảy ra khi lấy tên miền thay thế, vui lòng thử lại!",
+  "Close": "Đóng",
+  "Add domain alias": "Thêm tên miền thay thế",
+  "Alias already exist": "Tên miền thay thế đã tồn tại",
+  "Alias must be an existing domain": "Tên miền thay thế phải là một tên miền đã tồn tại",
+  "Add": "Thêm",
+  "Adding alias...": "Đang thêm tên miền thay thế...",
+  "Alias added": "Tên miền thay thế đã được thêm",
+  "Failed to add alias": "Thêm tên miền thay thế thất bại",
+  "Removing alias...": "Đang xóa tên miền thay thế...",
+  "Alias removed": "Tên miền thay thế đã được xóa",
+  "Failed to remove alias": "Xóa tên miền thay thế thất bại"
 }

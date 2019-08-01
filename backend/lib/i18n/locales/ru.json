@@ -34,5 +34,21 @@
   "Failed to update quota": "Не удалось обновить квоту",
   "Currently applied quota": "В настоящее время применяется квота",
   "Set quota": "Установить квоту",
-  "Unlimited": "Неограниченно"
+  "Unlimited": "Неограниченно",
+  "Manage aliases": "Управлять псевдонимами",
+  "Aliases of %s": "Псевдонимы %s",
+  "Current aliases": "Текущие псевдонимы",
+  "No alias": "Нет псевдонимов",
+  "An error occurred while getting domain aliases, please try again!": "При получении псевдонимов домена произошла ошибка, пожалуйста, попробуйте еще раз!",
+  "Close": "Закрыть",
+  "Add domain alias": "Добавить псевдоним домена",
+  "Alias already exist": "Псевдоним уже существует",
+  "Alias must be an existing domain": "Псевдоним должен быть для существующего домена",
+  "Add": "Добавить",
+  "Adding alias...": "Добавление Псевдоним...",
+  "Alias added": "Добавлен псевдоним",
+  "Failed to add alias": "Не удалось добавить псевдоним",
+  "Removing alias...": "Удаление псевдонима...",
+  "Alias removed": "Псевдоним удален",
+  "Failed to remove alias": "Не удалось удалить псевдоним"
 }
