@@ -122,8 +122,34 @@ module.exports = function(grunt) {
         configFile: './test/config/karma.conf.js',
         browsers: ['PhantomJS']
       }
-    }
+    },
 
+    swagger_generate: {
+      options: {
+        baseDir: __dirname,
+        swaggerOutputFile: 'doc/REST_API/swagger/james-swagger.json',
+        info: {
+          title: 'OpenPaaS James Module',
+          description: 'OpenPaaS James Module API',
+          version: '0.1'
+        },
+        host: 'localhost:8080',
+        securityDefinitions: {
+          auth: {
+            type: 'oauth2',
+            description: 'OAuth2 security scheme for the OpenPaaS James Module API',
+            flow: 'password',
+            tokenUrl: 'localhost:8080/oauth/token',
+            scopes: {}
+          }
+        },
+        paths: [
+          'doc/REST_API/swagger/*/*.js',
+          'backend/webserver/api/*/*.js',
+          'node_modules/linagora-rse/doc/REST_API/swagger/*/*.js'
+        ]
+      }
+    }
   });
 
   grunt.loadTasks('tasks');
@@ -138,6 +164,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-puglint');
   grunt.loadNpmTasks('@linagora/grunt-i18n-checker');
+  grunt.loadNpmTasks('grunt-swagger-generate');
 
   grunt.registerTask('pug-linter', 'Check the pug/jade files', ['puglint:all']);
   grunt.registerTask('linters', 'Check code for lint', ['eslint:all', 'lint_pattern:all', 'lint_pattern:css', 'pug-linter', 'i18n']);
@@ -148,5 +175,6 @@ module.exports = function(grunt) {
   grunt.registerTask('test-unit-frontend', 'Test frontend code', ['karma:unit']);
   grunt.registerTask('test-frontend', 'Test frontend code', ['test-unit-frontend']);
   grunt.registerTask('test', ['linters', 'test-unit-frontend', 'test-unit-backend', 'test-midway-backend']);
+  grunt.registerTask('swagger-generate', 'Grunt plugin for swagger generate', ['swagger_generate']);
   grunt.registerTask('default', ['test']);
 };
