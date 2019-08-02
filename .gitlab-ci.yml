@@ -2,6 +2,7 @@ stages:
   - prepare
   - linters
   - test
+  - swagger
   - deploy
 
 .cache-tpl: &cache-tpl
@@ -111,6 +112,33 @@ midway-backend-test:
   <<: *test-template-svc
   script:
     - grunt --chunk=1 -v test-midway-backend
+
+swagger:
+  <<: *test-template
+  stage: swagger
+  tags:
+    - docker
+  script:
+    - grunt swagger-generate
+  artifacts:
+    paths:
+      - ./doc/REST_API/swagger/james-swagger.json
+
+deploy-swagger:
+  stage: deploy
+  tags:
+    - deployment
+    - api.open-paas.org
+    - shell
+  environment:
+    name: api
+    url: https://api.open-paas.org
+  only:
+    - master@linagora/lgs/openpaas/linagora.esn.james
+  script:
+    - perl -i -pe's/"host":"localhost:8080"/"schemes":["https"],"host":"demo.open-paas.org"/' ./doc/REST_API/swagger/james-swagger.json
+    - cp ./doc/REST_API/swagger/james-swagger.json /var/www/html
+
 
 deploy_dev:
   stage: deploy
