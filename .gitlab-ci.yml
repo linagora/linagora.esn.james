@@ -149,7 +149,7 @@ deploy_dev:
     name: dev
     url: https://dev.open-paas.org
   only:
-    - master@linagora/lgs/openpaas/linagora.esn.unifiedinbox.james
+    - master@linagora/lgs/openpaas/linagora.esn.james
   script:
     - cd /srv/${CI_PROJECT_NAME}
     - git fetch --all
