@@ -10,13 +10,13 @@ module.exports = (dependencies, lib, router) => {
    * /sync/groups/:groupId:
    *   get:
    *     tags:
-   *       - Groups
+   *       - Synchronizing groups
    *     description: Get synchronizing status of a particular group
    *     parameters:
-   *       - $ref: "#/parameters/group_id"
+   *       - $ref: "#/parameters/james_group_id"
    *     responses:
    *       200:
-   *         $ref: "#/responses/group_status"
+   *         $ref: "#/responses/james_group_status"
    *       400:
    *         $ref: "#/responses/cm_400"
    *       401:
@@ -37,10 +37,10 @@ module.exports = (dependencies, lib, router) => {
    * /sync/groups/:groupId:
    *   post:
    *     tags:
-   *       - Groups
+   *       - Synchronizing groups
    *     description: Synchronize a particular group between ESN and James
    *     parameters:
-   *       - $ref: "#/parameters/group_id"
+   *       - $ref: "#/parameters/james_group_id"
    *     responses:
    *       204:
    *         $ref: "#/responses/cm_204"
@@ -68,7 +68,7 @@ module.exports = (dependencies, lib, router) => {
    *     description: Get synchronizing status of the ESN domanis
    *     responses:
    *       200:
-   *         $ref: "#/responses/domain_status"
+   *         $ref: "#/responses/james_domain_status"
    *       401:
    *         $ref: "#/responses/cm_401"
    *       403:

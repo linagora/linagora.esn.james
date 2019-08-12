@@ -6,6 +6,5 @@
  *     in: path
  *     description: Group ID
  *     required: true
- *     schema:
- *       $ref: "#/definitions/james_group_id"
+ *     type: string
 **/
