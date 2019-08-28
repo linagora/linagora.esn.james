@@ -29,3 +29,13 @@ ng-form(name="configForm")
       ng-switch-when="error",
       icon="mdi-lan-disconnect",
       message=__('Cannot connect to James server, please check your Web Admin API for frontend'))
+
+ng-form(name="deletedMessagesForm")
+  .form-title
+    h5 #{__('Deleted messages')}
+  .form-group.flex.flex-vertical-centered
+    div.m-l-10
+      h5 #{__('Enable restoring deleted messages')}
+      small.text-muted #{__('Allow domain members to recover their deleted messages')}
+    .flex-end
+      toggle-switch(ng-model="$ctrl.configurations.deletedMessages.value.restore.isEnabled", form="deletedMessagesForm")

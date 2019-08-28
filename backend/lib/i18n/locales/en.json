@@ -50,5 +50,8 @@
   "Failed to add alias": "Failed to add alias",
   "Removing alias...": "Removing alias...",
   "Alias removed": "Alias removed",
-  "Failed to remove alias": "Failed to remove alias"
+  "Failed to remove alias": "Failed to remove alias",
+  "Deleted messages": "Deleted messages",
+  "Enable restoring deleted messages": "Enable restoring deleted messages",
+  "Allow domain members to recover their deleted messages": "Allow domain members to recover their deleted messages"
 }
