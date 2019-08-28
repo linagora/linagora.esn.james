@@ -50,5 +50,8 @@
   "Failed to add alias": "Impossible d'ajouter un alias",
   "Removing alias...": "Supprimer l'alias...",
   "Alias removed": "Alias supprimé",
-  "Failed to remove alias": "Échec de la suppression de l'alias"
+  "Failed to remove alias": "Échec de la suppression de l'alias",
+  "Deleted messages" : "Messages supprimés",
+  "Enable restoring deleted messages": "Autoriser la restauration de messages suppprimés",
+  "Allow domain members to recover their deleted messages" : "Autoriser les membres du domaine à restaurer leurs messages supprimés"
 }

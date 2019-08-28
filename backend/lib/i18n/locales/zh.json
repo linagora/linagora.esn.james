@@ -50,5 +50,8 @@
   "Failed to add alias": "无法添加别名",
   "Removing alias...": "删除别名...",
   "Alias removed": "别名已删除",
-  "Failed to remove alias": "无法删除别名"
+  "Failed to remove alias": "无法删除别名",
+  "Deleted messages": "已删除的邮件",
+  "Enable restoring deleted messages": "启用还原已删除的邮件",
+  "Allow domain members to recover their deleted messages": "允许域成员恢复已删除的邮件"
 }

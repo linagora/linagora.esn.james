@@ -50,5 +50,8 @@
   "Failed to add alias": "Thêm tên miền thay thế thất bại",
   "Removing alias...": "Đang xóa tên miền thay thế...",
   "Alias removed": "Tên miền thay thế đã được xóa",
-  "Failed to remove alias": "Xóa tên miền thay thế thất bại"
+  "Failed to remove alias": "Xóa tên miền thay thế thất bại",
+  "Deleted messages": "Thư đã xóa",
+  "Enable restoring deleted messages": "Bật chức năng khôi phục thư đã xóa",
+  "Allow domain members to recover their deleted messages": "Cho phép người dùng phục hồi lại những thư đã bị xóa từ thùng rác"
 }
