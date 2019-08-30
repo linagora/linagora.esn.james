@@ -53,5 +53,8 @@
   "Failed to remove alias": "Échec de la suppression de l'alias",
   "Deleted messages" : "Messages supprimés",
   "Enable restoring deleted messages": "Autoriser la restauration de messages suppprimés",
-  "Allow domain members to recover their deleted messages" : "Autoriser les membres du domaine à restaurer leurs messages supprimés"
+  "Allow domain members to recover their deleted messages" : "Autoriser les membres du domaine à restaurer leurs messages supprimés",
+  "Search for an alias": "Rechercher un alias",
+  "No existing alias to add": "Aucun alias existant à ajouter",
+  "An error occurred while listing aliases to add, please try again!": "Une erreur s'est produite lors de l'inventaire des alias ajoutables. Veuillez réessayer!"
 }

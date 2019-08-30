@@ -5,9 +5,7 @@
     .controller('JamesDomainAliasFormController', JamesDomainAliasFormController);
 
   function JamesDomainAliasFormController(
-    $q,
     asyncAction,
-    domainAPI,
     jamesApiClient
   ) {
     var self = this;
@@ -16,32 +14,35 @@
 
     function $onInit() {
       self.alias = '';
-      self.checkAliasAvailability = checkAliasAvailability;
-      self.aliasValidator = aliasValidator;
+      self.status = 'loading';
       self.onAddBtnClick = onAddBtnClick;
+      self.isAddedAlias = isAddedAlias;
+
+      _getAvailableAliases()
+        .then(function(aliases) {
+          self.availableAliases = aliases;
+          self.status = 'loaded';
+        })
+        .catch(function() {
+          self.status = 'error';
+        });
     }
 
-    function checkAliasAvailability(alias) {
-      return domainAPI.getByName(alias)
-        .then(function(domain) {
-          if (!domain) {
-            return $q.reject(new Error('Alias must be an existing domain'));
+    function _getAvailableAliases() {
+      return jamesApiClient.listJamesDomains()
+        .then(function(domains) {
+          var index = domains.indexOf(self.domain.name);
+
+          if (index !== -1) {
+            domains.splice(index, 1);
           }
+
+          return domains;
         });
     }
 
-    function aliasValidator(alias) {
-      function _aliasAlreadyExist() {
-        return self.aliases.some(function(currentAlias) {
-          return currentAlias === alias;
-        });
-      }
-
-      if (self.domain.name === alias || _aliasAlreadyExist()) {
-        return false;
-      }
-
-      return true;
+    function isAddedAlias(alias) {
+      return self.aliases.indexOf(alias) !== -1;
     }
 
     function _addAlias() {

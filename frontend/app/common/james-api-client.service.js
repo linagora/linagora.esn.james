@@ -99,7 +99,10 @@
      * @return {Promise}          - On success, resolves with the list of James domains
      */
     function listJamesDomains() {
-      return jamesRestangular.one('domains').get();
+      return jamesRestangular.one('domains').get()
+        .then(function(response) {
+          return response.data;
+        });
     }
   }
 })(angular);

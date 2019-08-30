@@ -2,22 +2,32 @@
   h5 #{__('Add domain alias')}
   form(name='form')
     .row
-      .col-xs-10
-        esn-form-group(
-          form="form",
-          validator="$ctrl.aliasValidator"
-          validator-error-message=__('Alias already exist'),
-          async-validator-error-message=__('Alias must be an existing domain'),
-          async-validator="$ctrl.checkAliasAvailability"
-        )
-          input.form-control.fg-input(
-            ng-model="$ctrl.alias",
-            name="alias",
-            autocomplete="off",
-            ng-model-options="{ debounce: {'default': 300} }"
-          )
-      .col-xs-2.text-center
-        button.btn.btn-primary.btn-sm.waves-effect(
-          ng-disabled="!$ctrl.alias || form.$invalid",
-          ng-click="$ctrl.onAddBtnClick()"
-        ) #{__('Add')}
+      .text-center(
+        ng-if="$ctrl.status === $ctrl.status.loading",
+        openpaas-logo-spinner,
+        spinner-start-active='1',
+        spinner-size='0.5'
+      )
+
+      .col-xs-12(ng-if="$ctrl.status === 'loaded'")
+        .row(ng-if="$ctrl.availableAliases.length")
+          .col-xs-10
+            ui-select(
+              ng-model="$ctrl.alias",
+              close-on-select="true",
+              required
+            )
+              ui-select-match(placeholder=__('Search for an alias'))
+                span(ng-bind="$select.selected")
+              ui-select-choices(
+                repeat="item in ($ctrl.availableAliases | filter: $select.search) track by item",
+                ui-disable-choice="$ctrl.isAddedAlias(item)"
+              )
+                span(ng-bind="item")
+          .col-xs-2.text-center
+            button.btn.btn-primary.btn-sm.waves-effect(
+              ng-disabled="!$ctrl.alias || form.$invalid",
+              ng-click="$ctrl.onAddBtnClick()"
+            ) #{__('Add')}
+        p(ng-if="!$ctrl.availableAliases.length") #{__('No existing alias to add')}
+      .message(ng-if="$ctrl.status === $ctrl.status.error") #{__('An error occurred while listing aliases to add, please try again!')}

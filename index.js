@@ -55,7 +55,8 @@ const awesomeModule = new AwesomeModule(AWESOME_MODULE_NAME, {
       const frontendJsFilesUri = frontendJsFilesFullPath.map(filepath => filepath.replace(FRONTEND_JS_PATH, ''));
       const lessFile = path.resolve(__dirname, './frontend/app/app.less');
       const jsResourceFiles = [
-        '../components/james-admin-client/dist/james-admin-client.min.js'
+        '../components/james-admin-client/dist/james-admin-client.min.js',
+        '../components/angular-ui-select/dist/select.min.js'
       ];
 
       webserverWrapper.injectAngularAppModules(MODULE_NAME, frontendJsFilesUri, AWESOME_MODULE_NAME, ['esn'], {
@@ -63,6 +64,11 @@ const awesomeModule = new AwesomeModule(AWESOME_MODULE_NAME, {
       });
       webserverWrapper.injectJS(MODULE_NAME, jsResourceFiles, 'esn');
       webserverWrapper.injectLess(MODULE_NAME, [lessFile], 'esn');
+      webserverWrapper.injectCSS(
+        MODULE_NAME,
+        ['../components/angular-ui-select/dist/select.min.css'],
+        'esn'
+      );
       webserverWrapper.addApp(MODULE_NAME, app);
 
       return callback();
