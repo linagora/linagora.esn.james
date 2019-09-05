@@ -53,5 +53,8 @@
   "Failed to remove alias": "Xóa tên miền thay thế thất bại",
   "Deleted messages": "Thư đã xóa",
   "Enable restoring deleted messages": "Bật chức năng khôi phục thư đã xóa",
-  "Allow domain members to recover their deleted messages": "Cho phép người dùng phục hồi lại những thư đã bị xóa từ thùng rác"
+  "Allow domain members to recover their deleted messages": "Cho phép người dùng phục hồi lại những thư đã bị xóa từ thùng rác",
+  "Search for an alias": "Tìm tên miền thay thế",
+  "No existing alias to add": "Không có tên miền thay thế nào để thêm",
+  "An error occurred while listing aliases to add, please try again!": "Có lỗi xảy ra trong khi liệt kê tên miền thay thế để thêm, vui lòng thử lại!"
 }

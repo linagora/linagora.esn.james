@@ -53,5 +53,8 @@
   "Failed to remove alias": "无法删除别名",
   "Deleted messages": "已删除的邮件",
   "Enable restoring deleted messages": "启用还原已删除的邮件",
-  "Allow domain members to recover their deleted messages": "允许域成员恢复已删除的邮件"
+  "Allow domain members to recover their deleted messages": "允许域成员恢复已删除的邮件",
+  "Search for an alias": "搜索别名",
+  "No existing alias to add": "没有要添加的现有别名",
+  "An error occurred while listing aliases to add, please try again!": "列出要添加的别名时发生错误，请再试一次!"
 }

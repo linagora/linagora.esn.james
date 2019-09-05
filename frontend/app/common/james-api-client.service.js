@@ -12,6 +12,7 @@
       getDomainAliases: getDomainAliases,
       getDomainsSyncStatus: getDomainsSyncStatus,
       getGroupSyncStatus: getGroupSyncStatus,
+      listJamesDomains: listJamesDomains,
       removeDomainAlias: removeDomainAlias,
       syncGroup: syncGroup,
       syncDomains: syncDomains
@@ -91,6 +92,17 @@
      */
     function syncDomains() {
       return jamesRestangular.one('sync').one('domains').post();
+    }
+
+    /**
+     * List domains from James
+     * @return {Promise}          - On success, resolves with the list of James domains
+     */
+    function listJamesDomains() {
+      return jamesRestangular.one('domains').get()
+        .then(function(response) {
+          return response.data;
+        });
     }
   }
 })(angular);

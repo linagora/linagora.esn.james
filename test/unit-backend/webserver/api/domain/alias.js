@@ -48,7 +48,7 @@ describe('The webserver/api/domain/alias/controller module', function() {
     });
 
     it('should respond 500 if failed to add domain alias for internal problems', function(done) {
-      aliasLibMock.addDomainAliases = sinon.stub().returns(Promise.resolve());
+      aliasLibMock.addDomainAliases = sinon.stub().returns(Promise.reject());
 
       const req = {
         domain: {
@@ -61,19 +61,20 @@ describe('The webserver/api/domain/alias/controller module', function() {
       };
       const res = {
         status(code) {
-          expect(code).to.equal(500);
+          try {
 
-          return {
-            json(json) {
-              try {
+            expect(code).to.equal(500);
+
+            return {
+              json(json) {
                 expect(aliasLibMock.addDomainAliases).to.have.been.calledWith(req.domain, req.params.alias);
                 expect(json.error.details).to.equal(`Error while creating alias "${req.params.alias}" for domain "${req.domain.id}"`);
                 done();
-              } catch (error) {
-                done(error);
               }
-            }
-          };
+            };
+          } catch (error) {
+            done(error);
+          }
         }
       };
 
@@ -114,7 +115,7 @@ describe('The webserver/api/domain/alias/controller module', function() {
     });
 
     it('should respond 500 if it failed to get domain aliases due to internal problems', function(done) {
-      aliasLibMock.getDomainAliases = sinon.stub().returns(Promise.resolve());
+      aliasLibMock.getDomainAliases = sinon.stub().returns(Promise.reject());
 
       const req = {
         domain: {
@@ -125,19 +126,19 @@ describe('The webserver/api/domain/alias/controller module', function() {
 
       const res = {
         status(code) {
-          expect(code).to.equal(500);
+          try {
+            expect(code).to.equal(500);
 
-          return {
-            json(json) {
-              try {
+            return {
+              json(json) {
                 expect(aliasLibMock.getDomainAliases).to.have.been.calledWith(req.domain);
                 expect(json.error.details).to.equal(`Error while getting aliases for domain "${req.domain.id}"`);
                 done();
-              } catch (error) {
-                done(error);
               }
-            }
-          };
+            };
+          } catch (error) {
+            done(error);
+          }
         }
       };
 
@@ -178,7 +179,7 @@ describe('The webserver/api/domain/alias/controller module', function() {
     });
 
     it('should respond 500 if failed to remove domain alias for internal problems', function(done) {
-      aliasLibMock.removeDomainAliases = sinon.stub().returns(Promise.resolve());
+      aliasLibMock.removeDomainAliases = sinon.stub().returns(Promise.reject());
 
       const req = {
         domain: {
@@ -191,19 +192,19 @@ describe('The webserver/api/domain/alias/controller module', function() {
       };
       const res = {
         status(code) {
-          expect(code).to.equal(500);
+          try {
+            expect(code).to.equal(500);
 
-          return {
-            json(json) {
-              try {
-                expect(aliasLibMock.removeDomainAliases).to.have.been.calledWith(req.domain, req.params.alias);
-                expect(json.error.details).to.equal(`Error while removing alias "${req.params.alias}" for domain "${req.domain.id}"`);
-                done();
-              } catch (error) {
-                done(error);
+            return {
+              json(json) {
+                  expect(aliasLibMock.removeDomainAliases).to.have.been.calledWith(req.domain, req.params.alias);
+                  expect(json.error.details).to.equal(`Error while removing alias "${req.params.alias}" for domain "${req.domain.id}"`);
+                  done();
               }
-            }
-          };
+            };
+          } catch (error) {
+            done(error);
+          }
         }
       };
 

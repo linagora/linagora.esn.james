@@ -53,5 +53,8 @@
   "Failed to remove alias": "Failed to remove alias",
   "Deleted messages": "Deleted messages",
   "Enable restoring deleted messages": "Enable restoring deleted messages",
-  "Allow domain members to recover their deleted messages": "Allow domain members to recover their deleted messages"
+  "Allow domain members to recover their deleted messages": "Allow domain members to recover their deleted messages",
+  "Search for an alias": "Search for an alias",
+  "No existing alias to add": "No existing alias to add",
+  "An error occurred while listing aliases to add, please try again!": "An error occurred while listing aliases to add, please try again!"
 }

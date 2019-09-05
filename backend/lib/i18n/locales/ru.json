@@ -50,5 +50,8 @@
   "Failed to add alias": "Не удалось добавить псевдоним",
   "Removing alias...": "Удаление псевдонима...",
   "Alias removed": "Псевдоним удален",
-  "Failed to remove alias": "Не удалось удалить псевдоним"
+  "Failed to remove alias": "Не удалось удалить псевдоним",
+  "Search for an alias": "Поиск псевдонима",
+  "No existing alias to add": "Нет существующего псевдонима для добавления",
+  "An error occurred while listing aliases to add, please try again!": "Произошла ошибка при перечислении псевдонимов для добавления, пожалуйста, попробуйте еще раз!"
 }

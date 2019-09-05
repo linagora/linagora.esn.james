@@ -114,4 +114,14 @@ describe('The jamesApiClient service', function() {
       $httpBackend.flush();
     });
   });
+
+  describe('The listJamesDomains function', function() {
+    it('should send GET request to the right endpoint to list James domains', function() {
+      $httpBackend.expectGET('/james/api/domains').respond(200);
+
+      jamesApiClient.listJamesDomains();
+
+      $httpBackend.flush();
+    });
+  });
 });

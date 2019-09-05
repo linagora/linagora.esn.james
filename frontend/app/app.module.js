@@ -14,6 +14,8 @@
     'esn.user',
     'esn.session',
     'esn.domain',
-    'ngFileSaver'
+    'ngFileSaver',
+    'ngSanitize',
+    'ui.select'
   ]);
 })(angular);

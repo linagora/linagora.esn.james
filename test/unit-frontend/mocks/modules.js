@@ -44,3 +44,5 @@ angular.module('ngFileSaver', [])
       saveAs: angular.noop
     };
   });
+angular.module('ngSanitize', []);
+angular.module('ui.select', []);
