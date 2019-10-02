@@ -18,7 +18,6 @@
   "Data usage quota": "Квота на использование данных",
   "Message count quota": "Квота на количество сообщений",
   "Run": "Запустить",
-  "James": "James",
   "Domains": "Домены",
   "Synchronize domains in OpenPaaS with James": "Синхронизируйте домены в OpenPaaS с James",
   "Synchronizing domains...": "Синхронизация доменов ...",

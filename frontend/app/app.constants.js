@@ -13,6 +13,14 @@
           domain: true,
           platform: true
         }
+      },
+      maintenance: {
+        template: 'james-maintenance',
+        displayIn: {
+          user: false,
+          domain: false,
+          platform: true
+        }
       }
     })
     .constant('JAMES_MODULE_NAME', 'linagora.esn.james');
