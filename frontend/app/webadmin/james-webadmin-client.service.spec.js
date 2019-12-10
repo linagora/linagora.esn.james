@@ -53,39 +53,7 @@ describe('The jamesWebadminClient', function() {
       FileSaver = _FileSaver_;
 
       esnConfigMock = $q.when(serverUrl);
-      jamesClientInstanceMock.createDomain = sinon.stub().returns($q.when());
       jamesWebadminClientProvider.get = sinon.stub().returns($q.when(jamesClientInstanceMock));
-    });
-  });
-
-  describe('The createDomain method', function() {
-    it('should reject if failed to create domain in James', function(done) {
-      var error = new Error('something wrong');
-
-      jamesClientInstanceMock.createDomain = sinon.stub().returns($q.reject(error));
-
-      jamesWebadminClient.createDomain(domain.name)
-        .catch(function(err) {
-          expect(jamesClientInstanceMock.createDomain).to.have.been.calledOnce;
-          expect(jamesClientInstanceMock.createDomain).to.have.been.calledWith(domain.name);
-          expect(err.message).to.equal(error.message);
-
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve if successfully to create domain in James', function(done) {
-      jamesWebadminClient.createDomain(domain.name)
-        .then(function() {
-          expect(jamesClientInstanceMock.createDomain).to.have.been.calledOnce;
-          expect(jamesClientInstanceMock.createDomain).to.have.been.calledWith(domain.name);
-
-          done();
-        });
-
-      $rootScope.$digest();
     });
   });
 
@@ -109,40 +77,6 @@ describe('The jamesWebadminClient', function() {
       jamesWebadminClient.getServerUrl()
         .then(function(url) {
           expect(url).to.equal(serverUrl);
-
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-  });
-
-  describe('The listDomains function', function() {
-    it('should reject if failed to list domains in James', function(done) {
-      var error = new Error('something wrong');
-
-      jamesClientInstanceMock.listDomains = sinon.stub().returns($q.reject(error));
-
-      jamesWebadminClient.listDomains()
-        .catch(function(err) {
-          expect(jamesClientInstanceMock.listDomains).to.have.been.calledOnce;
-          expect(err.message).to.equal(error.message);
-
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve if successfully to list domains in James', function(done) {
-      var domains = ['awesome.com'];
-
-      jamesClientInstanceMock.listDomains = sinon.stub().returns($q.when(domains));
-
-      jamesWebadminClient.listDomains()
-        .then(function(jamesDomains) {
-          expect(jamesClientInstanceMock.listDomains).to.have.been.calledOnce;
-          expect(jamesDomains).to.equal(domains);
 
           done();
         });
