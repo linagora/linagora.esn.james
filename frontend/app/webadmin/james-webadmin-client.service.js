@@ -12,7 +12,6 @@
   ) {
     return {
       addDomainAliases: addDomainAliases,
-      createDomain: createDomain,
       deleteMailInMailRepository: deleteMailInMailRepository,
       deleteAllMailsInMailRepository: deleteAllMailsInMailRepository,
       downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
@@ -25,7 +24,6 @@
       setGlobalQuota: setGlobalQuota,
       listDlpRules: listDlpRules,
       listDomainAliases: listDomainAliases,
-      listDomains: listDomains,
       listMailRepositories: listMailRepositories,
       listMailsInMailRepository: listMailsInMailRepository,
       removeDlpRules: removeDlpRules,
@@ -37,22 +35,8 @@
       storeDlpRules: storeDlpRules
     };
 
-    function createDomain(domainName) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return jamesClient.createDomain(domainName);
-        });
-    }
-
     function getServerUrl() {
       return esnConfig('linagora.esn.james.webadminApiFrontend');
-    }
-
-    function listDomains() {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return jamesClient.listDomains();
-        });
     }
 
     function getUserQuota(username) {
