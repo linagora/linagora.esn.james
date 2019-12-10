@@ -11,7 +11,6 @@
     jamesWebadminClientProvider
   ) {
     return {
-      addDomainAliases: addDomainAliases,
       deleteMailInMailRepository: deleteMailInMailRepository,
       deleteAllMailsInMailRepository: deleteAllMailsInMailRepository,
       downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
@@ -23,11 +22,9 @@
       getMailInMailRepository: getMailInMailRepository,
       setGlobalQuota: setGlobalQuota,
       listDlpRules: listDlpRules,
-      listDomainAliases: listDomainAliases,
       listMailRepositories: listMailRepositories,
       listMailsInMailRepository: listMailsInMailRepository,
       removeDlpRules: removeDlpRules,
-      removeDomainAliases: removeDomainAliases,
       reprocessAllMailsFromMailRepository: reprocessAllMailsFromMailRepository,
       reprocessMailFromMailRepository: reprocessMailFromMailRepository,
       setUserQuota: setUserQuota,
@@ -209,31 +206,6 @@
       return _getJamesClient()
         .then(function(jamesClient) {
           return jamesClient.dlpRules.get(domainName, ruleId);
-        });
-    }
-
-    function listDomainAliases(domainName) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return jamesClient.listDomainAliases(domainName);
-        });
-    }
-
-    function addDomainAliases(domainName, aliases) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return $q.all(aliases.map(function(alias) {
-            return jamesClient.addDomainAlias(domainName, alias);
-          }));
-        });
-    }
-
-    function removeDomainAliases(domainName, aliases) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return $q.all(aliases.map(function(alias) {
-            return jamesClient.removeDomainAlias(domainName, alias);
-          }));
         });
     }
 
