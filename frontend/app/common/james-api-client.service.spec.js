@@ -124,4 +124,68 @@ describe('The jamesApiClient service', function() {
       $httpBackend.flush();
     });
   });
+
+  describe('The getDomainQuota method', function() {
+    it('should GET to right endpoint to get domain quota', function() {
+      var domainId = '123';
+
+      $httpBackend.expectGET('/james/api/quota?domain_id=' + domainId + '&scope=domain').respond(200);
+
+      jamesApiClient.getDomainQuota(domainId);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The getPlatformQuota method', function() {
+    it('should GET to right endpoint to get platform quota', function() {
+      $httpBackend.expectGET('/james/api/quota?scope=platform').respond(200);
+
+      jamesApiClient.getPlatformQuota();
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The getUserQuota method', function() {
+    var domainId = '123';
+    var userId = '234';
+
+    it('should GET to right endpoint to get user quota', function() {
+      $httpBackend.expectGET('/james/api/quota?domain_id=' + domainId + '&scope=user&user_id=' + userId).respond(200);
+
+      jamesApiClient.getUserQuota(domainId, userId);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The setDomainQuota method', function() {
+    it('should PUT to right endpoint to set domain quota', function() {
+      var domainId = '123';
+
+      $httpBackend.expectPUT('/james/api/quota?domain_id=' + domainId + '&scope=domain').respond(204);
+
+      jamesApiClient.setDomainQuota(domainId);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The setPlatformQuota method', function() {
+    it('should PUT to right endpoint to set platform quota', function() {
+      $httpBackend.expectPUT('/james/api/quota?scope=platform').respond(204);
+
+      jamesApiClient.setPlatformQuota();
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The setUserQuota method', function() {
+    it('should PUT to right endpoint to set user quota', function() {
+      var domainId = '123';
+      var userId = '234';
+
+      $httpBackend.expectPUT('/james/api/quota?domain_id=' + domainId + '&scope=user&user_id=' + userId).respond(204);
+
+      jamesApiClient.setUserQuota(domainId, userId);
+      $httpBackend.flush();
+    });
+  });
 });
