@@ -7,7 +7,8 @@ var expect = chai.expect;
 describe('The JamesQuotaDomainController', function() {
 
   var $controller, $rootScope, $scope, $q;
-  var jamesWebadminClient, jamesQuotaHelpers;
+  var jamesApiClient, jamesQuotaHelpers;
+  var domain = { _id: 'domainId' };
 
   beforeEach(function() {
     module('linagora.esn.james');
@@ -21,13 +22,13 @@ describe('The JamesQuotaDomainController', function() {
       _$controller_,
       _$rootScope_,
       _$q_,
-      _jamesWebadminClient_,
+      _jamesApiClient_,
       _jamesQuotaHelpers_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $q = _$q_;
-      jamesWebadminClient = _jamesWebadminClient_;
+      jamesApiClient = _jamesApiClient_;
       jamesQuotaHelpers = _jamesQuotaHelpers_;
     });
   });
@@ -44,10 +45,9 @@ describe('The JamesQuotaDomainController', function() {
 
   describe('The getDomainQuota function', function() {
     it('should set the status to loading while attempting to get domain quota ', function() {
-      var domain = { name: 'abc' };
       var controller = initController();
 
-      jamesWebadminClient.getDomainQuota = function() {
+      jamesApiClient.getDomainQuota = function() {
         return $q.defer().promise;
       };
 
@@ -58,21 +58,19 @@ describe('The JamesQuotaDomainController', function() {
     });
 
     it('should set the status to error in case of failed attempt to get domain quota', function() {
-      var domain = { name: 'abc' };
       var controller = initController();
 
       controller.domain = domain;
-      jamesWebadminClient.getDomainQuota = sinon.stub().returns($q.reject());
+      jamesApiClient.getDomainQuota = sinon.stub().returns($q.reject());
 
       controller.getDomainQuota();
       $rootScope.$digest();
 
-      expect(jamesWebadminClient.getDomainQuota).to.have.been.calledWith(domain.name);
+      expect(jamesApiClient.getDomainQuota).to.have.been.calledWith(domain._id);
       expect(controller.status).to.equal('error');
     });
 
     it('should set the status to loaded if succeed to get domain quota', function() {
-      var domain = { name: 'abc' };
       var quota = {
         domain: { count: 16, size: 21 },
         computed: { count: 20, size: 1000 }
@@ -80,19 +78,18 @@ describe('The JamesQuotaDomainController', function() {
       var controller = initController();
 
       controller.domain = domain;
-      jamesWebadminClient.getDomainQuota = sinon.stub().returns($q.when(quota));
+      jamesApiClient.getDomainQuota = sinon.stub().returns($q.when(quota));
 
       controller.getDomainQuota();
       $rootScope.$digest();
 
-      expect(jamesWebadminClient.getDomainQuota).to.have.been.calledWith(domain.name);
+      expect(jamesApiClient.getDomainQuota).to.have.been.calledWith(domain._id);
       expect(controller.status).to.equal('loaded');
       expect(controller.quota).to.deep.equal(quota.domain);
       expect(controller.computedQuota).to.deep.equal(quota.computed);
     });
 
     it('should qualify quota when succeed to get domain quota', function() {
-      var domain = { name: 'abc' };
       var quota = {
         domain: { count: -10, size: -20 },
         computed: { count: 100, size: 2000 }
@@ -100,7 +97,7 @@ describe('The JamesQuotaDomainController', function() {
       var controller = initController();
 
       controller.domain = domain;
-      jamesWebadminClient.getDomainQuota = function() {
+      jamesApiClient.getDomainQuota = function() {
         return $q.when(quota);
       };
 
@@ -114,10 +111,10 @@ describe('The JamesQuotaDomainController', function() {
 
   describe('The updateDomainQuota function', function() {
     it('should reject if failed to update domain quota', function(done) {
-      var domain = { name: 'abc' };
+      var domain = { _id: 'domainId' };
       var quota = { count: 16, size: 21 };
 
-      jamesWebadminClient.setDomainQuota = sinon.stub().returns($q.reject());
+      jamesApiClient.setDomainQuota = sinon.stub().returns($q.reject());
 
       var controller = initController();
 
@@ -125,7 +122,7 @@ describe('The JamesQuotaDomainController', function() {
       controller.quota = quota;
       controller.updateDomainQuota()
         .catch(function() {
-          expect(jamesWebadminClient.setDomainQuota).to.have.been.calledWith(domain.name, controller.quota);
+          expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain._id, controller.quota);
           done();
         });
 
@@ -133,28 +130,28 @@ describe('The JamesQuotaDomainController', function() {
     });
 
     it('should qualify quota before set domain quota', function() {
-      var domain = { name: 'abc' };
+      var domain = { _id: 'domainId' };
       var quota = { count: 16, size: 21 };
       var qualifiedQuota = { foo: 'bar' };
       var controller = initController();
 
       controller.domain = domain;
       controller.quota = quota;
-      jamesWebadminClient.setDomainQuota = sinon.stub().returns($q.when());
+      jamesApiClient.setDomainQuota = sinon.stub().returns($q.when());
       jamesQuotaHelpers.qualifySet = sinon.stub().returns(qualifiedQuota);
 
       controller.updateDomainQuota();
       $rootScope.$digest();
 
       expect(jamesQuotaHelpers.qualifySet).to.have.been.calledWith(quota);
-      expect(jamesWebadminClient.setDomainQuota).to.have.been.calledWith(domain.name, qualifiedQuota);
+      expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain._id, qualifiedQuota);
     });
 
     it('should resolve if succeed to update domain quota', function(done) {
-      var domain = { name: 'abc' };
+      var domain = { _id: 'domainId' };
       var quota = { count: 16, size: 21 };
 
-      jamesWebadminClient.setDomainQuota = sinon.stub().returns($q.when());
+      jamesApiClient.setDomainQuota = sinon.stub().returns($q.when());
 
       var controller = initController();
 
@@ -162,7 +159,7 @@ describe('The JamesQuotaDomainController', function() {
       controller.quota = quota;
       controller.updateDomainQuota()
         .then(function() {
-          expect(jamesWebadminClient.setDomainQuota).to.have.been.calledWith(domain.name, controller.quota);
+          expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain._id, controller.quota);
           done();
         })
         .catch(done);
