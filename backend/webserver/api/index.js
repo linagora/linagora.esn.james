@@ -9,6 +9,7 @@ module.exports = function(dependencies, lib) {
   require('./token')(dependencies, lib, router);
   require('./sync')(dependencies, lib, router);
   require('./domain')(dependencies, lib, router);
+  require('./quota')(dependencies, lib, router);
 
   return router;
 };
