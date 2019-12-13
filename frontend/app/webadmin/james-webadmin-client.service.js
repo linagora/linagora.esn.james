@@ -15,7 +15,6 @@
       downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
       getServerUrl: getServerUrl,
       getMailInMailRepository: getMailInMailRepository,
-      listMailRepositories: listMailRepositories,
       listMailsInMailRepository: listMailsInMailRepository,
       reprocessAllMailsFromMailRepository: reprocessAllMailsFromMailRepository,
       reprocessMailFromMailRepository: reprocessMailFromMailRepository
@@ -23,13 +22,6 @@
 
     function getServerUrl() {
       return esnConfig('linagora.esn.james.webadminApiFrontend');
-    }
-
-    function listMailRepositories() {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return jamesClient.mailRepositories.list();
-        });
     }
 
     function listMailsInMailRepository(repositoryId, options) {

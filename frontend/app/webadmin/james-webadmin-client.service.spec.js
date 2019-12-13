@@ -83,34 +83,6 @@ describe('The jamesWebadminClient', function() {
     });
   });
 
-  describe('The listMailRepositories function', function() {
-    it('should reject if failed to list mail repositories', function(done) {
-      jamesClientInstanceMock.mailRepositories = {
-        list: sinon.stub().returns($q.reject())
-      };
-
-      jamesWebadminClient.listMailRepositories()
-        .catch(function() {
-          expect(jamesClientInstanceMock.mailRepositories.list).to.have.been.called;
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve if listed email repositories successfully', function() {
-      jamesClientInstanceMock.mailRepositories = {
-        list: sinon.stub().returns($q.when([]))
-      };
-
-      jamesWebadminClient.listMailRepositories();
-
-      $rootScope.$digest();
-
-      expect(jamesClientInstanceMock.mailRepositories.list).to.have.been.called;
-    });
-  });
-
   describe('The listMailsInMailRepository function', function() {
     it('should reject if failed to list mails in a mail repository', function(done) {
       jamesClientInstanceMock.mailRepositories = {
