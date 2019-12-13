@@ -15,11 +15,14 @@ module.exports = dependencies => {
     addUserAlias,
     addUserAliases,
     createDomain,
+    exportDeletedMessages,
     getDomainQuota,
     getPlatformQuota,
+    getDlpRule,
     getGroupMembers,
     getUserQuota,
     listDestinationsOfForward,
+    listDlpRules,
     listDomains,
     listDomainAliases,
     listForwardsInDomain,
@@ -37,9 +40,9 @@ module.exports = dependencies => {
     setDomainQuota,
     setPlatformQuota,
     setUserQuota,
-    updateGroup,
     restoreDeletedMessages,
-    exportDeletedMessages
+    storeDlpRules,
+    updateGroup
   };
 };
 
@@ -353,6 +356,37 @@ function restoreDeletedMessages(user, rules) {
  */
 function exportDeletedMessages(user, exportTo, rules) {
   return get().then(client => client.exportDeletedMessages(user, exportTo, rules));
+}
+
+/**
+ * Get a DLP rule with the given ID from a domain
+ * @param  {String} domainName - Name of the domain
+ * @param  {String} ruleId - ID of a specific rule
+ * @return {Promise}      - Resolve a rule on success
+ */
+function getDlpRule(domainName, ruleId) {
+  return get().then(client => client.dlpRules.get(domainName, ruleId));
+}
+
+/**
+ * Get a list of DLP rules from a domain
+ * @param  {String} domainName - Name of the domain
+ * @return {Promise}      - Resolve a list of rules on success
+ */
+function listDlpRules(domainName) {
+  return get()
+    .then(client => client.dlpRules.list(domainName))
+    .then(({ rules }) => rules);
+}
+
+/**
+ * Store DLP rules from a domain
+ * @param  {String} domainName - Name of the domain
+ * @param  {String} rules - Set of rules to store
+ * @return {Promise}      - Resolve on success
+ */
+function storeDlpRules(domainName, rules) {
+  return get().then(client => client.dlpRules.store(domainName, rules));
 }
 
 /**
