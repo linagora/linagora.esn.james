@@ -6,6 +6,7 @@ var expect = chai.expect;
 
 describe('The jamesQuotaHelpers service', function() {
   var jamesQuotaHelpers, JAMES_UNLIMITED_QUOTA;
+  var quota;
 
   beforeEach(function() {
     angular.mock.module('linagora.esn.james');
@@ -14,66 +15,134 @@ describe('The jamesQuotaHelpers service', function() {
       jamesQuotaHelpers = _jamesQuotaHelpers_;
       JAMES_UNLIMITED_QUOTA = _JAMES_UNLIMITED_QUOTA_;
     });
+
+    quota = {
+      count: 100,
+      size: 100
+    };
   });
 
   describe('The qualifyGet function', function() {
-    it('should return qualified quota settings in case of invalid quota count', function() {
-      var invalid = {
-        count: -10,
-        size: -10
-      };
-      var invalid2 = null;
+    it('should return qualified quota in case of quota count is invalid', function() {
+      quota.count = -10;
 
-      expect(jamesQuotaHelpers.qualifyGet(invalid)).to.deep.equal({
+      expect(jamesQuotaHelpers.qualifyGet(quota)).to.deep.equal({
         count: null,
-        size: null
-      });
-      expect(jamesQuotaHelpers.qualifyGet(invalid2)).to.deep.equal({
-        count: null,
-        size: null
+        size: quota.size
       });
     });
 
-    it('should return valid quota', function() {
-      var valid = {
-        count: 12,
-        size: 34
-      };
-      var valid2 = {
-        count: JAMES_UNLIMITED_QUOTA,
-        size: JAMES_UNLIMITED_QUOTA
-      };
+    it('should return qualified quota in case of quota size is invalid', function() {
+      quota.size = -10;
 
-      expect(jamesQuotaHelpers.qualifyGet(valid)).to.deep.equal(valid);
-      expect(jamesQuotaHelpers.qualifyGet(valid2)).to.deep.equal(valid2);
+      expect(jamesQuotaHelpers.qualifyGet(quota)).to.deep.equal({
+        size: null,
+        count: quota.count
+      });
+    });
+
+    it('should return qualified quota in case of both quota size and count are invalid', function() {
+      quota.size = -10;
+      quota.count = -10;
+
+      expect(jamesQuotaHelpers.qualifyGet(quota)).to.deep.equal({
+        size: null,
+        count: null
+      });
+    });
+
+    it('should return qualified quota in case of quota size is unlimited', function() {
+      quota.size = JAMES_UNLIMITED_QUOTA;
+
+      expect(jamesQuotaHelpers.qualifyGet(quota)).to.deep.equal({
+        size: JAMES_UNLIMITED_QUOTA,
+        count: quota.count
+      });
+    });
+
+    it('should return qualified quota in case of quota count is unlimited', function() {
+      quota.count = JAMES_UNLIMITED_QUOTA;
+
+      expect(jamesQuotaHelpers.qualifyGet(quota)).to.deep.equal({
+        size: quota.size,
+        count: JAMES_UNLIMITED_QUOTA
+      });
+    });
+
+    it('should return qualified quota in case of both quota count and size are unlimited', function() {
+      quota.count = JAMES_UNLIMITED_QUOTA;
+      quota.size = JAMES_UNLIMITED_QUOTA;
+
+      expect(jamesQuotaHelpers.qualifyGet(quota)).to.deep.equal({
+        size: JAMES_UNLIMITED_QUOTA,
+        count: JAMES_UNLIMITED_QUOTA
+      });
+    });
+
+    it('should return qualified quota in case of both quota count and size are valid', function() {
+      expect(jamesQuotaHelpers.qualifyGet(quota)).to.deep.equal(quota);
     });
   });
 
   describe('The qualifySet function', function() {
-    it('should return null values in case of invalid quota count', function() {
-      var invalid = {
-        count: -23,
-        size: -11
-      };
+    it('should return qualified quota in case of quota count is invalid', function() {
+      quota.count = -10;
 
-      expect(jamesQuotaHelpers.qualifySet(invalid)).to.deep.equal({
+      expect(jamesQuotaHelpers.qualifySet(quota)).to.deep.equal({
         count: null,
-        size: null
+        size: quota.size
       });
     });
 
-    it('should return valid quota', function() {
-      var valid = {
-        count: 12,
-        size: 34
-      };
-      var valid2 = {
-        count: JAMES_UNLIMITED_QUOTA,
-        size: JAMES_UNLIMITED_QUOTA
-      };
+    it('should return qualified quota in case of quota size is invalid', function() {
+      quota.size = -10;
 
-      expect(jamesQuotaHelpers.qualifySet(valid)).to.deep.equal(valid);
-      expect(jamesQuotaHelpers.qualifySet(valid2)).to.deep.equal(valid2);
+      expect(jamesQuotaHelpers.qualifySet(quota)).to.deep.equal({
+        size: null,
+        count: quota.count
+      });
+    });
+
+    it('should return qualified quota in case of both quota size and count are invalid', function() {
+      quota.size = -10;
+      quota.count = -10;
+
+      expect(jamesQuotaHelpers.qualifySet(quota)).to.deep.equal({
+        size: null,
+        count: null
+      });
+    });
+
+    it('should return qualified quota in case of quota size is unlimited', function() {
+      quota.size = JAMES_UNLIMITED_QUOTA;
+
+      expect(jamesQuotaHelpers.qualifySet(quota)).to.deep.equal({
+        size: JAMES_UNLIMITED_QUOTA,
+        count: quota.count
+      });
+    });
+
+    it('should return qualified quota in case of quota count is unlimited', function() {
+      quota.count = JAMES_UNLIMITED_QUOTA;
+
+      expect(jamesQuotaHelpers.qualifySet(quota)).to.deep.equal({
+        size: quota.size,
+        count: JAMES_UNLIMITED_QUOTA
+      });
+    });
+
+    it('should return qualified quota in case of both quota count and size are unlimited', function() {
+      quota.count = JAMES_UNLIMITED_QUOTA;
+      quota.size = JAMES_UNLIMITED_QUOTA;
+
+      expect(jamesQuotaHelpers.qualifySet(quota)).to.deep.equal({
+        size: JAMES_UNLIMITED_QUOTA,
+        count: JAMES_UNLIMITED_QUOTA
+      });
+    });
+
+    it('should return qualified quota in case of both quota count and size are valid', function() {
+      expect(jamesQuotaHelpers.qualifySet(quota)).to.deep.equal(quota);
     });
   });
 });
