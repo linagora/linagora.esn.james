@@ -1335,4 +1335,143 @@ describe('The lib/client module', function() {
         .catch(err => done(err || new Error('should resolve')));
     });
   });
+
+  describe('The getDlpRule function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().getDlpRule()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().getDlpRule()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should connect to James admin client with get DLP rules function', function(done) {
+      const domainName = 'a';
+      const ruleId = '1';
+
+      JamesClientMock.prototype.dlpRules = {
+        get: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().getDlpRule(domainName, ruleId)
+        .then(() => {
+          expect(JamesClientMock.prototype.dlpRules.get).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.dlpRules.get).to.have.been.calledWith(domainName, ruleId);
+
+          done();
+        }).catch(done);
+    });
+  });
+
+  describe('The listDlpRules function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().listDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().listDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should connect to James admin client with list DLP rules function', function(done) {
+      const domainName = 'a';
+      const rulesList = { rules: 'list of rules' };
+
+      JamesClientMock.prototype.dlpRules = {
+        list: sinon.stub().returns(Promise.resolve(rulesList))
+      };
+
+      getModule().listDlpRules(domainName)
+        .then(() => {
+          expect(JamesClientMock.prototype.dlpRules.list).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.dlpRules.list).to.have.been.calledWith(domainName);
+
+          done();
+        }).catch(done);
+    });
+
+    it('should return an array of rules', function(done) {
+      const domainName = 'a';
+      const rulesList = { rules: [{ id: '1' }, { id: '2' }] };
+
+      JamesClientMock.prototype.dlpRules = {
+        list: sinon.stub().returns(Promise.resolve(rulesList))
+      };
+
+      getModule().listDlpRules(domainName)
+        .then(rules => {
+          expect(rules).to.deep.equal(rulesList.rules);
+
+          done();
+        }).catch(done);
+    });
+  });
+
+  describe('The storeDlpRules function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().storeDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().storeDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should connect to James admin client with store DLP rules function', function(done) {
+      const domainName = 'a';
+      const rules = { rules: 'setOfRules' };
+
+      JamesClientMock.prototype.dlpRules = {
+        store: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().storeDlpRules(domainName, rules)
+        .then(() => {
+          expect(JamesClientMock.prototype.dlpRules.store).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.dlpRules.store).to.have.been.calledWith(domainName, rules);
+
+          done();
+        }).catch(done);
+    });
+  });
 });
