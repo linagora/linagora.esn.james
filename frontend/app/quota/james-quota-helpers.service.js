@@ -18,7 +18,7 @@
       var qualifiedQuota = angular.copy(quota) || {};
 
       qualifiedQuota.size = (qualifiedQuota.size > 0 || qualifiedQuota.size === JAMES_UNLIMITED_QUOTA) ? qualifiedQuota.size : defaultValue;
-      qualifiedQuota.count = (qualifiedQuota.size > 0 || qualifiedQuota.size === JAMES_UNLIMITED_QUOTA) ? qualifiedQuota.count : defaultValue;
+      qualifiedQuota.count = (qualifiedQuota.count > 0 || qualifiedQuota.count === JAMES_UNLIMITED_QUOTA) ? qualifiedQuota.count : defaultValue;
 
       return qualifiedQuota;
     }
