@@ -8,7 +8,7 @@ var expect = chai.expect;
 describe('The jamesConfigFormController', function() {
 
   var $controller, $rootScope, $scope, $q;
-  var session, jamesWebadminClient;
+  var session, jamesApiClient;
 
   beforeEach(function() {
     module('linagora.esn.james');
@@ -21,24 +21,24 @@ describe('The jamesConfigFormController', function() {
       _$rootScope_,
       _$q_,
       _session_,
-      _jamesWebadminClient_
+      _jamesApiClient_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $q = _$q_;
       session = _session_;
-      jamesWebadminClient = _jamesWebadminClient_;
+      jamesApiClient = _jamesApiClient_;
 
-      jamesWebadminClient.getDomainQuota = sinon.stub().returns($q.when({
+      jamesApiClient.getDomainQuota = sinon.stub().returns($q.when({
         count: 10,
         size: 10000
       }));
-      jamesWebadminClient.setDomainQuota = sinon.stub().returns($q.when());
-      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.when({
+      jamesApiClient.setDomainQuota = sinon.stub().returns($q.when());
+      jamesApiClient.getPlatformQuota = sinon.stub().returns($q.when({
         count: 50,
         size: 50000
       }));
-      jamesWebadminClient.setGlobalQuota = sinon.stub().returns($q.when());
+      jamesApiClient.setPlatformQuota = sinon.stub().returns($q.when());
     });
   });
 
@@ -111,8 +111,8 @@ describe('The jamesConfigFormController', function() {
       controller.connectionStatus = 'foo';
 
       postSaveHandler().then(function() {
-        expect(jamesWebadminClient.setGlobalQuota).to.not.have.been.called;
-        expect(jamesWebadminClient.setDomainQuota).to.not.have.been.called;
+        expect(jamesApiClient.setPlatformQuota).to.not.have.been.called;
+        expect(jamesApiClient.setDomainQuota).to.not.have.been.called;
         done();
       });
 
@@ -124,7 +124,7 @@ describe('The jamesConfigFormController', function() {
       controller.config = { quota: { count: 10, size: 12 } };
 
       postSaveHandler().then(function() {
-        expect(jamesWebadminClient.setGlobalQuota).to.have.been.calledWith(controller.config.quota);
+        expect(jamesApiClient.setPlatformQuota).to.have.been.calledWith(controller.config.quota);
         done();
       });
 
@@ -132,12 +132,15 @@ describe('The jamesConfigFormController', function() {
     });
 
     it('should call James API to set domain quota', function(done) {
+      var domain = { _id: '123' };
+
+      session.domain = domain;
       controller.connectionStatus = 'connected';
       controller.config = { quota: { count: 10, size: 12 } };
       controller.mode = 'domain';
 
       postSaveHandler().then(function() {
-        expect(jamesWebadminClient.setDomainQuota).to.have.been.calledWith(session.domain.name, controller.config.quota);
+        expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain._id, controller.config.quota);
         done();
       });
 
@@ -149,7 +152,7 @@ describe('The jamesConfigFormController', function() {
       controller.config = { quota: { count: 0, size: -100 } };
 
       postSaveHandler().then(function() {
-        expect(jamesWebadminClient.setGlobalQuota).to.have.been.calledWith({ count: null, size: null });
+        expect(jamesApiClient.setPlatformQuota).to.have.been.calledWith({ count: null, size: null });
         done();
       });
 
@@ -193,7 +196,7 @@ describe('The jamesConfigFormController', function() {
     it('should call James API to get config and assign to controller on success', function() {
       var controller = initController();
 
-      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.when({ size: 11, count: 12 }));
+      jamesApiClient.getPlatformQuota = sinon.stub().returns($q.when({ size: 11, count: 12 }));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();
@@ -208,7 +211,7 @@ describe('The jamesConfigFormController', function() {
       controller.$onInit();
 
       controller.mode = 'domain';
-      jamesWebadminClient.getDomainQuota = sinon.stub().returns($q.when({ size: 11, count: 12 }));
+      jamesApiClient.getDomainQuota = sinon.stub().returns($q.when({ size: 11, count: 12 }));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();
@@ -221,7 +224,7 @@ describe('The jamesConfigFormController', function() {
     it('should qualify quota configuration before assigning to controller', function() {
       var controller = initController();
 
-      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.when({ size: -11, count: -12 }));
+      jamesApiClient.getPlatformQuota = sinon.stub().returns($q.when({ size: -11, count: -12 }));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();
@@ -232,7 +235,7 @@ describe('The jamesConfigFormController', function() {
     it('should set connectionStatus error on failure', function() {
       var controller = initController();
 
-      jamesWebadminClient.getGlobalQuota = sinon.stub().returns($q.reject(new Error('an_error')));
+      jamesApiClient.getPlatformQuota = sinon.stub().returns($q.reject(new Error('an_error')));
       controller.onServerUrlChange(form);
 
       $rootScope.$digest();

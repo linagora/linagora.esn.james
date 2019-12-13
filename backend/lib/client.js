@@ -15,7 +15,10 @@ module.exports = dependencies => {
     addUserAlias,
     addUserAliases,
     createDomain,
+    getDomainQuota,
+    getPlatformQuota,
     getGroupMembers,
+    getUserQuota,
     listDestinationsOfForward,
     listDomains,
     listDomainAliases,
@@ -31,6 +34,9 @@ module.exports = dependencies => {
     removeLocalCopyOfForward,
     removeUserAlias,
     removeUserAliases,
+    setDomainQuota,
+    setPlatformQuota,
+    setUserQuota,
     updateGroup,
     restoreDeletedMessages,
     exportDeletedMessages
@@ -367,4 +373,119 @@ function get() {
  */
 function getWebadminApiEndpoint() {
   return esnConfig('webadminApiBackend').inModule('linagora.esn.james').get();
+}
+
+/**
+ * Get platform quota
+ * @return {Promise} - Resolve with the quota on success
+ */
+function getPlatformQuota() {
+  return get()
+    .then(client => client.getQuota());
+}
+
+/**
+ * Set platform quota
+ * @param {Object} quota Contains count and size
+ * Remove quota count/size if its value is null
+ * Set quota count/size to unlimited if its value is -1
+ * @return {Promise} - Resolve on success
+ */
+function setPlatformQuota(quota) {
+  return get()
+    .then(client => {
+      const tasks = [];
+
+      if (quota.count === null) {
+        tasks.push(client.deleteQuotaCount());
+      }
+
+      if (quota.size === null) {
+        tasks.push(client.deleteQuotaSize());
+      }
+
+      if (quota.count !== null || quota.size !== null) {
+        tasks.push(client.setQuota(quota));
+      }
+
+      return Promise.all(tasks);
+    });
+}
+
+/**
+ * Get quota for a particular domain
+ * @param {String} domainName name of the target domain
+ * @return {Promise} - Resolve with the quota on success
+ */
+function getDomainQuota(domainName) {
+  return get()
+    .then(client => client.getDomainQuota(domainName));
+}
+
+/**
+ * Set quota for a particular domain
+ * @param {String} domainName name of the target domain
+ * @param {Object} quota Contains count and size
+ * Remove quota count/size if its value is null
+ * Set quota count/size to unlimited if its value is -1
+ * @return {Promise} - Resolve on success
+ */
+function setDomainQuota(domainName, quota) {
+  return get()
+    .then(client => {
+      const tasks = [];
+
+      if (quota.count === null) {
+        tasks.push(client.deleteDomainQuotaCount(domainName));
+      }
+
+      if (quota.size === null) {
+        tasks.push(client.deleteDomainQuotaSize(domainName));
+      }
+
+      if (quota.count !== null || quota.size !== null) {
+        tasks.push(client.setDomainQuota(domainName, quota));
+      }
+
+      return Promise.all(tasks);
+    });
+}
+
+/**
+ * Get quota for a particular user
+ * @param {String} username preferred email of the target user
+ * @return {Promise} - Resolve with the quota on success
+ */
+function getUserQuota(username) {
+  return get()
+    .then(client => client.getUserQuota(username));
+}
+
+/**
+ * Set quota for a particular user
+ * @param {String} username preferred email of the target user
+ * @param {Object} quota Contains count and size
+ * Remove quota count/size if its value is null
+ * Set quota count/size to unlimited if its value is -1
+ * @return {Promise} - Resolve on success
+ */
+function setUserQuota(username, quota) {
+  return get()
+    .then(client => {
+      const tasks = [];
+
+      if (quota.count === null) {
+        tasks.push(client.deleteUserQuotaCount(username));
+      }
+
+      if (quota.size === null) {
+        tasks.push(client.deleteUserQuotaSize(username));
+      }
+
+      if (quota.count !== null || quota.size !== null) {
+        tasks.push(client.setUserQuota(username, quota));
+      }
+
+      return Promise.all(tasks);
+    });
 }

@@ -909,4 +909,430 @@ describe('The lib/client module', function() {
       }).catch(done);
     });
   });
+
+  describe('The getPlatformQuota method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getPlatformQuota()
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getPlatformQuota()
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to get platform quota', function(done) {
+      JamesClientMock.prototype.getQuota = sinon.stub().returns(Promise.reject(new Error('something wrong')));
+
+      getModule().getPlatformQuota()
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.getQuota).to.have.been.calledOnce;
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to get platform quota', function(done) {
+      JamesClientMock.prototype.getQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().getPlatformQuota().then(() => {
+        expect(JamesClientMock.prototype.getQuota).to.have.been.calledOnce;
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The setPlatformQuota method', function() {
+    let quota;
+
+    beforeEach(function() {
+      quota = { count: 100, size: 100 };
+    });
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().setPlatformQuota(quota)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().setPlatformQuota(quota)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should set platform quota if size is null and count is not null', function(done) {
+      quota.size = null;
+      JamesClientMock.prototype.deleteQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setPlatformQuota(quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteQuotaSize).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteQuotaCount).to.not.have.been.called;
+          expect(JamesClientMock.prototype.setQuota).to.have.been.calledWith(quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set platform quota if size is not null and count is null', function(done) {
+      quota.count = null;
+      JamesClientMock.prototype.deleteQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setPlatformQuota(quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteQuotaSize).to.not.have.been.called;
+          expect(JamesClientMock.prototype.deleteQuotaCount).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setQuota).to.have.been.calledWith(quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set platform quota if both size and count are null', function(done) {
+      quota.size = null;
+      quota.count = null;
+      JamesClientMock.prototype.deleteQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setPlatformQuota(quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteQuotaSize).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteQuotaCount).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setQuota).to.not.have.been.called;
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set platform quota if both size and count are not null', function(done) {
+      JamesClientMock.prototype.deleteQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setPlatformQuota(quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteQuotaSize).to.not.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteQuotaCount).to.not.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setQuota).to.have.been.calledWith(quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The getDomainQuota method', function() {
+    const domainName = 'domainName';
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getDomainQuota(domainName)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getDomainQuota(domainName)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to get platform quota', function(done) {
+      JamesClientMock.prototype.getDomainQuota = sinon.stub().returns(Promise.reject(new Error('something wrong')));
+
+      getModule().getDomainQuota(domainName)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.getDomainQuota).to.have.been.calledWith(domainName);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to get platform quota', function(done) {
+      JamesClientMock.prototype.getDomainQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().getDomainQuota(domainName).then(() => {
+        expect(JamesClientMock.prototype.getDomainQuota).to.have.been.calledWith(domainName);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The setDomainQuota method', function() {
+    let quota;
+    const domainName = 'domainName';
+
+    beforeEach(function() {
+      quota = { count: 100, size: 100 };
+    });
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().setDomainQuota(domainName, quota)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().setDomainQuota(domainName, quota)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should set domain quota if size is null and count is not null', function(done) {
+      quota.size = null;
+      JamesClientMock.prototype.deleteDomainQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteDomainQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setDomainQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setDomainQuota(domainName, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteDomainQuotaSize).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteDomainQuotaCount).to.not.have.been.called;
+          expect(JamesClientMock.prototype.setDomainQuota).to.have.been.calledWith(domainName, quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set domain quota if size is not null and count is null', function(done) {
+      quota.count = null;
+      JamesClientMock.prototype.deleteDomainQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteDomainQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setDomainQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setDomainQuota(domainName, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteDomainQuotaSize).to.not.have.been.called;
+          expect(JamesClientMock.prototype.deleteDomainQuotaCount).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setDomainQuota).to.have.been.calledWith(domainName, quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set domain quota if both size and count are null', function(done) {
+      quota.size = null;
+      quota.count = null;
+      JamesClientMock.prototype.deleteDomainQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteDomainQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setDomainQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setDomainQuota(domainName, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteDomainQuotaSize).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteDomainQuotaCount).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setDomainQuota).to.not.have.been.called;
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set domain quota if both size and count are not null', function(done) {
+      JamesClientMock.prototype.deleteDomainQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteDomainQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setDomainQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setDomainQuota(domainName, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteDomainQuotaSize).to.not.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteDomainQuotaCount).to.not.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setDomainQuota).to.have.been.calledWith(domainName, quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The getUserQuota method', function() {
+    const username = 'username';
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getUserQuota(username)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getUserQuota(username)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to get platform quota', function(done) {
+      JamesClientMock.prototype.getUserQuota = sinon.stub().returns(Promise.reject(new Error('something wrong')));
+
+      getModule().getUserQuota(username)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.getUserQuota).to.have.been.calledWith(username);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to get platform quota', function(done) {
+      JamesClientMock.prototype.getUserQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().getUserQuota(username).then(() => {
+        expect(JamesClientMock.prototype.getUserQuota).to.have.been.calledWith(username);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The setUserQuota method', function() {
+    let quota;
+    const username = 'username';
+
+    beforeEach(function() {
+      quota = { count: 100, size: 100 };
+    });
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().setUserQuota(username, quota)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().setUserQuota(username, quota)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should set user quota if size is null and count is not null', function(done) {
+      quota.size = null;
+      JamesClientMock.prototype.deleteUserQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteUserQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setUserQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setUserQuota(username, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteUserQuotaSize).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteUserQuotaCount).to.not.have.been.called;
+          expect(JamesClientMock.prototype.setUserQuota).to.have.been.calledWith(username, quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set user quota if size is not null and count is null', function(done) {
+      quota.count = null;
+      JamesClientMock.prototype.deleteUserQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteUserQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setUserQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setUserQuota(username, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteUserQuotaSize).to.not.have.been.called;
+          expect(JamesClientMock.prototype.deleteUserQuotaCount).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setUserQuota).to.have.been.calledWith(username, quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set user quota if both size and count are null', function(done) {
+      quota.size = null;
+      quota.count = null;
+      JamesClientMock.prototype.deleteUserQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteUserQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setUserQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setUserQuota(username, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteUserQuotaSize).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteUserQuotaCount).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setUserQuota).to.not.have.been.called;
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+
+    it('should set user quota if both size and count are not null', function(done) {
+      JamesClientMock.prototype.deleteUserQuotaCount = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.deleteUserQuotaSize = sinon.stub().returns(Promise.resolve());
+      JamesClientMock.prototype.setUserQuota = sinon.stub().returns(Promise.resolve());
+
+      getModule().setUserQuota(username, quota)
+        .then(() => {
+          expect(JamesClientMock.prototype.deleteUserQuotaSize).to.not.have.been.calledOnce;
+          expect(JamesClientMock.prototype.deleteUserQuotaCount).to.not.have.been.calledOnce;
+          expect(JamesClientMock.prototype.setUserQuota).to.have.been.calledWith(username, quota);
+          done();
+        })
+        .catch(err => done(err || new Error('should resolve')));
+    });
+  });
 });

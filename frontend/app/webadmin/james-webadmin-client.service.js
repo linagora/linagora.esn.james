@@ -5,7 +5,6 @@
     .factory('jamesWebadminClient', jamesWebadminClient);
 
   function jamesWebadminClient(
-    $q,
     esnConfig,
     FileSaver,
     jamesWebadminClientProvider
@@ -15,109 +14,19 @@
       deleteAllMailsInMailRepository: deleteAllMailsInMailRepository,
       downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
       getDlpRule: getDlpRule,
-      getDomainQuota: getDomainQuota,
       getServerUrl: getServerUrl,
-      getUserQuota: getUserQuota,
-      getGlobalQuota: getGlobalQuota,
       getMailInMailRepository: getMailInMailRepository,
-      setGlobalQuota: setGlobalQuota,
       listDlpRules: listDlpRules,
       listMailRepositories: listMailRepositories,
       listMailsInMailRepository: listMailsInMailRepository,
       removeDlpRules: removeDlpRules,
       reprocessAllMailsFromMailRepository: reprocessAllMailsFromMailRepository,
       reprocessMailFromMailRepository: reprocessMailFromMailRepository,
-      setUserQuota: setUserQuota,
-      setDomainQuota: setDomainQuota,
       storeDlpRules: storeDlpRules
     };
 
     function getServerUrl() {
       return esnConfig('linagora.esn.james.webadminApiFrontend');
-    }
-
-    function getUserQuota(username) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return jamesClient.getUserQuota(username);
-        });
-    }
-
-    function setUserQuota(username, quota) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          var tasks = [];
-
-          if (quota.count === null) {
-            tasks.push(jamesClient.deleteUserQuotaCount(username));
-          }
-
-          if (quota.size === null) {
-            tasks.push(jamesClient.deleteUserQuotaSize(username));
-          }
-
-          if (quota.count !== null || quota.size !== null) {
-            tasks.push(jamesClient.setUserQuota(username, quota));
-          }
-
-          return $q.all(tasks);
-        });
-    }
-
-    function getDomainQuota(domainName) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return jamesClient.getDomainQuota(domainName);
-        });
-    }
-
-    function getGlobalQuota() {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          return jamesClient.getQuota();
-        });
-    }
-
-    function setGlobalQuota(quota) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          var tasks = [];
-
-          if (quota.count === null) {
-            tasks.push(jamesClient.deleteQuotaCount());
-          }
-
-          if (quota.size === null) {
-            tasks.push(jamesClient.deleteQuotaSize());
-          }
-
-          if (quota.count !== null || quota.size !== null) {
-            tasks.push(jamesClient.setQuota(quota));
-          }
-
-          return $q.all(tasks);
-        });
-    }
-
-    function setDomainQuota(domainName, quota) {
-      return _getJamesClient()
-        .then(function(jamesClient) {
-          var tasks = [];
-
-          if (quota.count === null) {
-            tasks.push(jamesClient.deleteDomainQuotaCount(domainName));
-          }
-
-          if (quota.size === null) {
-            tasks.push(jamesClient.deleteDomainQuotaSize(domainName));
-          }
-
-          if (quota.count !== null || quota.size !== null) {
-            tasks.push(jamesClient.setDomainQuota(domainName, quota));
-          }
-
-          return $q.all(tasks);
-        });
     }
 
     function listMailRepositories() {

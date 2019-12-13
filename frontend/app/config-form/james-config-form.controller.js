@@ -14,7 +14,7 @@
     $q,
     session,
     jamesQuotaHelpers,
-    jamesWebadminClient
+    jamesApiClient
   ) {
     var self = this;
 
@@ -54,9 +54,9 @@
       var getQuota;
 
       if (self.mode === self.availableModes.domain) {
-        getQuota = jamesWebadminClient.getDomainQuota(session.domain.name);
+        getQuota = jamesApiClient.getDomainQuota(session.domain._id);
       } else {
-        getQuota = jamesWebadminClient.getGlobalQuota();
+        getQuota = jamesApiClient.getPlatformQuota();
       }
 
       return getQuota.then(function(data) {
@@ -79,10 +79,10 @@
       };
 
       if (self.mode === self.availableModes.domain) {
-        return jamesWebadminClient.setDomainQuota(session.domain.name, config.quota);
+        return jamesApiClient.setDomainQuota(session.domain._id, config.quota);
       }
 
-      return jamesWebadminClient.setGlobalQuota(config.quota);
+      return jamesApiClient.setPlatformQuota(config.quota);
     }
   }
 })(angular);

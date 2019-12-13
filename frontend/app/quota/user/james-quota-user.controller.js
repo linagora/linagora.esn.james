@@ -5,8 +5,9 @@
     .controller('jamesQuotaUserController', jamesUserQuotaController);
 
   function jamesUserQuotaController(
+    session,
     asyncAction,
-    jamesWebadminClient,
+    jamesApiClient,
     jamesQuotaHelpers,
     userUtils
   ) {
@@ -24,7 +25,7 @@
       self.status = GET_USER_QUOTA_STATUS.loading;
       self.userDisplayName = userUtils.displayNameOf(self.user);
 
-      return jamesWebadminClient.getUserQuota(self.user.emails[0])
+      return jamesApiClient.getUserQuota(session.domain._id, self.user._id)
         .then(function(quota) {
           self.quota = jamesQuotaHelpers.qualifyGet(quota.user);
           self.computedQuota = jamesQuotaHelpers.qualifyGet(quota.computed);
@@ -43,7 +44,11 @@
       };
 
       return asyncAction(notificationMessages, function() {
-        return jamesWebadminClient.setUserQuota(self.user.emails[0], jamesQuotaHelpers.qualifySet(self.quota));
+        return jamesApiClient.setUserQuota(
+          session.domain._id,
+          self.user._id,
+          jamesQuotaHelpers.qualifySet(self.quota)
+        );
       });
     }
   }
