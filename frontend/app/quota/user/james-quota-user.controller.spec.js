@@ -7,8 +7,10 @@ var expect = chai.expect;
 
 describe('The jamesQuotaUserController', function() {
 
-  var $controller, $rootScope, $scope, $q;
-  var jamesWebadminClient, jamesQuotaHelpers;
+  var $controller, $rootScope, $scope, $q, session;
+  var jamesApiClient, jamesQuotaHelpers;
+  var domain = { _id: 'domainId' };
+  var user = { _id: 'userId' };
 
   beforeEach(function() {
     module('linagora.esn.james');
@@ -22,17 +24,20 @@ describe('The jamesQuotaUserController', function() {
       _$controller_,
       _$rootScope_,
       _$q_,
-      _jamesWebadminClient_,
+      _session_,
+      _jamesApiClient_,
       _jamesQuotaHelpers_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $q = _$q_;
-      jamesWebadminClient = _jamesWebadminClient_;
+      session = _session_;
+      jamesApiClient = _jamesApiClient_;
       jamesQuotaHelpers = _jamesQuotaHelpers_;
 
       jamesQuotaHelpers.qualifyGet = function(quota) { return quota; };
       jamesQuotaHelpers.qualifySet = function(quota) { return quota; };
+      session.domain = domain;
     });
   });
 
@@ -48,22 +53,19 @@ describe('The jamesQuotaUserController', function() {
 
   describe('The init function', function() {
     it('should resolve with gotten user quota then set the status to loaded', function(done) {
-      var user = {
-        emails: ['toto@tata.ti']
-      };
       var quota = {
         user: { count: 1, size: 1 },
         computed: { count: 1, size: 1 }
       };
 
-      jamesWebadminClient.getUserQuota = sinon.stub().returns($q.when(quota));
+      jamesApiClient.getUserQuota = sinon.stub().returns($q.when(quota));
       var controller = initController();
 
       controller.user = user;
 
       controller.init()
         .then(function() {
-          expect(jamesWebadminClient.getUserQuota).to.have.been.calledWith(controller.user.emails[0]);
+          expect(jamesApiClient.getUserQuota).to.have.been.calledWith(session.domain._id, controller.user._id);
           expect(controller.status).to.equal('loaded');
           expect(controller.quota).to.deep.equal(quota.user);
           expect(controller.computedQuota).to.deep.equal(quota.computed);
@@ -75,18 +77,14 @@ describe('The jamesQuotaUserController', function() {
     });
 
     it('should set the status to error in case of failed attempt to get user quota', function(done) {
-      var user = {
-        emails: ['toto@tata.ti']
-      };
-
-      jamesWebadminClient.getUserQuota = sinon.stub().returns($q.reject());
+      jamesApiClient.getUserQuota = sinon.stub().returns($q.reject());
       var controller = initController();
 
       controller.user = user;
 
       controller.init()
         .then(function() {
-          expect(jamesWebadminClient.getUserQuota).to.have.been.calledWith(controller.user.emails[0]);
+          expect(jamesApiClient.getUserQuota).to.have.been.calledWith(session.domain._id, controller.user._id);
           expect(controller.status).to.equal('error');
           done();
         })
@@ -98,11 +96,7 @@ describe('The jamesQuotaUserController', function() {
 
   describe('The updateUserQuota function', function() {
     it('should resolve after update user qupta', function(done) {
-      var user = {
-        emails: ['toto@tata.ti']
-      };
-
-      jamesWebadminClient.setUserQuota = sinon.stub().returns($q.when());
+      jamesApiClient.setUserQuota = sinon.stub().returns($q.when());
 
       var controller = initController();
 
@@ -110,7 +104,7 @@ describe('The jamesQuotaUserController', function() {
       controller.quota = { count: 23, size: 200 };
       controller.updateUserQuota()
         .then(function() {
-          expect(jamesWebadminClient.setUserQuota).to.have.been.calledWith(controller.user.emails[0], controller.quota);
+          expect(jamesApiClient.setUserQuota).to.have.been.calledWith(session.domain._id, controller.user._id, controller.quota);
           done();
         })
         .catch(done);

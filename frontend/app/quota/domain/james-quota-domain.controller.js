@@ -6,7 +6,7 @@
 
   function JamesQuotaDomainController(
     asyncAction,
-    jamesWebadminClient,
+    jamesApiClient,
     jamesQuotaHelpers
   ) {
     var self = this;
@@ -27,7 +27,7 @@
     function getDomainQuota() {
       self.status = GET_DOMAIN_QUOTA_STATUS.loading;
 
-      return jamesWebadminClient.getDomainQuota(self.domain.name)
+      return jamesApiClient.getDomainQuota(self.domain._id)
         .then(function(quota) {
           self.quota = jamesQuotaHelpers.qualifyGet(quota.domain);
           self.computedQuota = jamesQuotaHelpers.qualifyGet(quota.computed);
@@ -46,7 +46,7 @@
       };
 
       return asyncAction(notificationMessages, function() {
-        return jamesWebadminClient.setDomainQuota(self.domain.name, jamesQuotaHelpers.qualifySet(self.quota));
+        return jamesApiClient.setDomainQuota(self.domain._id, jamesQuotaHelpers.qualifySet(self.quota));
       });
     }
   }
