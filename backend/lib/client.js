@@ -16,7 +16,11 @@ module.exports = dependencies => {
     addUserAliases,
     createDomain,
     exportDeletedMessages,
+    removeMailFromMailRepository,
+    removeAllMailsFromMailRepository,
+    downloadEmlFileFromMailRepository,
     getDomainQuota,
+    getMailFromMailRepository,
     getPlatformQuota,
     getDlpRule,
     getGroupMembers,
@@ -26,6 +30,7 @@ module.exports = dependencies => {
     listDomains,
     listDomainAliases,
     listForwardsInDomain,
+    listMailsFromMailRepository,
     listUserAliases,
     listUsersHavingAliases,
     removeDestinationsOfForward,
@@ -40,11 +45,84 @@ module.exports = dependencies => {
     setDomainQuota,
     setPlatformQuota,
     setUserQuota,
+    reprocessAllMailsFromMailRepository,
+    reprocessMailFromMailRepository,
     restoreDeletedMessages,
     storeDlpRules,
     updateGroup
   };
 };
+
+/**
+ * List mails from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {Object} options contains offset and limit
+ * @return {Promise} Resolve with list of mails on success
+ */
+function listMailsFromMailRepository(repositoryPath, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.getMails(repositoryPath, options));
+}
+
+/**
+ * Get a mail from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @param {Object} options contains additionalFields
+ * @return {Promise} Resolve with the mail object on success
+ */
+function getMailFromMailRepository(repositoryPath, mailKey, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.getMail(repositoryPath, mailKey, options));
+}
+
+/**
+ * Remove a mail from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @return {Promise} Resolve on success
+ */
+function removeMailFromMailRepository(repositoryPath, mailKey) {
+  return get().then(({ mailRepositories }) => mailRepositories.removeMail(repositoryPath, mailKey));
+}
+
+/**
+ * Remove all mails from a mail repository
+ * @param {String} repositoryPath repository path
+ * @return {Promise} Resolve with task on success
+ */
+function removeAllMailsFromMailRepository(repositoryPath) {
+  return get().then(({ mailRepositories }) => mailRepositories.removeAllMails(repositoryPath));
+}
+
+/**
+ * Reprocess all mails from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {Object} options contains queue and processor
+ * @return {Promise} Resolve with task on success
+ */
+function reprocessAllMailsFromMailRepository(repositoryPath, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.reprocessAllMails(repositoryPath, options));
+}
+
+/**
+ * Reprocess a mail from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @param {Object} options contains queue and processor
+ * @return {Promise} Resolve with task on success
+ */
+function reprocessMailFromMailRepository(repositoryPath, mailKey, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.reprocessMail(repositoryPath, mailKey, options));
+}
+
+/**
+ * Download an eml file from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @return {Promise} Resolve with file on success
+ */
+function downloadEmlFileFromMailRepository(repositoryPath, mailKey) {
+  return get().then(({ mailRepositories }) => mailRepositories.downloadEmlFile(repositoryPath, mailKey));
+}
 
 /**
  * Add a new group
