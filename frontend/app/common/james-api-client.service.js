@@ -8,17 +8,20 @@
     return {
       addDomainAlias: addDomainAlias,
       generateJwtToken: generateJwtToken,
+      getDlpRule: getDlpRule,
       getDomainAliases: getDomainAliases,
       getDomainQuota: getDomainQuota,
       getDomainsSyncStatus: getDomainsSyncStatus,
       getGroupSyncStatus: getGroupSyncStatus,
       getPlatformQuota: getPlatformQuota,
       getUserQuota: getUserQuota,
+      listDlpRules: listDlpRules,
       listJamesDomains: listJamesDomains,
       removeDomainAlias: removeDomainAlias,
       setDomainQuota: setDomainQuota,
       setPlatformQuota: setPlatformQuota,
       setUserQuota: setUserQuota,
+      storeDlpRules: storeDlpRules,
       syncGroup: syncGroup,
       syncDomains: syncDomains
     };
@@ -184,6 +187,41 @@
      */
     function setUserQuota(domainId, userId, quota) {
       return jamesRestangular.all('quota').customPUT(quota, '', { domain_id: domainId, user_id: userId, scope: 'user' });
+    }
+
+    /**
+     * Get a DLP rule with the given rule ID
+     * @param {String} domainId target domain ID
+     * @param {String} ruleId target rule ID
+     * @return {Promise} - On success, resolves with a DLP rule with the given ID
+     */
+    function getDlpRule(domainId, ruleId) {
+      return jamesRestangular.all('dlp').one('domains', domainId).one('rules', ruleId).get()
+        .then(function(response) {
+          return response.data;
+        });
+    }
+
+    /**
+     * Get a list of DLP rules from a specific domain
+     * @param {String} domainId target domain ID
+     * @return {Promise} - On success, resolves with a list of DLP rules
+     */
+    function listDlpRules(domainId) {
+      return jamesRestangular.all('dlp').one('domains', domainId).all('rules').getList()
+        .then(function(response) {
+          return response.data;
+        });
+    }
+
+    /**
+     * Update a list of DLP rules to a specific domain
+     * @param {String} domainId target domain ID
+     * @param {Array} rules contains list of rules
+     * @return {Promise} - Resolve on success
+     */
+    function storeDlpRules(domainId, rules) {
+      return jamesRestangular.all('dlp').one('domains', domainId).all('rules').customPUT(rules);
     }
   }
 })(angular);
