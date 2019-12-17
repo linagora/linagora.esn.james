@@ -10,7 +10,7 @@ describe('The jamesWebadminClient', function() {
   var $rootScope, $q;
   var $windowMock, jamesClientInstanceMock;
   var jamesWebadminClient, jamesWebadminClientProvider, esnConfigMock, FileSaver;
-  var domain, serverUrl;
+  var serverUrl;
   var REPOSITORY_ID = 'file://var/www/example';
 
   beforeEach(function() {
@@ -26,7 +26,6 @@ describe('The jamesWebadminClient', function() {
       }
     };
 
-    domain = { name: 'abc.com' };
     serverUrl = 'http://james.com';
 
     module(function($provide) {
@@ -81,34 +80,6 @@ describe('The jamesWebadminClient', function() {
         });
 
       $rootScope.$digest();
-    });
-  });
-
-  describe('The listMailRepositories function', function() {
-    it('should reject if failed to list mail repositories', function(done) {
-      jamesClientInstanceMock.mailRepositories = {
-        list: sinon.stub().returns($q.reject())
-      };
-
-      jamesWebadminClient.listMailRepositories()
-        .catch(function() {
-          expect(jamesClientInstanceMock.mailRepositories.list).to.have.been.called;
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve if listed email repositories successfully', function() {
-      jamesClientInstanceMock.mailRepositories = {
-        list: sinon.stub().returns($q.when([]))
-      };
-
-      jamesWebadminClient.listMailRepositories();
-
-      $rootScope.$digest();
-
-      expect(jamesClientInstanceMock.mailRepositories.list).to.have.been.called;
     });
   });
 
@@ -206,128 +177,6 @@ describe('The jamesWebadminClient', function() {
 
       expect(jamesClientInstanceMock.mailRepositories.downloadEmlFile).to.have.been.calledWith(REPOSITORY_ID, mailKey);
       expect(FileSaver.saveAs).to.have.been.calledWith(blob, 'mail-key-1.eml');
-    });
-  });
-
-  describe('The listDlpRules function', function() {
-    beforeEach(function() {
-      esnConfigMock = $q.when(serverUrl);
-    });
-
-    it('should reject if failed to list rules', function(done) {
-      jamesClientInstanceMock.dlpRules = {
-        list: sinon.stub().returns($q.reject())
-      };
-
-      jamesWebadminClient.listDlpRules(domain.name)
-        .catch(function() {
-          expect(jamesClientInstanceMock.dlpRules.list).to.have.been.calledWith(domain.name);
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve on success to list rules', function(done) {
-      var rules = [{
-        id: '1',
-        expression: 'abc',
-        explanation: 'Anything contains abcs',
-        targetsSender: false,
-        targetsRecipients: false,
-        targetsContent: true
-      }];
-
-      jamesClientInstanceMock.dlpRules = {
-        list: sinon.stub().returns($q.when({ rules: rules }))
-      };
-
-      jamesWebadminClient.listDlpRules(domain.name)
-        .then(function(_rules_) {
-          expect(_rules_).to.deep.equal(rules);
-          expect(jamesClientInstanceMock.dlpRules.list).to.have.been.calledWith(domain.name);
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-  });
-
-  describe('The storeDlpRules function', function() {
-    it('should reject if failed to store rules', function(done) {
-      var rules = [{
-        id: '1',
-        expression: 'abc',
-        explanation: 'Anything contains abcs',
-        targetsSender: false,
-        targetsRecipients: false,
-        targetsContent: true
-      }];
-
-      jamesClientInstanceMock.dlpRules = {
-        store: sinon.stub().returns($q.reject())
-      };
-
-      jamesWebadminClient.storeDlpRules(domain.name, rules)
-        .catch(function() {
-          expect(jamesClientInstanceMock.dlpRules.store).to.have.been.calledWith(domain.name, { rules: rules });
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve on success to store rules', function(done) {
-      var rules = [{
-        id: '1',
-        expression: 'abc',
-        explanation: 'Anything contains abcs',
-        targetsSender: false,
-        targetsRecipients: false,
-        targetsContent: true
-      }];
-
-      jamesClientInstanceMock.dlpRules = {
-        store: sinon.stub().returns($q.when())
-      };
-
-      jamesWebadminClient.storeDlpRules(domain.name, rules)
-        .then(function() {
-          expect(jamesClientInstanceMock.dlpRules.store).to.have.been.calledWith(domain.name, { rules: rules });
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-  });
-
-  describe('The removeDlpRules function', function() {
-    it('should reject if failed to remove rules', function(done) {
-      jamesClientInstanceMock.dlpRules = {
-        remove: sinon.stub().returns($q.reject())
-      };
-
-      jamesWebadminClient.removeDlpRules(domain.name)
-        .catch(function() {
-          expect(jamesClientInstanceMock.dlpRules.remove).to.have.been.calledWith(domain.name);
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve on success to remove rules', function(done) {
-      jamesClientInstanceMock.dlpRules = {
-        remove: sinon.stub().returns($q.when())
-      };
-
-      jamesWebadminClient.removeDlpRules(domain.name)
-        .then(function() {
-          expect(jamesClientInstanceMock.dlpRules.remove).to.have.been.calledWith(domain.name);
-          done();
-        });
-
-      $rootScope.$digest();
     });
   });
 
@@ -468,40 +317,6 @@ describe('The jamesWebadminClient', function() {
       jamesWebadminClient.reprocessMailFromMailRepository(REPOSITORY_ID, mailKey, options)
         .then(function() {
           expect(jamesClientInstanceMock.mailRepositories.reprocessMail).to.have.been.calledWith(REPOSITORY_ID, mailKey, options);
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-  });
-
-  describe('The getDlpRule function', function() {
-    it('should reject if failed to get a specific DLP rule', function(done) {
-      var ruleId = '123';
-
-      jamesClientInstanceMock.dlpRules = {
-        get: sinon.stub().returns($q.reject())
-      };
-
-      jamesWebadminClient.getDlpRule(domain.name, ruleId)
-        .catch(function() {
-          expect(jamesClientInstanceMock.dlpRules.get).to.have.been.calledWith(domain.name, ruleId);
-          done();
-        });
-
-      $rootScope.$digest();
-    });
-
-    it('should resolve on success to get a specific DLP rule', function(done) {
-      var ruleId = '123';
-
-      jamesClientInstanceMock.dlpRules = {
-        get: sinon.stub().returns($q.when())
-      };
-
-      jamesWebadminClient.getDlpRule(domain.name, ruleId)
-        .then(function() {
-          expect(jamesClientInstanceMock.dlpRules.get).to.have.been.calledWith(domain.name, ruleId);
           done();
         });
 

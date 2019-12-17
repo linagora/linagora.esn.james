@@ -15,14 +15,22 @@ module.exports = dependencies => {
     addUserAlias,
     addUserAliases,
     createDomain,
+    exportDeletedMessages,
+    removeMailFromMailRepository,
+    removeAllMailsFromMailRepository,
+    downloadEmlFileFromMailRepository,
     getDomainQuota,
+    getMailFromMailRepository,
     getPlatformQuota,
+    getDlpRule,
     getGroupMembers,
     getUserQuota,
     listDestinationsOfForward,
+    listDlpRules,
     listDomains,
     listDomainAliases,
     listForwardsInDomain,
+    listMailsFromMailRepository,
     listUserAliases,
     listUsersHavingAliases,
     removeDestinationsOfForward,
@@ -37,11 +45,84 @@ module.exports = dependencies => {
     setDomainQuota,
     setPlatformQuota,
     setUserQuota,
-    updateGroup,
+    reprocessAllMailsFromMailRepository,
+    reprocessMailFromMailRepository,
     restoreDeletedMessages,
-    exportDeletedMessages
+    storeDlpRules,
+    updateGroup
   };
 };
+
+/**
+ * List mails from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {Object} options contains offset and limit
+ * @return {Promise} Resolve with list of mails on success
+ */
+function listMailsFromMailRepository(repositoryPath, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.getMails(repositoryPath, options));
+}
+
+/**
+ * Get a mail from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @param {Object} options contains additionalFields
+ * @return {Promise} Resolve with the mail object on success
+ */
+function getMailFromMailRepository(repositoryPath, mailKey, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.getMail(repositoryPath, mailKey, options));
+}
+
+/**
+ * Remove a mail from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @return {Promise} Resolve on success
+ */
+function removeMailFromMailRepository(repositoryPath, mailKey) {
+  return get().then(({ mailRepositories }) => mailRepositories.removeMail(repositoryPath, mailKey));
+}
+
+/**
+ * Remove all mails from a mail repository
+ * @param {String} repositoryPath repository path
+ * @return {Promise} Resolve with task on success
+ */
+function removeAllMailsFromMailRepository(repositoryPath) {
+  return get().then(({ mailRepositories }) => mailRepositories.removeAllMails(repositoryPath));
+}
+
+/**
+ * Reprocess all mails from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {Object} options contains queue and processor
+ * @return {Promise} Resolve with task on success
+ */
+function reprocessAllMailsFromMailRepository(repositoryPath, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.reprocessAllMails(repositoryPath, options));
+}
+
+/**
+ * Reprocess a mail from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @param {Object} options contains queue and processor
+ * @return {Promise} Resolve with task on success
+ */
+function reprocessMailFromMailRepository(repositoryPath, mailKey, options) {
+  return get().then(({ mailRepositories }) => mailRepositories.reprocessMail(repositoryPath, mailKey, options));
+}
+
+/**
+ * Download an eml file from a mail repository
+ * @param {String} repositoryPath repository path
+ * @param {String} mailKey mail key
+ * @return {Promise} Resolve with file on success
+ */
+function downloadEmlFileFromMailRepository(repositoryPath, mailKey) {
+  return get().then(({ mailRepositories }) => mailRepositories.downloadEmlFile(repositoryPath, mailKey));
+}
 
 /**
  * Add a new group
@@ -353,6 +434,37 @@ function restoreDeletedMessages(user, rules) {
  */
 function exportDeletedMessages(user, exportTo, rules) {
   return get().then(client => client.exportDeletedMessages(user, exportTo, rules));
+}
+
+/**
+ * Get a DLP rule with the given ID from a domain
+ * @param  {String} domainName - Name of the domain
+ * @param  {String} ruleId - ID of a specific rule
+ * @return {Promise}      - Resolve a rule on success
+ */
+function getDlpRule(domainName, ruleId) {
+  return get().then(client => client.dlpRules.get(domainName, ruleId));
+}
+
+/**
+ * Get a list of DLP rules from a domain
+ * @param  {String} domainName - Name of the domain
+ * @return {Promise}      - Resolve a list of rules on success
+ */
+function listDlpRules(domainName) {
+  return get()
+    .then(client => client.dlpRules.list(domainName))
+    .then(({ rules }) => rules);
+}
+
+/**
+ * Store DLP rules from a domain
+ * @param  {String} domainName - Name of the domain
+ * @param  {String} rules - Set of rules to store
+ * @return {Promise}      - Resolve on success
+ */
+function storeDlpRules(domainName, rules) {
+  return get().then(client => client.dlpRules.store(domainName, rules));
 }
 
 /**

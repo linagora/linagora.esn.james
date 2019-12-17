@@ -1335,4 +1335,524 @@ describe('The lib/client module', function() {
         .catch(err => done(err || new Error('should resolve')));
     });
   });
+
+  describe('The getDlpRule function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().getDlpRule()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().getDlpRule()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should connect to James admin client with get DLP rules function', function(done) {
+      const domainName = 'a';
+      const ruleId = '1';
+
+      JamesClientMock.prototype.dlpRules = {
+        get: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().getDlpRule(domainName, ruleId)
+        .then(() => {
+          expect(JamesClientMock.prototype.dlpRules.get).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.dlpRules.get).to.have.been.calledWith(domainName, ruleId);
+
+          done();
+        }).catch(done);
+    });
+  });
+
+  describe('The listDlpRules function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().listDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().listDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should connect to James admin client with list DLP rules function', function(done) {
+      const domainName = 'a';
+      const rulesList = { rules: 'list of rules' };
+
+      JamesClientMock.prototype.dlpRules = {
+        list: sinon.stub().returns(Promise.resolve(rulesList))
+      };
+
+      getModule().listDlpRules(domainName)
+        .then(() => {
+          expect(JamesClientMock.prototype.dlpRules.list).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.dlpRules.list).to.have.been.calledWith(domainName);
+
+          done();
+        }).catch(done);
+    });
+
+    it('should return an array of rules', function(done) {
+      const domainName = 'a';
+      const rulesList = { rules: [{ id: '1' }, { id: '2' }] };
+
+      JamesClientMock.prototype.dlpRules = {
+        list: sinon.stub().returns(Promise.resolve(rulesList))
+      };
+
+      getModule().listDlpRules(domainName)
+        .then(rules => {
+          expect(rules).to.deep.equal(rulesList.rules);
+
+          done();
+        }).catch(done);
+    });
+  });
+
+  describe('The storeDlpRules function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().storeDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().storeDlpRules()
+        .then(() => done(new Error('should not have resolved')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should connect to James admin client with store DLP rules function', function(done) {
+      const domainName = 'a';
+      const rules = { rules: 'setOfRules' };
+
+      JamesClientMock.prototype.dlpRules = {
+        store: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().storeDlpRules(domainName, rules)
+        .then(() => {
+          expect(JamesClientMock.prototype.dlpRules.store).to.have.been.calledOnce;
+          expect(JamesClientMock.prototype.dlpRules.store).to.have.been.calledWith(domainName, rules);
+
+          done();
+        }).catch(done);
+    });
+  });
+
+  describe('The listMailsFromMailRepository method', function() {
+    const repositoryPath = 'repository/path';
+    const options = {
+      offset: 0,
+      limit: 10
+    };
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().listMailsFromMailRepository(repositoryPath, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().listMailsFromMailRepository(repositoryPath, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to list mails', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        getMails: sinon.stub().returns(Promise.reject(new Error('something wrong')))
+      };
+
+      getModule().listMailsFromMailRepository(repositoryPath, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.mailRepositories.getMails).to.have.been.calledWith(repositoryPath, options);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to list mails', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        getMails: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().listMailsFromMailRepository(repositoryPath, options).then(() => {
+        expect(JamesClientMock.prototype.mailRepositories.getMails).to.have.been.calledWith(repositoryPath, options);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The getMailFromMailRepository method', function() {
+    const repositoryPath = 'repository/path';
+    const mailKey = 'mail-key';
+    const options = { additionalFields: [] };
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getMailFromMailRepository(repositoryPath, mailKey, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getMailFromMailRepository(repositoryPath, mailKey, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to get mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        getMail: sinon.stub().returns(Promise.reject(new Error('something wrong')))
+      };
+
+      getModule().getMailFromMailRepository(repositoryPath, mailKey, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.mailRepositories.getMail).to.have.been.calledWith(repositoryPath, mailKey, options);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to get mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        getMail: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().getMailFromMailRepository(repositoryPath, mailKey, options).then(() => {
+        expect(JamesClientMock.prototype.mailRepositories.getMail).to.have.been.calledWith(repositoryPath, mailKey, options);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The removeMailFromMailRepository method', function() {
+    const repositoryPath = 'repository/path';
+    const mailKey = 'mail-key';
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().removeMailFromMailRepository(repositoryPath, mailKey)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().removeMailFromMailRepository(repositoryPath, mailKey)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to delete mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        removeMail: sinon.stub().returns(Promise.reject(new Error('something wrong')))
+      };
+
+      getModule().removeMailFromMailRepository(repositoryPath, mailKey)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.mailRepositories.removeMail).to.have.been.calledWith(repositoryPath, mailKey);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to delete mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        removeMail: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().removeMailFromMailRepository(repositoryPath, mailKey).then(() => {
+        expect(JamesClientMock.prototype.mailRepositories.removeMail).to.have.been.calledWith(repositoryPath, mailKey);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The removeAllMailsFromMailRepository method', function() {
+    const repositoryPath = 'repository/path';
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().removeAllMailsFromMailRepository(repositoryPath)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().removeAllMailsFromMailRepository(repositoryPath)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to delete mails', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        removeAllMails: sinon.stub().returns(Promise.reject(new Error('something wrong')))
+      };
+
+      getModule().removeAllMailsFromMailRepository(repositoryPath)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.mailRepositories.removeAllMails).to.have.been.calledWith(repositoryPath);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to delete mails', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        removeAllMails: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().removeAllMailsFromMailRepository(repositoryPath).then(() => {
+        expect(JamesClientMock.prototype.mailRepositories.removeAllMails).to.have.been.calledWith(repositoryPath);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The reprocessAllMailsFromMailRepository method', function() {
+    const repositoryPath = 'repository/path';
+    const options = {
+      processor: 'processor',
+      queue: 'queue'
+    };
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().reprocessAllMailsFromMailRepository(repositoryPath, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().reprocessAllMailsFromMailRepository(repositoryPath, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to reprocess mails', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        reprocessAllMails: sinon.stub().returns(Promise.reject(new Error('something wrong')))
+      };
+
+      getModule().reprocessAllMailsFromMailRepository(repositoryPath, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.mailRepositories.reprocessAllMails).to.have.been.calledWith(repositoryPath, options);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to reprocess mails', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        reprocessAllMails: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().reprocessAllMailsFromMailRepository(repositoryPath, options).then(() => {
+        expect(JamesClientMock.prototype.mailRepositories.reprocessAllMails).to.have.been.calledWith(repositoryPath, options);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The reprocessMailFromMailRepository method', function() {
+    const repositoryPath = 'repository/path';
+    const mailKey = 'mail-key';
+    const options = {
+      processor: 'processor',
+      queue: 'queue'
+    };
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().reprocessMailFromMailRepository(repositoryPath, mailKey, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().reprocessMailFromMailRepository(repositoryPath, mailKey, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to reprocess mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        reprocessMail: sinon.stub().returns(Promise.reject(new Error('something wrong')))
+      };
+
+      getModule().reprocessMailFromMailRepository(repositoryPath, mailKey, options)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.mailRepositories.reprocessMail).to.have.been.calledWith(repositoryPath, mailKey, options);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to reprocess mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        reprocessMail: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().reprocessMailFromMailRepository(repositoryPath, mailKey, options).then(() => {
+        expect(JamesClientMock.prototype.mailRepositories.reprocessMail).to.have.been.calledWith(repositoryPath, mailKey, options);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
+
+  describe('The downloadEmlFileFromMailRepository method', function() {
+    const repositoryPath = 'repository/path';
+    const mailKey = 'mail-key';
+
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().downloadEmlFileFromMailRepository(repositoryPath, mailKey)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().downloadEmlFileFromMailRepository(repositoryPath, mailKey)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to download mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        downloadEmlFile: sinon.stub().returns(Promise.reject(new Error('something wrong')))
+      };
+
+      getModule().downloadEmlFileFromMailRepository(repositoryPath, mailKey)
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.mailRepositories.downloadEmlFile).to.have.been.calledWith(repositoryPath, mailKey);
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to download mail', function(done) {
+      JamesClientMock.prototype.mailRepositories = {
+        downloadEmlFile: sinon.stub().returns(Promise.resolve())
+      };
+
+      getModule().downloadEmlFileFromMailRepository(repositoryPath, mailKey).then(() => {
+        expect(JamesClientMock.prototype.mailRepositories.downloadEmlFile).to.have.been.calledWith(repositoryPath, mailKey);
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
 });

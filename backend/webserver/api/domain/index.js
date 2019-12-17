@@ -1,5 +1,6 @@
 module.exports = (dependencies, lib, router) => {
   require('./alias')(dependencies, lib, router);
+  require('./mail-repository')(dependencies, lib, router);
 
   const authorizationMW = dependencies('authorizationMW');
   const platformadminMW = dependencies('platformadminsMW');
