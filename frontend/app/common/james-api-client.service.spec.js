@@ -188,4 +188,39 @@ describe('The jamesApiClient service', function() {
       $httpBackend.flush();
     });
   });
+
+  describe('The getDlpRule method', function() {
+    it('should GET to right endpoint to get a DLP rule', function() {
+      var domainId = '1';
+      var ruleId = '1';
+
+      $httpBackend.expectGET('/james/api/dlp/domains/' + domainId + '/rules/' + ruleId).respond(200);
+
+      jamesApiClient.getDlpRule(domainId, ruleId);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The listDlpRules method', function() {
+    it('should GET to right endpoint to list DLP rules', function() {
+      var domainId = '1';
+
+      $httpBackend.expectGET('/james/api/dlp/domains/' + domainId + '/rules').respond(200);
+
+      jamesApiClient.getDlpRule(domainId);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The storeDlpRules method', function() {
+    it('should PUT to right endpoint to store DLP rules', function() {
+      var domainId = '1';
+      var rules = [];
+
+      $httpBackend.expectPUT('/james/api/dlp/domains/' + domainId + '/rules').respond(204);
+
+      jamesApiClient.storeDlpRules(domainId, rules);
+      $httpBackend.flush();
+    });
+  });
 });
