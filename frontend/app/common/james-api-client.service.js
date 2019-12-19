@@ -4,21 +4,28 @@
   angular.module('linagora.esn.james')
     .factory('jamesApiClient', jamesApiClient);
 
-  function jamesApiClient(jamesRestangular) {
+  function jamesApiClient(jamesRestangular, FileSaver) {
     return {
       addDomainAlias: addDomainAlias,
+      downloadEmlFileFromMailRepository: downloadEmlFileFromMailRepository,
       generateJwtToken: generateJwtToken,
       getDlpRule: getDlpRule,
       getDomainAliases: getDomainAliases,
       getDomainQuota: getDomainQuota,
       getDomainsSyncStatus: getDomainsSyncStatus,
       getGroupSyncStatus: getGroupSyncStatus,
+      getMailFromMailRepository: getMailFromMailRepository,
       getPlatformQuota: getPlatformQuota,
       getUserQuota: getUserQuota,
       listDlpRules: listDlpRules,
       listJamesDomains: listJamesDomains,
+      listMailsFromMailRepository: listMailsFromMailRepository,
       removeDomainAlias: removeDomainAlias,
       setDomainQuota: setDomainQuota,
+      removeAllMailsFromMailRepository: removeAllMailsFromMailRepository,
+      removeMailFromMailRepository: removeMailFromMailRepository,
+      reprocessAllMailsFromMailRepository: reprocessAllMailsFromMailRepository,
+      reprocessMailFromMailRepository: reprocessMailFromMailRepository,
       setPlatformQuota: setPlatformQuota,
       setUserQuota: setUserQuota,
       storeDlpRules: storeDlpRules,
@@ -222,6 +229,118 @@
      */
     function storeDlpRules(domainId, rules) {
       return jamesRestangular.all('dlp').one('domains', domainId).all('rules').customPUT(rules);
+    }
+
+    /**
+     * Get a list of mails in repository from a specific domain
+     * @param {String} domainId target domain ID
+     * @param {String} mailRepository target mail respository ID
+     * @param {Object} options additional configs: limit, offset
+     * @return {Promise} - On success, resolves with a list of mails in repository
+     */
+    function listMailsFromMailRepository(domainId, mailRepository, options) {
+      return jamesRestangular
+        .one('domains', domainId).one('mailRepositories', mailRepository).all('mails')
+        .getList(options)
+        .then(function(response) {
+          return response.data;
+        });
+    }
+
+    /**
+     * Get details of a mail in repository from a specific domain
+     * @param {String} domainId target domain ID
+     * @param {String} mailRepository target mail respository ID
+     * @param {String} mailKey target mail name
+     * @param {Object} options additional configs: additionalFields
+     * @return {Promise} - On success, resolves with details of a mail in repository
+     */
+    function getMailFromMailRepository(domainId, mailRepository, mailKey, options) {
+      return jamesRestangular
+        .one('domains', domainId).one('mailRepositories', mailRepository).one('mails', mailKey)
+        .get(options)
+        .then(function(response) {
+          return response.data;
+        });
+    }
+
+    /**
+     * Download an eml files which contains details of a mail in repository from a specific domain
+     * @param {String} domainId target domain ID
+     * @param {String} mailRepository target mail respository ID
+     * @param {String} mailKey target mail name
+     * @return {Promise} - On success, resolves with a eml file which can be read by a mail application
+     */
+    function downloadEmlFileFromMailRepository(domainId, mailRepository, mailKey) {
+      return jamesRestangular
+        .setDefaultHeaders({ accept: 'message/rfc822' })
+        .one('domains', domainId).one('mailRepositories', mailRepository).one('mails', mailKey)
+        .get()
+        .then(function(response) {
+          var emlData = new Blob([response.data], { type: 'text/html' });
+
+          FileSaver.saveAs(emlData, [mailKey, 'eml'].join('.'));
+        });
+    }
+
+    /**
+     * Remove a mail in repository from a specific domain
+     * @param {String} domainId target domain ID
+     * @param {String} mailRepository target mail respository ID
+     * @param {Object} mailKey target mailKey
+     * @return {Promise} - resolves on success
+     */
+    function removeMailFromMailRepository(domainId, mailRepository, mailKey) {
+      return jamesRestangular
+        .one('domains', domainId).one('mailRepositories', mailRepository).one('mails', mailKey)
+        .remove();
+    }
+
+    /**
+     * Remove all mails in repository from a specific domain
+     * @param {String} domainId target domain ID
+     * @param {String} mailRepository target mail respository ID
+     * @return {Promise} - resolve with task ID on success
+     */
+    function removeAllMailsFromMailRepository(domainId, mailRepository) {
+      return jamesRestangular
+        .one('domains', domainId).one('mailRepositories', mailRepository).all('mails')
+        .remove()
+        .then(function(response) {
+          return response.data && response.data.taskId;
+        });
+    }
+
+    /**
+     * Reprocess a mail in repository from a specific domain
+     * @param {String} domainId target domain ID
+     * @param {String} mailRepository target mail respository ID
+     * @param {Object} options additional configs: processor
+     * @return {Promise} - resolve with task ID on success
+     */
+    function reprocessMailFromMailRepository(domainId, mailRepository, mailKey, options) {
+      return jamesRestangular
+        .one('domains', domainId).one('mailRepositories', mailRepository).one('mails', mailKey)
+        .patch('', options)
+        .then(function(response) {
+          return response.data && response.data.taskId;
+        });
+    }
+
+    /**
+     * Reprocess all mails in repository from a specific domain
+     * @param {String} domainId target domain ID
+     * @param {String} mailRepository target mail respository ID
+     * @param {Object} options additional configs: processor
+     * @return {Promise} - resolve with task ID on success
+     */
+    function reprocessAllMailsFromMailRepository(domainId, mailRepository, options) {
+      return jamesRestangular
+        .one('domains', domainId).one('mailRepositories', mailRepository).all('mails')
+        .patch('', options)
+        .then(function(response) {
+          return response.data && response.data.taskId;
+        });
     }
   }
 })(angular);
