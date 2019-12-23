@@ -13,26 +13,6 @@ describe('The jamesApiClient service', function() {
     });
   });
 
-  describe('The generateJwtToken fn', function() {
-    it('should POST to the right endpoint to generate JWT token', function() {
-      $httpBackend.expectPOST('/james/api/token').respond(200);
-
-      jamesApiClient.generateJwtToken();
-
-      $httpBackend.flush();
-    });
-
-    it('should POST to the right endpoint to generate JWT token (with domain ID)', function() {
-      var domainId = '123';
-
-      $httpBackend.expectPOST('/james/api/token?domain_id=' + domainId).respond(200);
-
-      jamesApiClient.generateJwtToken(domainId);
-
-      $httpBackend.flush();
-    });
-  });
-
   describe('The getGroupSyncStatus fn', function() {
     it('should GET to the right endpoint to get synchornization status of group', function() {
       var groupId = '123';
