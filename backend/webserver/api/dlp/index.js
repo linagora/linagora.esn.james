@@ -2,7 +2,7 @@ module.exports = (dependencies, lib, router) => {
   const authorizationMW = dependencies('authorizationMW');
   const domainMiddleware = dependencies('domainMiddleware');
   const controller = require('./controller')(dependencies, lib);
-  const { validateRules } = require('./middleware')(dependencies);
+  const { loadRule, validateRules } = require('./middleware')(dependencies, lib);
 
   /**
    * @swagger
@@ -29,6 +29,7 @@ module.exports = (dependencies, lib, router) => {
     authorizationMW.requiresAPILogin,
     domainMiddleware.load,
     authorizationMW.requiresDomainManager,
+    loadRule,
     controller.getRule
   );
 

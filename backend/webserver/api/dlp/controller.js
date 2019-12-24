@@ -9,24 +9,7 @@ module.exports = function(dependencies, lib) {
   };
 
   function getRule(req, res) {
-    const domainName = req.domain.name;
-    const ruleId = req.params.ruleId;
-
-    client.getDlpRule(domainName, req.params.ruleId)
-      .then(rule => res.status(200).json(rule))
-      .catch(err => {
-        const details = `Error while getting DLP rule id "${ruleId}" for domain "${domainName}"`;
-
-        logger.error(details, err);
-
-        return res.status(500).json({
-          error: {
-            code: 500,
-            message: 'Server Error',
-            details
-          }
-        });
-      });
+    return res.status(200).json(req.rule);
   }
 
   function listRules(req, res) {
