@@ -13,26 +13,6 @@ describe('The jamesApiClient service', function() {
     });
   });
 
-  describe('The generateJwtToken fn', function() {
-    it('should POST to the right endpoint to generate JWT token', function() {
-      $httpBackend.expectPOST('/james/api/token').respond(200);
-
-      jamesApiClient.generateJwtToken();
-
-      $httpBackend.flush();
-    });
-
-    it('should POST to the right endpoint to generate JWT token (with domain ID)', function() {
-      var domainId = '123';
-
-      $httpBackend.expectPOST('/james/api/token?domain_id=' + domainId).respond(200);
-
-      jamesApiClient.generateJwtToken(domainId);
-
-      $httpBackend.flush();
-    });
-  });
-
   describe('The getGroupSyncStatus fn', function() {
     it('should GET to the right endpoint to get synchornization status of group', function() {
       var groupId = '123';
@@ -220,6 +200,137 @@ describe('The jamesApiClient service', function() {
       $httpBackend.expectPUT('/james/api/dlp/domains/' + domainId + '/rules').respond(204);
 
       jamesApiClient.storeDlpRules(domainId, rules);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The listMailsFromMailRepository method', function() {
+    it('should GET to right endpoint to list mails from mail repository', function() {
+      var domainId = '1';
+      var mailRepository = 'a';
+      var options = { limit: 20, offset: 0 };
+
+      $httpBackend
+        .expectGET(
+          '/james/api/domains/' + domainId +
+          '/mailRepositories/' + mailRepository +
+          '/mails?limit=' + options.limit + '&offset=' + options.offset
+        ).respond(200, []);
+
+      jamesApiClient.listMailsFromMailRepository(domainId, mailRepository, options);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The getMailFromMailRepository method', function() {
+    it('should GET to right endpoint to get a mail details from mail repository', function() {
+      var domainId = '1';
+      var mailRepository = 'a';
+      var mailKey = 'b';
+      var options = { additionalFields: 'c' };
+
+      $httpBackend
+        .expectGET(
+          '/james/api/domains/' + domainId +
+          '/mailRepositories/' + mailRepository +
+          '/mails/' + mailKey +
+          '?additionalFields=' + options.additionalFields
+        ).respond(200);
+
+      jamesApiClient.getMailFromMailRepository(domainId, mailRepository, mailKey, options);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The downloadEmlFileFromMailRepository method', function() {
+    it('should GET to right endpoint with header to get a eml file from mail repository', function() {
+      var domainId = '1';
+      var mailRepository = 'a';
+      var mailKey = 'b';
+
+      $httpBackend
+        .expectGET(
+          '/james/api/domains/' + domainId +
+          '/mailRepositories/' + mailRepository +
+          '/mails/' + mailKey,
+          { accept: 'message/rfc822' }
+        ).respond(200);
+
+      jamesApiClient.downloadEmlFileFromMailRepository(domainId, mailRepository, mailKey);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The removeMailFromMailRepository method', function() {
+    it('should DELETE to right endpoint to delete a mail from mail repository', function() {
+      var domainId = '1';
+      var mailRepository = 'a';
+      var mailKey = 'b';
+
+      $httpBackend
+        .expectDELETE(
+          '/james/api/domains/' + domainId +
+          '/mailRepositories/' + mailRepository +
+          '/mails/' + mailKey
+        ).respond(204);
+
+      jamesApiClient.removeMailFromMailRepository(domainId, mailRepository, mailKey);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The removeAllMailsFromMailRepository method', function() {
+    it('should DELETE to right endpoint to delete all mails from mail repository', function() {
+      var domainId = '1';
+      var mailRepository = 'a';
+
+      $httpBackend
+        .expectDELETE(
+          '/james/api/domains/' + domainId +
+          '/mailRepositories/' + mailRepository +
+          '/mails'
+        ).respond(201, {taskId: '1'});
+
+      jamesApiClient.removeAllMailsFromMailRepository(domainId, mailRepository);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The reprocessMailFromMailRepository method', function() {
+    it('should PATCH to right endpoint to reprocess a mail from mail repository', function() {
+      var domainId = '1';
+      var mailRepository = 'a';
+      var mailKey = 'b';
+      var options = { processor: 'c' };
+
+      $httpBackend
+        .expectPATCH(
+          '/james/api/domains/' + domainId +
+          '/mailRepositories/' + mailRepository +
+          '/mails/' + mailKey +
+          '?processor=' + options.processor
+        ).respond(201, {taskId: '1'});
+
+      jamesApiClient.reprocessMailFromMailRepository(domainId, mailRepository, mailKey, options);
+      $httpBackend.flush();
+    });
+  });
+
+  describe('The reprocessAllMailsFromMailRepository method', function() {
+    it('should PATCH to right endpoint to reprocess all mails from mail repository', function() {
+      var domainId = '1';
+      var mailRepository = 'a';
+      var options = { processor: 'b' };
+
+      $httpBackend
+        .expectPATCH(
+          '/james/api/domains/' + domainId +
+          '/mailRepositories/' + mailRepository +
+          '/mails' +
+          '?processor=' + options.processor
+        ).respond(201, {taskId: '1'});
+
+      jamesApiClient.reprocessAllMailsFromMailRepository(domainId, mailRepository, options);
       $httpBackend.flush();
     });
   });
