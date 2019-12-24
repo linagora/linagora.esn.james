@@ -57,7 +57,6 @@ const awesomeModule = new AwesomeModule(AWESOME_MODULE_NAME, {
       const frontendJsFilesUri = frontendJsFilesFullPath.map(filepath => filepath.replace(FRONTEND_JS_PATH, ''));
       const lessFile = path.resolve(__dirname, './frontend/app/app.less');
       const jsResourceFiles = [
-        '../components/james-admin-client/dist/james-admin-client.min.js',
         '../components/angular-ui-select/dist/select.min.js'
       ];
 
