@@ -8,7 +8,7 @@ describe('The JamesQuotaDomainController', function() {
 
   var $controller, $rootScope, $scope, $q;
   var jamesApiClient, jamesQuotaHelpers;
-  var domain = { _id: 'domainId' };
+  var domain = { id: 'domainId' };
 
   beforeEach(function() {
     module('linagora.esn.james');
@@ -66,7 +66,7 @@ describe('The JamesQuotaDomainController', function() {
       controller.getDomainQuota();
       $rootScope.$digest();
 
-      expect(jamesApiClient.getDomainQuota).to.have.been.calledWith(domain._id);
+      expect(jamesApiClient.getDomainQuota).to.have.been.calledWith(domain.id);
       expect(controller.status).to.equal('error');
     });
 
@@ -83,7 +83,7 @@ describe('The JamesQuotaDomainController', function() {
       controller.getDomainQuota();
       $rootScope.$digest();
 
-      expect(jamesApiClient.getDomainQuota).to.have.been.calledWith(domain._id);
+      expect(jamesApiClient.getDomainQuota).to.have.been.calledWith(domain.id);
       expect(controller.status).to.equal('loaded');
       expect(controller.quota).to.deep.equal(quota.domain);
       expect(controller.computedQuota).to.deep.equal(quota.computed);
@@ -122,7 +122,7 @@ describe('The JamesQuotaDomainController', function() {
       controller.quota = quota;
       controller.updateDomainQuota()
         .catch(function() {
-          expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain._id, controller.quota);
+          expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain.id, controller.quota);
           done();
         });
 
@@ -144,7 +144,7 @@ describe('The JamesQuotaDomainController', function() {
       $rootScope.$digest();
 
       expect(jamesQuotaHelpers.qualifySet).to.have.been.calledWith(quota);
-      expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain._id, qualifiedQuota);
+      expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain.id, qualifiedQuota);
     });
 
     it('should resolve if succeed to update domain quota', function(done) {
@@ -159,7 +159,7 @@ describe('The JamesQuotaDomainController', function() {
       controller.quota = quota;
       controller.updateDomainQuota()
         .then(function() {
-          expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain._id, controller.quota);
+          expect(jamesApiClient.setDomainQuota).to.have.been.calledWith(domain.id, controller.quota);
           done();
         })
         .catch(done);
