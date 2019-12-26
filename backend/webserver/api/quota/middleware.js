@@ -175,7 +175,7 @@ module.exports = dependencies => {
   function _checkAuthorizationForDomainScope(req, res, next) {
     const { user, domain } = req;
 
-    corePlatformAdmin.isPlatformAdmin(user._id)
+    corePlatformAdmin.isPlatformAdmin(user.id)
       .then(isPlatformAdmin => {
         if (isPlatformAdmin) return next();
 
