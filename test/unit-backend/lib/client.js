@@ -1855,4 +1855,50 @@ describe('The lib/client module', function() {
       .catch(err => done(err || new Error('should resolve')));
     });
   });
+
+  describe('The getTask method', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getTask('task-id')
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('something wrong'));
+
+      getModule().getTask('task-id')
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should reject if failed to get task details', function(done) {
+      JamesClientMock.prototype.getTask = sinon.stub().returns(Promise.reject(new Error('something wrong')));
+
+      getModule().getTask('task-id')
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(JamesClientMock.prototype.getTask).to.have.been.calledWith('task-id');
+          expect(err.message).to.equal('something wrong');
+          done();
+        });
+    });
+
+    it('should resolve if success to get task details', function(done) {
+      JamesClientMock.prototype.getTask = sinon.stub().returns(Promise.resolve());
+
+      getModule().getTask('task-id').then(() => {
+        expect(JamesClientMock.prototype.getTask).to.have.been.calledWith('task-id');
+        done();
+      })
+      .catch(err => done(err || new Error('should resolve')));
+    });
+  });
 });

@@ -24,6 +24,7 @@ module.exports = dependencies => {
     getPlatformQuota,
     getDlpRule,
     getGroupMembers,
+    getTask,
     getUserQuota,
     listDestinationsOfForward,
     listDlpRules,
@@ -600,4 +601,14 @@ function setUserQuota(username, quota) {
 
       return Promise.all(tasks);
     });
+}
+
+/**
+ *  Get details of a task from its id
+ *  @param {String} id unique id of the task
+ *
+ *  @return {Promise}  Resolve on success
+ */
+function getTask(id) {
+  return get().then(client => client.getTask(id));
 }
