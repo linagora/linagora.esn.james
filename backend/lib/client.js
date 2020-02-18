@@ -19,6 +19,7 @@ module.exports = dependencies => {
     removeMailFromMailRepository,
     removeAllMailsFromMailRepository,
     downloadEmlFileFromMailRepository,
+    getAllowedFromHeaders,
     getDomainQuota,
     getMailFromMailRepository,
     getPlatformQuota,
@@ -601,6 +602,17 @@ function setUserQuota(username, quota) {
 
       return Promise.all(tasks);
     });
+}
+
+/**
+ * Get a list of allowed from headers (in form of email) of a user
+
+ * @param {String} username preferred email of the target user
+ * @return {Promise} Resolve on success with a list of emails
+ */
+function getAllowedFromHeaders(username) {
+  return get()
+    .then(client => client.users.getAllowedFromHeaders(username));
 }
 
 /**

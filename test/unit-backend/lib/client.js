@@ -1901,4 +1901,44 @@ describe('The lib/client module', function() {
       .catch(err => done(err || new Error('should resolve')));
     });
   });
+
+  describe('The getAllowedFromHeaders function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().getAllowedFromHeaders('foo@bar')
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().getAllowedFromHeaders('foo@bar')
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should get all allowed from headers of user', function(done) {
+      const allowedFromHeaders = ['foo@email.com', 'bar@email.com'];
+
+      JamesClientMock.prototype.users = {
+        getAllowedFromHeaders: sinon.stub().returns(Promise.resolve(allowedFromHeaders))
+      };
+
+      getModule().getAllowedFromHeaders('foo@bar')
+        .then(res => {
+          expect(res).to.equal(allowedFromHeaders);
+          expect(JamesClientMock.prototype.users.getAllowedFromHeaders).to.have.been.calledWith('foo@bar');
+          done();
+        })
+        .catch(done);
+    });
+  });
 });
