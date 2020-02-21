@@ -33,10 +33,12 @@ module.exports = dependencies => {
   }
 
   function _getStatus(user) {
-    const emailAccount = user.accounts.find(account => account.type === 'email');
-    const userAliases = emailAccount.emails.filter(email => email !== user.preferredEmail);
+    const userAliases = user.accounts
+      .find(account => account.type === 'email').emails
+      .filter(email => email !== user.preferredEmail);
 
     return clientModule.listUserAliases(user.preferredEmail)
+      .then(aliases => aliases.map(alias => alias.source))
       .then(jamesUserAliases => {
         const notAddedAliases = _.difference(userAliases, jamesUserAliases);
         const notRemovedAliases = _.difference(jamesUserAliases, userAliases);

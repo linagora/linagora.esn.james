@@ -23,7 +23,7 @@ describe('The lib/sync/user/synchronizer module', function() {
         }],
         preferredEmail: 'user1@open-paas.org'
       };
-      const jamesAliases = ['alias3@open-paas.org'];
+      const jamesAliases = [{ source: 'alias3@open-paas.org' }];
 
       clientMock.listUserAliases = () => Promise.resolve(jamesAliases);
       clientMock.addUserAliases = sinon.spy();
