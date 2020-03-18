@@ -2,6 +2,7 @@ const _ = require('lodash');
 
 module.exports = dependencies => {
   const logger = dependencies('logger');
+  const esnConfig = dependencies('esn-config');
   const clientModule = require('../../client')(dependencies);
 
   return {
@@ -9,27 +10,34 @@ module.exports = dependencies => {
   };
 
   function sync(user) {
-    return _getStatus(user).then(status => {
-      if (status.ok) {
-        return;
-      }
+    return esnConfig('allowDomainAdminToManageUserEmails')
+      .inModule('core')
+      .get()
+      .then(allowDomainAdminToManageUserEmails => {
+        if (!allowDomainAdminToManageUserEmails) return;
 
-      const promises = [];
+        return _getStatus(user).then(status => {
+          if (status.ok) {
+            return;
+          }
 
-      if (status.notAddedAliases.length > 0) {
-        promises.push(clientModule.addUserAliases(user.preferredEmail, status.notAddedAliases));
-      }
+          const promises = [];
 
-      if (status.notRemovedAliases.length > 0) {
-        promises.push(clientModule.removeUserAliases(user.preferredEmail, status.notRemovedAliases));
-      }
+          if (status.notAddedAliases.length > 0) {
+            promises.push(clientModule.addUserAliases(user.preferredEmail, status.notAddedAliases));
+          }
 
-      return Promise.all(promises)
-        .then(() => {
-          logger.debug(`Synchronized aliases of user "${user.preferredEmail}": added ${status.notAddedAliases.length} / removed ${status.notRemovedAliases.length}`);
-        })
-        .catch(err => logger.debug(`Error while synchronizing aliases of user ${user.preferredEmail}`, err));
-    });
+          if (status.notRemovedAliases.length > 0) {
+            promises.push(clientModule.removeUserAliases(user.preferredEmail, status.notRemovedAliases));
+          }
+
+          return Promise.all(promises)
+            .then(() => {
+              logger.debug(`Synchronized aliases of user "${user.preferredEmail}": added ${status.notAddedAliases.length} / removed ${status.notRemovedAliases.length}`);
+            })
+            .catch(err => logger.debug(`Error while synchronizing aliases of user ${user.preferredEmail}`, err));
+        });
+      });
   }
 
   function _getStatus(user) {
