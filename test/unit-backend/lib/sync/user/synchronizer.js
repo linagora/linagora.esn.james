@@ -4,18 +4,49 @@ const mockery = require('mockery');
 
 describe('The lib/sync/user/synchronizer module', function() {
   let getModule;
-  let clientMock;
+  let clientMock, getConfigMethodMock;
 
   beforeEach(function() {
     getModule = () => require(`${this.moduleHelpers.backendPath}/lib/sync/user/synchronizer`)(this.moduleHelpers.dependencies);
 
-    clientMock = {};
+    const esnConfigMock = key => {
+      expect(key).to.equal('allowDomainAdminToManageUserEmails');
 
+      return {
+        inModule: moduleName => {
+          expect(moduleName).to.equal('core');
+
+          return {
+            get: getConfigMethodMock
+          };
+        }
+      };
+    };
+
+    this.moduleHelpers.addDep('esn-config', esnConfigMock);
+
+    clientMock = {};
     mockery.registerMock('../../client', () => clientMock);
   });
 
   describe('The sync method', function() {
+    it('should do nothing if the allowDomainAdminToManageUserEmails feature is disabled', function(done) {
+      getConfigMethodMock = sinon.stub().returns(Promise.resolve(false));
+
+      clientMock.listUserAliases = sinon.stub().returns(Promise.resolve());
+
+      getModule().sync()
+        .then(() => {
+          expect(getConfigMethodMock).to.have.been.calledOnce;
+          expect(clientMock.listUserAliases).to.not.have.been.called;
+          done();
+        })
+        .catch(err => done(err || 'should resolve'));
+    });
+
     it('should create missing user aliases and remove redundant user aliases', function(done) {
+      getConfigMethodMock = sinon.stub().returns(Promise.resolve(true));
+
       const user = {
         accounts: [{
           type: 'email',
@@ -34,6 +65,7 @@ describe('The lib/sync/user/synchronizer module', function() {
         expect(clientMock.addUserAliases).to.have.been.calledWith(user.preferredEmail, ['alias1@open-paas.org', 'alias2@open-paas.org']);
 
         expect(clientMock.removeUserAliases).to.have.been.calledOnce;
+
         expect(clientMock.removeUserAliases).to.have.been.calledWith(user.preferredEmail, ['alias3@open-paas.org']);
 
         done();
