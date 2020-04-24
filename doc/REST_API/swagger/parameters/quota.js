@@ -33,8 +33,8 @@
  *       properties:
  *         size:
  *           type: number
- *           nullable: true
+ *           x-nullable: true
  *         count:
  *           type: number
- *           nullable: true
+ *           x-nullable: true
 **/
