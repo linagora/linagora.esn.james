@@ -120,6 +120,7 @@ swagger:
     - docker
   script:
     - grunt swagger-generate
+    - grunt swagger-validate
   artifacts:
     paths:
       - ./doc/REST_API/swagger/james-swagger.json

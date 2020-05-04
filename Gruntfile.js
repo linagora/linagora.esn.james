@@ -150,6 +150,16 @@ module.exports = function(grunt) {
           'node_modules/linagora-rse/doc/REST_API/swagger/*/*.js'
         ]
       }
+    },
+
+    swagger_checker: {
+      options: {
+        path: './doc/REST_API/swagger/james-swagger.json',
+        validate: {
+          schema: true,
+          spec: false
+        }
+      }
     }
   });
 
@@ -166,6 +176,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-puglint');
   grunt.loadNpmTasks('@linagora/grunt-i18n-checker');
   grunt.loadNpmTasks('grunt-swagger-generate');
+  grunt.loadNpmTasks('grunt-swagger-checker');
 
   grunt.registerTask('pug-linter', 'Check the pug/jade files', ['puglint:all']);
   grunt.registerTask('linters', 'Check code for lint', ['eslint:all', 'lint_pattern:all', 'lint_pattern:css', 'pug-linter', 'i18n']);
@@ -177,5 +188,6 @@ module.exports = function(grunt) {
   grunt.registerTask('test-frontend', 'Test frontend code', ['test-unit-frontend']);
   grunt.registerTask('test', ['linters', 'test-unit-frontend', 'test-unit-backend', 'test-midway-backend']);
   grunt.registerTask('swagger-generate', 'Grunt plugin for swagger generate', ['swagger_generate']);
+  grunt.registerTask('swagger-validate', ['swagger_checker']);
   grunt.registerTask('default', ['test']);
 };
