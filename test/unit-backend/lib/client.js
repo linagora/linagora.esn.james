@@ -1941,4 +1941,44 @@ describe('The lib/client module', function() {
         .catch(done);
     });
   });
+
+  describe('The getHealthCheck function', function() {
+    it('should fail if it cannot get API URL', function(done) {
+      esnConfigGetMock = () => Promise.reject(new Error('an_error'));
+
+      getModule().getHealthCheck()
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should fail if it cannot generate JWT token', function(done) {
+      tokenMock.generate = () => Promise.reject(new Error('an_error'));
+
+      getModule().getHealthCheck()
+        .then(() => done(new Error('should not resolve')))
+        .catch(err => {
+          expect(err.message).to.equal('an_error');
+          done();
+        });
+    });
+
+    it('should get health status of James server', function(done) {
+      const responseStatus = {
+        status: 'healthy'
+      };
+      JamesClientMock.prototype.healthCheck = {
+        get: sinon.stub().returns(Promise.resolve(responseStatus))
+      };
+      getModule().getHealthCheck()
+        .then(res => {
+          expect(res).to.equal(responseStatus);
+          expect(JamesClientMock.prototype.healthCheck.get).to.have.been.called;
+          done();
+        })
+        .catch(done);
+    });
+  });
 });
