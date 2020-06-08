@@ -5,3 +5,4 @@ frontend/components
 package-lock.json
 yarn.lock
 doc/REST_API/swagger/james-swagger.json
+dist/
