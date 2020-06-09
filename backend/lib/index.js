@@ -6,7 +6,6 @@ module.exports = function(dependencies) {
   const models = require('./db')(dependencies);
   const config = require('./config')(dependencies);
   const client = require('./client')(dependencies);
-  const healthCheck = require('./health-check')(dependencies);
 
   return {
     init,
@@ -19,6 +18,5 @@ module.exports = function(dependencies) {
   function init() {
     sync.init();
     config.init();
-    healthCheck.register(client);
   }
 };

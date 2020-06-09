@@ -25,7 +25,6 @@ module.exports = dependencies => {
     getPlatformQuota,
     getDlpRule,
     getGroupMembers,
-    getHealthCheck,
     getTask,
     getUserQuota,
     listDestinationsOfForward,
@@ -624,9 +623,4 @@ function getAllowedFromHeaders(username) {
  */
 function getTask(id) {
   return get().then(client => client.getTask(id));
-}
-
-function getHealthCheck() {
-  return get()
-    .then(({ healthCheck }) => healthCheck.get());
 }
