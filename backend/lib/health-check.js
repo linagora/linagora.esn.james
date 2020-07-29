@@ -5,7 +5,6 @@ module.exports = dependencies => {
   const { registry, buildHealthyMessage, buildUnhealthyMessage, HealthCheckProvider } = dependencies('health-check');
 
   const SERVICE_NAME = 'james';
-  const HEALTHY_RESPONSE = 'healthy';
 
   return {
     register
@@ -35,7 +34,12 @@ module.exports = dependencies => {
       });
   }
 
+  /**
+   * Check if James web admin connection is healthy or not by evaluating the result, then return true or false.
+   * If the result contains the status field, James web admin has responded properly. Otherwise, something wrong has happened.
+   * @param {function} client
+   */
   function checkConnectionStatus(client) {
-    return client.getHealthCheck().then(result => result && result.status === HEALTHY_RESPONSE);
+    return client.getHealthCheck().then(result => result && result.status);
   }
 };
