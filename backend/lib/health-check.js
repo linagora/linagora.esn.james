@@ -35,8 +35,11 @@ module.exports = dependencies => {
   }
 
   /**
-   * Check if James web admin connection is healthy or not by evaluating the result, then return true or false.
-   * If the result contains the status field, James web admin has responded properly. Otherwise, something wrong has happened.
+   * Check whether James web admin configuration on ESN is correct or not through testing its connection.
+   * This function calls a health check API from James web admin and evaluates the connection status based on the received response.
+   * James web admin health check API does not require authentication and has low operating cost, which is suitable for the connection test.
+   * If the received response contains status field, James web admin has responded properly. Otherwise, something wrong has happened.
+   * The reason for choosing the status field instead of the whole result is James web admin might have other responses such as 500: Internal Server Error, which should not be considered as healthy connection.
    * @param {function} client
    */
   function checkConnectionStatus(client) {
