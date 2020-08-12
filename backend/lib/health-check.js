@@ -5,7 +5,6 @@ module.exports = dependencies => {
   const { registry, buildHealthyMessage, buildUnhealthyMessage, HealthCheckProvider } = dependencies('health-check');
 
   const SERVICE_NAME = 'james';
-  const HEALTHY_RESPONSE = 'healthy';
 
   return {
     register
@@ -35,7 +34,15 @@ module.exports = dependencies => {
       });
   }
 
+  /**
+   * Check whether James web admin configuration on ESN is correct or not through testing its connection.
+   * This function calls a health check API from James web admin and evaluates the connection status based on the received response.
+   * James web admin health check API does not require authentication and has low operating cost, which is suitable for the connection test.
+   * If the received response contains status field, James web admin has responded properly. Otherwise, something wrong has happened.
+   * The reason for choosing the status field instead of the whole result is James web admin might have other responses such as 500: Internal Server Error, which should not be considered as healthy connection.
+   * @param {function} client
+   */
   function checkConnectionStatus(client) {
-    return client.getHealthCheck().then(result => result && result.status === HEALTHY_RESPONSE);
+    return client.getHealthCheck().then(result => result && result.status);
   }
 };
